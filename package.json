@@ -56,7 +56,6 @@
     "react-native-gesture-handler": "~2.24.0",
     "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-localize": "^3.4.1",
-    "react-native-maps": "^1.22.6",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-paper": "^5.14.0",
     "react-native-paper-dates": "^0.22.40",

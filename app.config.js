@@ -9,11 +9,11 @@ export default ({ config }) => ({
 
   plugins: [
     // 1. Pin your Android build properties so Kotlin/SafeAreaContext compile correctly
-    "expo-build-properties",
+    
     
 
     // 2. All your other plugins
-    ["expo-router", {}],
+    "expo-router",
     [
       "expo-splash-screen",
       {
@@ -23,6 +23,7 @@ export default ({ config }) => ({
         backgroundColor: "#ffffff",
       },
     ],
-    "expo-dev-client"
+    "expo-build-properties",
+    "expo-dev-client",
   ],
 });

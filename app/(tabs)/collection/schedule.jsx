@@ -11,7 +11,7 @@ import {
   Image,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
-import { Button, Overlay, Icon } from "@rneui/themed";
+// import { Button, Overlay, Icon } from "@rneui/themed";
 // import DateTimePicker from "expo-date-time-picker";
 import {
   fetchOrderDetail,
@@ -373,7 +373,10 @@ const ScheduleDeliveryScreen = () => {
             duration={500}
             style={styles.errorContainer}
           >
+          {/* 
+          
             <Icon name="error-outline" color="#ff4444" />
+          */}
             <Text style={styles.errorText}>{error}</Text>
           </Animatable.View>
         ) : null}
@@ -450,7 +453,7 @@ const ScheduleDeliveryScreen = () => {
             style={styles.timePickerButton}
             onPress={() => setShowTimePicker(true)}
           >
-            <Icon name="clock" type="feather" color="#2089dc" />
+            {/* <Icon name="clock" type="feather" color="#2089dc" /> */}
             <Text style={styles.timeText}>
               {format(selectedDate, "hh:mm a")}
             </Text>

@@ -101,7 +101,7 @@ const SignIn = () => {
   return (
     <SafeAreaView className="flex-1 bg-primary">
       {/* Upper Section with Background Image */}
-      <View className="h-[45%] relative">
+      <View className="h-[45%] relative" style={{height:200}}>
         <Image
           source={require("@/assets/images/signup.png")}
           className="w-full h-full absolute"

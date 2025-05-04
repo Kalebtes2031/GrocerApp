@@ -20,7 +20,7 @@ import { useGlobalContext } from "@/context/GlobalProvider";
 import { useTranslation } from "react-i18next";
 import * as Location from "expo-location";
 // import { GebetaMap, MapMarker } from "@gebeta/tiles";
-import MapView, { Marker } from "react-native-maps";
+// import MapView, { Marker } from "react-native-maps";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const GOOGLE_PLACES_API_KEY = "YOUR_GOOGLE_PLACES_API_KEY";
@@ -197,53 +197,53 @@ const CheckoutPage = () => {
   };
 
   // The map modal for custom location selection
-  const renderMapModal = () => (
-    <Modal visible={mapVisible} animationType="slide">
-      <View style={styles.mapContainer}>
-        <Text style={styles.mapHeader}>Select Your Location</Text>
-        {selectedLocation ? (
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: selectedLocation.latitude,
-              longitude: selectedLocation.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}
-            onPress={(e) => {
-              // When user taps on the map, update the marker location
-              const { latitude, longitude } = e.nativeEvent.coordinate;
-              setSelectedLocation({ latitude, longitude });
-            }}
-          >
-            <Marker
-              coordinate={selectedLocation}
-              draggable
-              onDragEnd={(e) => {
-                const { latitude, longitude } = e.nativeEvent.coordinate;
-                setSelectedLocation({ latitude, longitude });
-              }}
-            />
-          </MapView>
-        ) : (
-          <Text>Loading map...</Text>
-        )}
-        {/* Confirm and Cancel buttons */}
-        <TouchableOpacity
-          style={styles.confirmButton}
-          onPress={() => setMapVisible(false)}
-        >
-          <Text style={styles.confirmButtonText}>Confirm Location</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => setMapVisible(false)}
-        >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </Modal>
-  );
+  // const renderMapModal = () => (
+  //   <Modal visible={mapVisible} animationType="slide">
+  //     <View style={styles.mapContainer}>
+  //       <Text style={styles.mapHeader}>Select Your Location</Text>
+  //       {selectedLocation ? (
+  //         <MapView
+  //           style={styles.map}
+  //           initialRegion={{
+  //             latitude: selectedLocation.latitude,
+  //             longitude: selectedLocation.longitude,
+  //             latitudeDelta: 0.01,
+  //             longitudeDelta: 0.01,
+  //           }}
+  //           onPress={(e) => {
+  //             // When user taps on the map, update the marker location
+  //             const { latitude, longitude } = e.nativeEvent.coordinate;
+  //             setSelectedLocation({ latitude, longitude });
+  //           }}
+  //         >
+  //           <Marker
+  //             coordinate={selectedLocation}
+  //             draggable
+  //             onDragEnd={(e) => {
+  //               const { latitude, longitude } = e.nativeEvent.coordinate;
+  //               setSelectedLocation({ latitude, longitude });
+  //             }}
+  //           />
+  //         </MapView>
+  //       ) : (
+  //         <Text>Loading map...</Text>
+  //       )}
+  //       {/* Confirm and Cancel buttons */}
+  //       <TouchableOpacity
+  //         style={styles.confirmButton}
+  //         onPress={() => setMapVisible(false)}
+  //       >
+  //         <Text style={styles.confirmButtonText}>Confirm Location</Text>
+  //       </TouchableOpacity>
+  //       <TouchableOpacity
+  //         style={styles.cancelButton}
+  //         onPress={() => setMapVisible(false)}
+  //       >
+  //         <Text style={styles.cancelButtonText}>Cancel</Text>
+  //       </TouchableOpacity>
+  //     </View>
+  //   </Modal>
+  // );
 
   return (
     <View style={styles.container}>
