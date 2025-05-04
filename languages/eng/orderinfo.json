@@ -1,0 +1,16 @@
+{
+  "your": "Your Order is Successfully Submitted",
+  "thank":"Thank you!",
+  "number":"ORDER NUMBER",
+  "date":"DATE",
+  "total":"TOTAL",
+  "br":"Br",
+  "payment":"PAYMENT METHOD",
+  "bank":"Bank Transfer",
+  "cash":"Cash on Delivery",
+  "address":"Order Address",
+  "name":"NAME",
+  "email":"EMAIL",
+  "phone":"PHONE No",
+  "track":"Track Order"
+}

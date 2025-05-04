@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "704310350921",
+    "firebase_url": "https://yason-7c405-default-rtdb.firebaseio.com",
+    "project_id": "yason-7c405",
+    "storage_bucket": "yason-7c405.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704310350921:android:c699137c7dc2744aa61b98",
+        "android_client_info": {
+          "package_name": "com.abeniexpo.MyFreshApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlBMTgwbiWspXy4UAq2Jl9nE2ir9aPQiA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704310350921:android:fbf92e668b568845a61b98",
+        "android_client_info": {
+          "package_name": "dev.expo.deliveryapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlBMTgwbiWspXy4UAq2Jl9nE2ir9aPQiA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704310350921:android:662255fcf420b763a61b98",
+        "android_client_info": {
+          "package_name": "dev.expo.mobileapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlBMTgwbiWspXy4UAq2Jl9nE2ir9aPQiA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,26 @@
+{
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "createAccount": "Create Account",
+    "signIn": "Sign In",
+    "slide1": {
+      "title": "Welcome to Yason",
+      "subtitle": "Store Delivery Application"
+    },
+    "slide2": {
+      "title": "We provide",
+      "subtitle": "Consumption products"
+    },
+    "slide3": {
+      "title": "Delivery on your",
+      "subtitle": "Door step"
+    }
+  },
+  "accessibility": {
+    "back": "Go back"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "bank": "Bank Accounts",
+  "yason":"Yason Consumption Products Trading S.c",
+  "name":"Abebe Demssie W/Mariam",
+  "select":"Select Bank",
+  "selecta":"Select a bank",
+  "upload":"Upload Payment Receipt",
+  "tap":"Tap to Upload",
+  "shipment":"Select Shipment/Delivery Method",
+  "schedule":"Schedule Delivery",
+  "pick":"Pick Up from Store",
+  "qty": "Qty",
+  "tele":"Telebirr",
+  "cbe":"Commercial Bank of Ethiopia",
+  "abyssinia":"Bank of Abysinia",
+  "coop":"Cooperative Bank of Oromia"
+}

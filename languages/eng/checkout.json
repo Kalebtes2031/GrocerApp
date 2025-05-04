@@ -1,0 +1,17 @@
+{
+  "check": "Check Out",
+  "phone":"Phone Number",
+  "first":"First Name",
+  "last":"Last Name",
+  "email":"Email Address",
+  "your":"Your Order",
+  "product":"Product",
+  "price":"Price",
+  "br":"Br",
+  "pay":"Pay Now",
+  "total":"Total Price",
+  "direct":"Direct Bank Transfer",
+  "cash":"Cash on Delivery",
+  "qty": "Qty",
+  "schedule": "Schedule Delivery"
+}

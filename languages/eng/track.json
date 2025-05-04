@@ -1,0 +1,22 @@
+{
+  "active": "Active Deliveries",
+  "completed": "Completed Deliveries",
+  "noorder": "No orders found",
+  "loading": "Loading Orders...",
+  "await": "Awaiting driver assignment",
+  "br": "Br",
+  "totalamount": "Total Amount",
+  "subtotal": "Subtotal",
+  "summary": "Order Summary",
+  "delivered": "Delivered",
+  "prepared": "Prepared",
+  "accepted": "On the way",
+  "confirmed": "Confirmed",
+  "nocompletedelivery": "There is no Completed Delivery",
+  "noactivedelivery": "There is no Active Delivery",
+  "nomissedelivery": "There is no Missed Delivery",
+  "waiting": "Waiting",
+  "confirm": "Confirm",
+  "missed": "Missed Deliveries",
+  "reschedule": "Reschedule"
+}

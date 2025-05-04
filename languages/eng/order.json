@@ -1,0 +1,21 @@
+{
+  "myorders": "My Orders",
+  "found":"orders found",
+  "please":"Please",
+  "login":"Login",
+  "view":"to view your orders",
+  "bank":"Direct Bank Payment",
+  "cancel":"Cancel",
+  "proceed":"Proceed",
+  "choose":"Choose",
+  "full":"Full Payment",
+  "ordertotal":"Order Total",
+  "br":"Br",
+  "payment":"Payment",
+  "items":"ITEMS",
+  "order":"Order",
+  "no":"No orders found. Start shopping!",
+  "price":"price",
+  "total":"Total",
+  "date":"Date"
+}

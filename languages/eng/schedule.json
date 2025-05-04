@@ -1,0 +1,9 @@
+{
+  "schedule": "Schedule Delivery",
+  "address": "Address",
+  "date": "Date and Time",
+  "confirm":"I need Delivery",
+  "scheduling":"Scheduling...",
+  "please":"Please select a future date and time",
+  "pick":"Self Pick Up"
+}

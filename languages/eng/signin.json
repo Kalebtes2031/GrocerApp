@@ -1,0 +1,17 @@
+{
+  "title": "Create your account",
+  "first_name": "First Name",
+  "last_name": "Last Name",
+  "phone_number": "Phone Number",
+  "username": "Username",
+  "email": "Email address",
+  "password": "Password",
+  "forgot": "Forgot Password?",
+  "submit": "Submit",
+  "terms":"Terms & Conditions",
+  "terms_and_conditions": "I agree to the Terms and Conditions",
+  "privacy_policy": "I have read the Privacy Policy",
+  "signup": "Sign Up",
+  "dont":"Don't have an account?",
+    "signin":"Sign In"
+}
