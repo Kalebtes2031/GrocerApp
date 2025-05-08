@@ -1,9 +1,10 @@
 {
   "categories": "መደቦች",
   "morning": "እንደምን አደሩ",
-  "afternoon": "እንደምን ዋሉ",
+  "afternoon": "እንደምን አረፈዱ",
   "evening": "እንደምን አመሹ",
   "night": "Good night",
-  "recommended": "የሚመከሩ ምርቶች",
-  "loading": "በትዕግስት ይጠብቁ"
+  "recommended": "ተመራጭ ምርቶች",
+  "loading": "በትዕግስት ይጠብቁ",
+  "more":"ተጨማሪ"
 }

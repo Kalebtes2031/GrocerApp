@@ -124,40 +124,81 @@ const Order = () => {
           </Text>
           <View style={styles.priceRow}>
             <Text style={styles.itemPrice}>
-              {t("br")}
+              {i18n.language === "en" ? t("br") : ""}
               {item.variant?.price}
+              {i18n.language === "amh" ? t("br") : ""}
             </Text>
             <Text style={styles.itemQuantity}>x {item.quantity}</Text>
           </View>
           <Text style={styles.itemTotal}>
-            {t("total")}: {t("br")}
+            {t("total")}: {i18n.language === "en" ? t("br") : ""}
             {item.total_price}
+            {i18n.language === "amh" ? t("br") : ""}
           </Text>
         </View>
       </View>
     ));
 
-  const renderOrderStatus = (status) => {
-    let statusStyle = {};
-    switch (status.toLowerCase()) {
-      case "assigned":
-        statusStyle = styles.statusCompleted;
-        break;
-      case "pending":
-        statusStyle = styles.statusPending;
-        break;
-      case "cancelled":
-        statusStyle = styles.statusCancelled;
-        break;
-      default:
-        statusStyle = styles.statusDefault;
-    }
-    return (
-      <View style={[styles.statusBadge, statusStyle]}>
-        <Text style={styles.statusText}>{status}</Text>
-      </View>
-    );
-  };
+    const statusTranslations = {
+      assigned: {
+        en: "Assigned",
+        amh: "ሚያደርስ ሰው ተመድቧል"
+      },
+      confirmed: {
+        en: "Confirmed",
+        amh: "ተቀብሎዎታል"
+      },
+      accepted: {
+        en: "Accepted",
+        amh: "ተቀብሎዎታል"
+      },
+      outfordelivery: {
+        en: "Out for delivery",
+        amh: "ወደ እርስዎ እየመጣ ነው"
+      },
+      pending: {
+        en: "Pending",
+        amh: "ይጠብቁ"
+      },
+      cancelled: {
+        en: "Cancelled",
+        amh: "ተሰርዟል"
+      },
+      default: {
+        en: "Unknown",
+        amh: "አልታወቀም"
+      }
+    };
+    
+    const renderOrderStatus = (status) => {
+      let statusStyle = {};
+      let displayText = statusTranslations.default[i18n.language];
+    
+      switch (status.toLowerCase()) {
+        case "assigned":
+          statusStyle = styles.statusCompleted;
+          displayText = statusTranslations.assigned[i18n.language];
+          break;
+        case "pending":
+          statusStyle = styles.statusPending;
+          displayText = statusTranslations.pending[i18n.language];
+          break;
+        case "cancelled":
+          statusStyle = styles.statusCancelled;
+          displayText = statusTranslations.cancelled[i18n.language];
+          break;
+        default:
+          statusStyle = styles.statusDefault;
+      }
+    
+      return (
+        <View style={[styles.statusBadge, statusStyle]}>
+          <Text style={styles.statusText}>
+            {displayText}
+          </Text>
+        </View>
+      );
+    };
 
   const renderOrders = () => {
     if (loading) {
@@ -214,7 +255,7 @@ const Order = () => {
             />
           )}
           <Text style={styles.text}>
-            {order.payment_status === "Fully Paid"
+            {i18n.language === "en" ? order.payment_status === "Fully Paid"
               ? "Fully Paid"
               : order.payment_status === "Pending"
               ? "Pending"
@@ -222,6 +263,13 @@ const Order = () => {
               ? "Partial Payment"
               : order.payment_status === "On Delivery"
               ? "Fully Paid"
+              : "Cancel"
+              : order.payment_status === "Fully Paid"
+              ? "ሙሉ ተከፍሉዋል"
+              : order.payment_status === "Pending"
+              ? "ምንም አልተከፈለም"
+              : order.payment_status === "Partial Payment"
+              ? "Partial Payment"
               : "Cancel"}
           </Text>
         </View>
@@ -260,8 +308,9 @@ const Order = () => {
         <View style={styles.totalContainer}>
           <Text style={styles.orderTotal}>{t("ordertotal")}:</Text>
           <Text style={styles.orderTotal}>
-            {t("br")}
+            {i18n.language === "en" ?  t("br") : ""}
             {order.total}
+            {i18n.language === "amh" ? t("br") : ""}
           </Text>
         </View>
       </View>

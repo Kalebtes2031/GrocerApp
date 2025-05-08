@@ -220,10 +220,12 @@ const styles = StyleSheet.create({
   categoryTitle: {
     position: "absolute",
     top: 100,
-    left: 120,
+    left: 80,
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
+    width: width * 0.7,
+    textAlign: "center",
   },
   searchContainer: {
     position: "absolute",

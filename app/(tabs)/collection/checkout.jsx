@@ -128,11 +128,19 @@ const CheckoutPage = () => {
     //   return;
     // }
     setIsLoading(true); // Show loading spinner
+    const paymentOptionValue =
+      selectedOption === "directbanktransfer"
+        ? "Bank Transfer"
+        : selectedOption === "cashondelivery"
+        ? "Cash"
+        : "Pending"; // fallback (optional)
+
     const orderinfo = {
       phone_number: phone,
       first_name: firstName,
       last_name: lastName,
       email: email,
+      payment_option: paymentOptionValue,
       // customer_latitude: selectedLocation.latitude,
       // customer_longitude: selectedLocation.longitude,
     };
@@ -250,7 +258,7 @@ const CheckoutPage = () => {
       {/* <Header /> */}
       <View style={styles.headerContainer}>
         <TouchableOpacity
-          onPress={() => route.push('/(tabs)/cartscreen')}
+          onPress={() => route.push("/(tabs)/cartscreen")}
           style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
           className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
         >
@@ -502,7 +510,7 @@ const CheckoutPage = () => {
             </View>
             <Text style={styles.radioText}>{t("direct")}</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={styles.radioLabel}
             onPress={() => {
               // setAmountToPay(advanceAmount);
@@ -520,7 +528,7 @@ const CheckoutPage = () => {
               />
             </View>
             <Text style={styles.radioText}>{t("cash")}</Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
@@ -677,6 +685,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
+    color: "#445399",
+    marginBottom: 10,
   },
   scrollContent: {
     paddingHorizontal: 26,

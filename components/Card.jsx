@@ -119,7 +119,7 @@ const toggleFavorite = () => {
               {product?.variation?.unit}
             </Text>
             <Text style={styles.priceText}>
-              {t('etb')} {product.variation?.price}
+              {i18n.language === "en"? "Birr":""} {product.variation?.price} {i18n.language === "amh"? "ብር":""} 
             </Text>
           </View>
         </View>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    height: 280,
+    height: 250,
   },
   imageContainer: {
     height: 280,
@@ -178,17 +178,18 @@ const styles = StyleSheet.create({
   },
   infoOverlay: {
     position: "absolute",
-    bottom: 0,
+    bottom: 28,
     left: 0,
     right: 0,
-    padding: 12,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "rgba(0,0,0,0.6)",
   },
   productName: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "700",
-    marginBottom: 4,
+    marginBottom: 1,
     fontFamily: "Poppins-SemiBold",
   },
   priceContainer: {
@@ -199,14 +200,14 @@ const styles = StyleSheet.create({
   },
   unitText: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 13,
     fontFamily: "Poppins-Regular",
     opacity: 0.9,
     fontWeight: "700",
   },
   priceText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "600",
     fontFamily: "Poppins-Bold",
   },

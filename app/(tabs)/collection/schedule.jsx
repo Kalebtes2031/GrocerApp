@@ -9,6 +9,8 @@ import {
   TextInput,
   ScrollView,
   Image,
+  ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { Calendar } from "react-native-calendars";
 // import { Button, Overlay, Icon } from "@rneui/themed";
@@ -31,13 +33,15 @@ import * as Location from "expo-location";
 // import { GebetaMap, MapMarker } from "@gebeta/tiles";
 import Toast from "react-native-toast-message";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
 // import Mapbox from "@rnmapbox/maps";
-// import MapboxGL from "@rnmapbox/maps"; // Import MapboxGL from '@rnmapbox/maps'; // Ensure you have the correct import for your version
+import MapboxGL from "@rnmapbox/maps"; // Import MapboxGL from '@rnmapbox/maps'; // Ensure you have the correct import for your version
 import debounce from "lodash.debounce";
 
-// MapboxGL.setAccessToken(
-//   "pk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY205ZHdkMXJ0MGhlMTJpcXQ4bzgyYjFnZiJ9.Lhg5WUbonFe4mhCmEpSUKg"
-// );
+MapboxGL.setAccessToken(
+  "pk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY205ZHdkMXJ0MGhlMTJpcXQ4bzgyYjFnZiJ9.Lhg5WUbonFe4mhCmEpSUKg"
+);
 
 const ScheduleDeliveryScreen = () => {
   const { t, i18n } = useTranslation("schedule");
@@ -66,12 +70,12 @@ const ScheduleDeliveryScreen = () => {
   // this ensures we never access null before location is set
   const initialCoords = selectedLocation || currentLocation;
 
-  
-
   // memoize & debounce so it’s stable across renders:
-  const debouncedFetch = useCallback(debounce(fetchPlaces, 300), []);
+  // const debouncedFetch = useCallback(debounce(fetchPlaces, 300), []);
 
-  
+  const screenWidth = Dimensions.get('window').width;
+const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
+
   const fetchOrderData = async () => {
     const response = await fetchOrderDetail(orderId);
     setProduct(response);
@@ -109,7 +113,7 @@ const ScheduleDeliveryScreen = () => {
   const validateDateTime = () => {
     const now = new Date();
     if (selectedDate <= now) {
-      setError(t("please"));
+      setError(t("please select future date & time"));
       return false;
     }
     return true;
@@ -147,6 +151,7 @@ const ScheduleDeliveryScreen = () => {
       );
       // Show success toast here
     } catch (err) {
+      Toast.show({ type: "error", text1: err.response?.data?.detail });
       setError(err.response?.data?.detail || "Failed to schedule delivery");
     } finally {
       setLoading(false);
@@ -175,7 +180,7 @@ const ScheduleDeliveryScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => navigation.back()}
@@ -186,8 +191,15 @@ const ScheduleDeliveryScreen = () => {
         </TouchableOpacity>
       </View>
       <Text
-        className="font-poppins-bold text-center text-primary mb-4"
-        style={{ fontSize: 20, fontWeight: "bold" }}
+        // className="font-poppins-bold text-center text-primary mb-4"
+        style={{
+          fontSize: 20,
+          fontWeight: "bold",
+          fontFamily: "Poppins-bold",
+          textAlign: "center",
+          color: "#445399",
+          marginBottom: 4,
+        }}
       >
         {t("schedule")}
       </Text>
@@ -209,7 +221,7 @@ const ScheduleDeliveryScreen = () => {
               marginBottom: 10,
               borderRadius: 39,
             }}
-            placeholder="Type your home address"
+            placeholder={t("type")}
             value={text}
             onChangeText={(value) => {
               setText(value);
@@ -272,8 +284,9 @@ const ScheduleDeliveryScreen = () => {
       >
         <Image source={require("@/assets/images/map.png")} />
       </View> */}
+
       {/* Location Choice Section */}
-      {/* <View style={styles.locationSection}>
+      <View style={styles.locationSection}>
         <View style={styles.choiceContainer}>
           <TouchableOpacity
             style={[
@@ -358,7 +371,7 @@ const ScheduleDeliveryScreen = () => {
           </Text>
             </View>
         )}
-</View> */}
+      </View>
 
       <Text
         style={{ fontSize: 18, paddingLeft: 8, marginTop: 15 }}
@@ -373,7 +386,7 @@ const ScheduleDeliveryScreen = () => {
             duration={500}
             style={styles.errorContainer}
           >
-          {/* 
+            {/* 
           
             <Icon name="error-outline" color="#ff4444" />
           */}
@@ -398,7 +411,7 @@ const ScheduleDeliveryScreen = () => {
             {calendarOpen && (
               <Calendar
                 // only fix the overall width; height will adjust
-                style={{ width: 250, alignSelf: "center" }}
+                style={{ width: responsiveWidth(63), alignSelf: "center" }}
                 // keep your existing props…
                 minDate={format(new Date(), "yyyy-MM-dd")}
                 onDayPress={handleDateSelect}
@@ -450,16 +463,16 @@ const ScheduleDeliveryScreen = () => {
           </View>
 
           <TouchableOpacity
-            style={styles.timePickerButton}
+            style={[styles.timePickerButton,{flexDirection:"column"}]}
             onPress={() => setShowTimePicker(true)}
           >
+            <FontAwesome6 name="clock" size={24} color="#445399" />
             {/* <Icon name="clock" type="feather" color="#2089dc" /> */}
             <Text style={styles.timeText}>
               {format(selectedDate, "hh:mm a")}
             </Text>
           </TouchableOpacity>
         </View>
-
         {showTimePicker && (
           // <Overlay
           //   isVisible={showTimePicker}
@@ -485,29 +498,100 @@ const ScheduleDeliveryScreen = () => {
             />
           </View>
         )}
-        
-
-        {/* <View style={{ marginTop: 20 }}>
-          <View
-            style={{ flexDirection: "row", alignItems: "center", padding: 5 }}
+        // Confirm Button
+        <View
+          style={{
+            paddding:50,
+            flexDirection:"column",
+            justifyContent:"center",
+            alignItems:"center",  
+          }}
+        >
+        <View style={{ marginBottom: 10, width:"100%", paddingHorizontal:2, flexDirection:"row", justifyContent:"space-between", alignItems:"center"}}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              styles.buttonContainer,
+              loading && { opacity: 0.6 },
+            ]}
+            onPress={handleSchedule}
+            disabled={loading}
+            activeOpacity={0.8}
           >
-            <View className="flex-row items-center gap-3 my-6">
-              <View className="flex-1 h-px bg-gray-200" />
-              <Text className="text-gray-500 font-poppins-medium">OR</Text>
-              <View className="flex-1 h-px bg-gray-200" />
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
+              ) : (
+                <MaterialIcons
+                  name="check-circle"
+                  size={20}
+                  color="#fff"
+                  style={{ marginRight: 10 }}
+                />
+              )}
+              <Text style={{ color: "white", fontSize: i18n.language === "amh" ? 12 : 16  }}>
+                {loading ? t("scheduling") : t("confirm")}
+              </Text>
             </View>
-          </View>
-          <Button
-            title={loading ? t("scheduling") : t("pick")}
-            buttonStyle={styles.button1}
-            containerStyle={styles.buttonContainer1}
+          </TouchableOpacity>
+        {/* OR Divider and Pickup Button */}
+        <View>
+          {/* <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 4,
+              gap: 12,
+            }}
+          >
+            <View style={{ flex: 1, height: 1, backgroundColor: "#e5e7eb" }} />
+            <Text style={{ color: "#6b7280", fontSize: 14, fontWeight: "500" }}>
+              OR
+            </Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: "#e5e7eb" }} />
+          </View> */}
+
+          <TouchableOpacity
+            style={[
+              styles.button1,
+              styles.buttonContainer1,
+              loading && { opacity: 0.6 },
+            ]}
             onPress={handleScheduleForPickFromStore}
             disabled={loading}
-            loading={loading}
-          />
-         
-        </View> */}
-
+            activeOpacity={0.8}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
+              ) : (
+                <MaterialIcons
+                  name="store"
+                  size={20}
+                  color="#fff"
+                  style={{ marginRight: 10 }}
+                />
+              )}
+              <Text style={{ color: "white", fontSize: i18n.language === "amh" ? 12 : 16 }}>
+                {loading ? t("scheduling") : t("pick")}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        </View>
+        </View>
         {/* <View style={{ marginTop: 12 }}>
         <Button title="Show Date Picker" onPress={showDatePicker} />
         <DateTimePickerModal
@@ -529,7 +613,7 @@ const styles = StyleSheet.create({
   },
   container: {
     // flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#fff",
     padding: 5,
     // height:200,
   },
@@ -600,20 +684,20 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#445399",
     borderRadius: 48,
-    paddingVertical: 15,
+    padding: 15,
   },
   buttonContainer: {
     marginTop: 20,
-    borderRadius: 10,
+    borderRadius: 50,
   },
   button1: {
     backgroundColor: "#55B051",
     borderRadius: 48,
-    paddingVertical: 15,
+    padding: 15,
   },
   buttonContainer1: {
     marginTop: 20,
-    borderRadius: 10,
+    borderRadius: 50,
   },
   errorContainer: {
     flexDirection: "row",

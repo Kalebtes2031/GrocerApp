@@ -41,7 +41,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 // Get device width for the scroll item (or use DEVICE_WIDTH for full-screen width)
 const { width: DEVICE_WIDTH } = Dimensions.get("window");
-const ITEM_WIDTH = 335; // Adjust as needed
+const ITEM_WIDTH = 255; // Adjust as needed
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation("home");
@@ -71,15 +71,6 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
-
-  // Auto scrolling
-  useEffect(() => {
-    if (loading || announcements.length === 0) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((i) => (i + 1) % announcements.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [loading, announcements]);
 
   const fetchNewCategories = async () => {
     try {
@@ -187,15 +178,43 @@ export default function HomeScreen() {
   //   return () => clearInterval(interval);
   // }, [images]);
 
-  // Scroll to the current index when it changes
+  useEffect(() => {
+    if (loading || announcements.length === 0) return;
+    const extendedLength = announcements.length + 1; // Extended array length
+    const interval = setInterval(() => {
+      setCurrentIndex((i) => (i + 1) % extendedLength);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [loading, announcements]);
+
   useEffect(() => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({
-        x: currentIndex * ITEM_WIDTH,
-        animated: true,
-      });
+      const extendedLength = announcements.length + 1;
+      if (currentIndex === extendedLength - 1) {
+        // Scroll to the duplicated item (last in extended array)
+        scrollViewRef.current.scrollTo({
+          x: currentIndex * ITEM_WIDTH,
+          animated: true,
+        });
+        // Reset to start after the scroll animation
+        setTimeout(() => {
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ x: 0, animated: false });
+            setCurrentIndex(0);
+          }
+        }, 500); // Match animation duration (adjust if needed)
+      } else {
+        scrollViewRef.current.scrollTo({
+          x: currentIndex * ITEM_WIDTH,
+          animated: true,
+        });
+      }
     }
-  }, [currentIndex]);
+  }, [currentIndex, announcements.length]);
+
+  // Create extended announcements array for rendering
+  const extendedAnnouncements =
+    announcements.length > 0 ? [...announcements, announcements[0]] : [];
 
   useEffect(() => {
     const currentHour = new Date().getHours();
@@ -262,14 +281,32 @@ export default function HomeScreen() {
           flexDirection: "row",
           justifyContent: "start",
           alignItems: "center",
-          marginLeft: 18,
+          marginLeft: 24,
           gap: 6,
+          // marginTop: 6,
         }}
       >
-        <Text className="text-lg  font-poppins-medium text-primary ">
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#445399",
+            fontFamily: "Poppins-Medium",
+          }}
+          // className="text-lg  font-poppins-medium text-primary "
+        >
           {greeting}
         </Text>
-        <Text className="italic ml-2 text-primary">
+        <Text
+          style={{
+            fontSize: 18,
+            color: "#445399",
+            fontFamily: "Poppins-Medium",
+            fontStyle: "italic",
+            marginLeft: 4,
+            marginBottom: 3,
+          }}
+          className="italic ml-2 text-primary"
+        >
           {user?.first_name} {user?.last_name}
         </Text>
       </View>
@@ -307,15 +344,14 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingRight: 60 }}
       >
         {loading ? (
-          // show 3 skeletons (or any number you like)
           [0, 1, 2].map((i) => <SkeletonCard key={i} />)
         ) : announcements.length === 0 ? (
           <Text className="text-gray-500 text-center">
             No announcement found
           </Text>
         ) : (
-          announcements.map((item, index) => (
-            <View key={item.id} style={styles.card}>
+          extendedAnnouncements.map((item, index) => (
+            <View key={`${item.id}-${index}`} style={styles.card}>
               <Image source={{ uri: item.image_url }} style={styles.image} />
               <View style={styles.overlay} />
               <View style={styles.textContainer}>
@@ -329,8 +365,16 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* categories*/}
-      <View className="pb-12">
-        <View className="flex flex-row justify-between pr-12 items-center">
+      <View  className="">
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingRight: 20,
+          }}
+          className="flex flex-row justify-between pr-12 items-center"
+        >
           <Text
             style={{
               color: colorScheme === "dark" ? "white" : "#445399",
@@ -354,7 +398,8 @@ export default function HomeScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            className="px-8"
+            // className="px-8"
+            style={{ paddingHorizontal: 10 }}
             contentContainerStyle={{ paddingRight: 40 }}
           >
             {Array.from({ length: 6 }).map((_, index) => (
@@ -375,7 +420,8 @@ export default function HomeScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             className="px-8"
-            contentContainerStyle={{ paddingRight: 40 }}
+            style={{ paddingHorizontal: 10 }}
+            contentContainerStyle={{ paddingRight: 1 }}
           >
             {category && category.length > 0 ? (
               category.map((product, index) => (
@@ -384,7 +430,8 @@ export default function HomeScreen() {
                   onPress={() =>
                     handlecategory(product.id, product.name, product.name_amh)
                   }
-                  className="flex justify-center items-center mx-2"
+                  style={{ flexDirection: "column", marginHorizontal: 4 }}
+                  // className="flex justify-center items-center mx-2"
                 >
                   <View
                     style={{
@@ -400,7 +447,16 @@ export default function HomeScreen() {
                       resizeMode="cover"
                     />
                   </View>
-                  <Text className="text-sm font-medium mt-2 text-center">
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      fontSize: 12,
+                      color: "#445399",
+                      marginTop: 4,
+                      width: 100,
+                    }}
+                    className="text-sm font-medium mt-2 text-center"
+                  >
                     {i18n.language === "en" ? product.name : product.name_amh}
                   </Text>
                 </TouchableOpacity>
@@ -418,7 +474,15 @@ export default function HomeScreen() {
               //       }}
               //     />
               //   ))
-              <Text className="text-gray-500 text-center">
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: 12,
+                  color: "#445399",
+                  marginTop: 4,
+                }}
+                className="text-gray-500 text-center"
+              >
                 No Category found
               </Text>
             )}
@@ -428,11 +492,20 @@ export default function HomeScreen() {
 
       {/* Recommended Products */}
       <View>
-        <View className="flex flex-row justify-between pr-12 items-center">
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingRight: 20,
+          }}
+          // className="flex flex-row justify-between pr-12 items-center"
+        >
           <Text
             style={{
               color: colorScheme === "dark" ? "white" : "#445399",
-              padding: 16,
+              paddingHorizontal: 16,
+              paddingTop:8,
               fontSize: 20,
               fontWeight: "bold",
               textAlign: "start",
@@ -449,25 +522,32 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
         <View style={styles.popularContainer}>
-          {loading
-            ? Array.from({ length: 6 }).map((_, index) => (
-                <View key={index} style={styles.cardWrapper}>
-                  <ProductCardSkeleton />
-                </View>
-              ))
-            : veryPopular.length > 0
-            ? veryPopular.map((product, index) => (
-                <View
-                  key={product.variation.id || index}
-                  style={styles.cardWrapper}
-                >
-                  <Card product={product} />
-                </View>
-              ))
-            : 
-            <View style={{flex:1, justifyContent:"center", alignItems:"center", gap:6}}>
+          {loading ? (
+            Array.from({ length: 4 }).map((_, index) => (
+              <View key={index} style={styles.cardWrapper}>
+                <ProductCardSkeleton />
+              </View>
+            ))
+          ) : veryPopular.length > 0 ? (
+            veryPopular.map((product, index) => (
+              <View
+                key={product.variation.id || index}
+                style={styles.cardWrapper}
+              >
+                <Card product={product} />
+              </View>
+            ))
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
               <Text className="text-gray-500 text-center">
-                No Recommended Products found
+                {t('norecommended')}
               </Text>
               <View className="">
                 <Image
@@ -475,10 +555,9 @@ export default function HomeScreen() {
                   style={styles.exploreImage}
                   resizeMode="contain"
                 />
-                </View>
-
+              </View>
             </View>
-            }
+          )}
         </View>
         <View
           style={{
@@ -497,7 +576,7 @@ export default function HomeScreen() {
               justifyContent: "center",
               alignItems: "center",
               backgroundColor: "#445399",
-              padding: 16,
+              padding: 12,
               marginBottom: 22,
               borderRadius: 42,
               width: "100%",
@@ -508,7 +587,7 @@ export default function HomeScreen() {
               className="font-poppins-medium"
             >
               {" "}
-              MORE
+              {t('more')}
             </Text>
           </TouchableOpacity>
         </View>
@@ -573,7 +652,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   popularContainer: {
-    marginBottom: 6,
+    // marginBottom: 1,
     padding: 16,
     flexDirection: "row",
     flexWrap: "wrap", // Allows wrapping to the next row
@@ -582,7 +661,7 @@ const styles = StyleSheet.create({
   cardWrapper: {
     // backgroundColor: "#fff",
     width: "48%",
-    marginBottom: 16, // Adds spacing between rows
+    marginBottom: 12, // Adds spacing between rows
   },
   loadingText: {
     fontSize: 16,
@@ -598,20 +677,22 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   scrollView: {
-    paddingVertical: 20,
+    paddingVertical: 5,
     paddingHorizontal: 20,
   },
   card: {
     width: ITEM_WIDTH,
-    height: 160,
+    height: 130,
     borderRadius: 20,
     overflow: "hidden", // Ensures the children are clipped to the borderRadius
     marginRight: 16, // Gap between cards
     position: "relative",
+    marginTop:6
   },
   image: {
     ...StyleSheet.absoluteFillObject,
     resizeMode: "cover",
+    
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

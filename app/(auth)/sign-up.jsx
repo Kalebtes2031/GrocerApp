@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next";
 const { width } = Dimensions.get("window");
 
 const SignUp = () => {
-  const { t, i18n } = useTranslation('signup');
+  const { t, i18n } = useTranslation("signup");
   const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
@@ -123,20 +123,19 @@ const SignUp = () => {
           paddingBottom: 24,
         }}
       >
-       
         {/* Hero Image */}
         <Image
           source={require("@/assets/images/signup.png")}
           resizeMode="cover"
           style={{
             width: "100%",
-            height: 240,
+            height: 200,
           }}
         />
         <View className="absolute inset-0 bg-white/20" />
-          <View className="absolute top-8 right-4 flex-row gap-x-1 items-center ">
-            <LanguageToggle bgcolor="#445399" textcolor="#445399" />
-          </View>
+        <View className="absolute top-8 right-4 flex-row gap-x-1 items-center ">
+          <LanguageToggle bgcolor="#445399" textcolor="#445399" />
+        </View>
         {/* Form Container */}
         <View
           style={{
@@ -145,17 +144,18 @@ const SignUp = () => {
             backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
             borderTopLeftRadius: 32,
             borderTopRightRadius: 32,
-            marginTop: -44,
+            marginTop: -64,
           }}
         >
           <Text
-            // style={{
-            //   fontSize: 20,
-            //   fontWeight: "700",
-            //   // color: colorScheme === "dark" ? "#fff" : "#000",
-            //   marginBottom: 16,
-            //   fontFamily:"",
-            // }}
+            style={{
+              fontSize: 20,
+              fontWeight: "700",
+              // color: colorScheme === "dark" ? "#fff" : "#000",
+              marginBottom: 16,
+              color: "#445399",
+              fontFamily: "Poppins-Bold",
+            }}
             className="text-primary text-[20px] font-poppins-medium mb-4"
           >
             {t("title")}
@@ -247,7 +247,7 @@ const SignUp = () => {
               height: 48,
               marginBottom: 20,
             }}
-            placeholder={t('phone_number')}
+            placeholder={t("phone_number")}
             placeholderTextColor="#888"
             keyboardType="phone-pad"
             value={form.phoneNumber}
@@ -271,7 +271,7 @@ const SignUp = () => {
               height: 48,
               marginBottom: 20,
             }}
-            placeholder={t('username')}
+            placeholder={t("username")}
             placeholderTextColor="#888"
             value={form.username}
             onChangeText={(text) => setForm({ ...form, username: text })}
@@ -279,7 +279,7 @@ const SignUp = () => {
 
           {/* Email */}
           <TextInput
-             style={{
+            style={{
               flex: 1,
               // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
               backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
@@ -294,7 +294,7 @@ const SignUp = () => {
               height: 48,
               marginBottom: 20,
             }}
-            placeholder={t('email')}
+            placeholder={t("email")}
             placeholderTextColor="#888"
             keyboardType="email-address"
             value={form.email}
@@ -321,7 +321,7 @@ const SignUp = () => {
 
           <View style={{ marginBottom: 10, position: "relative" }}>
             <TextInput
-               style={{
+              style={{
                 flex: 1,
                 // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
                 backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
@@ -336,7 +336,7 @@ const SignUp = () => {
                 height: 48,
                 // marginBottom: 20,
               }}
-              placeholder={t('password')}
+              placeholder={t("password")}
               placeholderTextColor="#888"
               secureTextEntry={!showPassword}
               value={form.password}
@@ -374,7 +374,7 @@ const SignUp = () => {
               paddingHorizontal: 24,
             }}
           >
-            {t('by')}{" "}
+            {t("by")}{" "}
             <Text
               // style={{
               //   color: "#7E0201",
@@ -383,32 +383,30 @@ const SignUp = () => {
               className="text-primary underline"
               onPress={() => router.push("/terms")}
             >
-              {t('terms')}
+              {t("terms")}
             </Text>
           </Text>
-        <View
-                      style={{flex: 1, justifyContent: "center", alignItems: "center"}}
-                    >
-
-
-          {/* Sign Up Button */}
-          <CustomButton
-            title={t("signup")}
-            containerStyles={{
-              backgroundColor: "#7E0201",
-              borderRadius: 12,
-              height: 48,
-              justifyContent: "center",
-            }}
-            textStyles={{
-              color: "#fff",
-              fontSize: 16,
-              fontWeight: "600",
-            }}
-            isLoading={isSubmitting}
-            handlePress={handleSignUp}
-          />
-                      </View>    
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
+            {/* Sign Up Button */}
+            <CustomButton
+              title={t("signup")}
+              containerStyles={{
+                backgroundColor: "#7E0201",
+                borderRadius: 12,
+                height: 48,
+                justifyContent: "center",
+              }}
+              textStyles={{
+                color: "#fff",
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+              isLoading={isSubmitting}
+              handlePress={handleSignUp}
+            />
+          </View>
 
           {/* Login Link */}
           <View
@@ -425,7 +423,7 @@ const SignUp = () => {
               }}
               className="font-poppins-medium"
             >
-              {t('already')}{" "}
+              {t("already")}{" "}
             </Text>
             <TouchableOpacity onPress={() => router.push("/sign-in")}>
               <Text
@@ -436,23 +434,23 @@ const SignUp = () => {
                 // }}
                 className="text-primary font-poppins-medium text-[14px]"
               >
-                {t('login')}
+                {t("login")}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
         <View style={{ alignItems: "center", marginTop: 10 }}>
-                            <Text
-                              style={{
-                                textAlign: "center",
-                                color: colorScheme === "dark" ? "#fff" : "#000",
-                                fontSize: 12,
-                              }}
-                            >
-                              Powered by{" "}
-                              <Text style={{ fontWeight: "bold" }}>Active Technology</Text>
-                            </Text>
-                          </View>
+          <Text
+            style={{
+              textAlign: "center",
+              color: colorScheme === "dark" ? "#fff" : "#000",
+              fontSize: 12,
+            }}
+          >
+            Powered by{" "}
+            <Text style={{ fontWeight: "bold" }}>Active Technology</Text>
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

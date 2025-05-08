@@ -352,8 +352,9 @@ const Header = () => {
                       style={styles.editButton}
                       onPress={handleImagePick}
                     >
-                      <Icon name="edit" size={15} color="#445399" />
-                      <Text style={styles.editButtonText}>Edit</Text>
+                     <Icon name="edit" size={i18n.language === "en" ? 15 : 10} color="#445399"/>
+
+                      <Text style={styles.editButtonText}>{t("edit")}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>

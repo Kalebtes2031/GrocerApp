@@ -232,7 +232,7 @@ const DirectBankTransfer = () => {
         <View style={styles.headerContainer}>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+            style={{ marginHorizontal: 1, paddingHorizontal: 2 }}
             className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
           >
             <Ionicons name="arrow-back" size={24} color="#445399" />
@@ -274,8 +274,8 @@ const DirectBankTransfer = () => {
                          style={styles.copyButton}
                        >
                          {copiedIndex === idx
-                           ? <Feather name="check-circle" size={20} color="green" />
-                           : <Feather name="copy" size={20} color="gray" />
+                           ? <Feather name="check-circle" size={12} color="green" />
+                           : <Feather name="copy" size={12} color="gray" />
                          }
                        </TouchableOpacity>
                      </View>
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   headerContainer: {
-    height: 60,
+    height: 30,
     backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -436,6 +436,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    textAlign: "center",
+    color: "#445399",
+    marginBottom: 16,
   },
   sectiona: {
     backgroundColor: "rgba(150, 166, 234, 0.4)",
@@ -460,7 +463,8 @@ const styles = StyleSheet.create({
 bankCard: {
   width: "48%",            // two cards per row
   backgroundColor: "#fff",
-  padding: 12,
+  paddingHorizontal: 4,
+  paddingVertical: 12,
   borderRadius: 8,
   marginBottom: 12,
   // keep your shadows/elevation here…
@@ -492,7 +496,7 @@ bankLogo: {
     flex: 1,
   },
   accountName: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#6B7280",
     marginBottom: 4,
   },
@@ -502,13 +506,13 @@ bankLogo: {
     justifyContent: "space-between",
   },
   accountNumber: {
-    fontSize: 16,
+    fontSize: 11,
     fontFamily: Platform.OS === "android" ? "monospace" : "Courier",
     color: "#4B5563",
   },
   copyButton: {
-    marginLeft: 12,
-    padding: 8,
+    marginLeft: 8,
+    padding: 6,
     backgroundColor: "#E5E7EB",
     borderRadius: 4,
   },

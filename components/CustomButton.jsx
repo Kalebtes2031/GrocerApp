@@ -15,9 +15,12 @@ const CustomButton = ({
       activeOpacity={0.7}
       style={{ 
         backgroundColor: "#445399",
-        height: 62,
+        height: 42,
         borderRadius: 32,
         width: 304,
+        flexDirection:"row",
+        justifyContent:"center",
+        alignItems:"center",
       }}
       className={` flex flex-row justify-center items-center ${containerStyles} ${
         isLoading ? "opacity-50" : ""

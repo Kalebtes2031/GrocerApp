@@ -55,7 +55,7 @@ const FormField = ({
   };
 
   return (
-    <View style={{ gap: 4, paddingVertical: 8 }} className={`${otherStyles}`}>
+    <View style={{ gap: 4, paddingVertical: 2 }} className={`${otherStyles}`}>
       <View
         style={{
           backgroundColor: "white",
@@ -63,7 +63,7 @@ const FormField = ({
           borderWidth: 1,
           borderColor: "#445399",
           width: "100%",
-          height: 58,
+          height: 45,
           paddingHorizontal: 4,
           display: "flex",
           flexDirection: "row",
@@ -76,6 +76,7 @@ const FormField = ({
         ) : (
           <TextInput
             style={inputStyle}
+            
             value={value}
             placeholder={placeholder}
             placeholderTextColor="#7B7B8B"

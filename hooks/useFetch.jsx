@@ -237,12 +237,14 @@ export const scheduleDelivery = async (
   orderId,
   date,
   customer_latitude,
-  customer_longitude
+  customer_longitude,
+  customer_address
 ) => {
   const response = await pay.patch(`orders/${orderId}/schedule-delivery/`, {
     scheduled_delivery: date,
-    customer_latitude:customer_latitude,
-    customer_longitude,customer_longitude,
+    customer_latitude,
+    customer_longitude,
+    customer_address,
   });
   return response.data;
 };

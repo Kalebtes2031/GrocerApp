@@ -1,9 +1,11 @@
 {
   "categories": "Categories",
-  "morning": "Good morning",
-  "afternoon": "Good afternoon",
-  "evening": "Good evening",
-  "night": "Good night",
-  "recommended": "Recommended Products",
-  "loading": "Loading popular products..."
+  "morning": "Good Morning",
+  "afternoon": "Good Afternoon",
+  "evening": "Good Evening",
+  "night": "Good Evening",
+  "recommended": "Popular Products",
+  "loading": "Loading popular products...",
+  "more":"MORE",
+  "norecommended":"No Recommended Products found"
 }

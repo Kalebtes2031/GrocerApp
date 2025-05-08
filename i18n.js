@@ -24,6 +24,9 @@ const resources = {
     signin: require("@/languages/eng/signin.json"),
     track: require("@/languages/eng/track.json"),
     profile: require("@/languages/eng/profile.json"),
+    forgot: require("@/languages/eng/forgot.json"),
+    otpverify: require("@/languages/eng/otpverify.json"),
+    newpass: require("@/languages/eng/newpass.json"),
   },
   amh: {
     welcome: require("@/languages/amh/welcome.json"),
@@ -46,10 +49,13 @@ const resources = {
     signin: require("@/languages/amh/signin.json"),
     track: require("@/languages/amh/track.json"),
     profile: require("@/languages/amh/profile.json"),
+    forgot: require("@/languages/amh/forgot.json"),
+    otpverify: require("@/languages/amh/otpverify.json"),
+    newpass: require("@/languages/amh/newpass.json"),
   },
 };
 
-const fallback = { languageTag: "en", isRTL: false };
+const fallback = { languageTag: "amh", isRTL: false };
 let languageTag = fallback.languageTag;
 let RNLocalize;
 
@@ -69,7 +75,7 @@ i18n
     compatibilityJSON: "v3", // For React Native compatibility
     resources,
     lng: languageTag,
-    fallbackLng: "en",
+    fallbackLng: "amh",
     interpolation: { escapeValue: false },
     react: { useSuspense: false },
   });

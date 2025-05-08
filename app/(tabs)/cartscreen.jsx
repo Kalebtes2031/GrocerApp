@@ -97,8 +97,22 @@ const CartScreen = () => {
           <View style={styles.headerContainer}>
             <TouchableOpacity
               onPress={() => router.back()}
-              style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
-              className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
+              style={{ 
+                marginHorizontal: 10, 
+                paddingHorizontal: 2,
+                width:10,
+                height:10,
+                borderRadius: 10,
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 1,
+                
+                // 
+
+              
+              }}
+              // className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
             >
               <Ionicons name="arrow-back" size={24} color="#445399" />
             </TouchableOpacity>
@@ -119,6 +133,7 @@ const CartScreen = () => {
             </View>
           </View>
           <Text
+
             className="font-poppins-bold text-center text-primary mb-4"
             style={styles.headerTitle}
           >
@@ -216,25 +231,30 @@ const CartScreen = () => {
                     <View
                       className="flex"
                       style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 10,
+                        // display: "flex",
+                        // flexDirection: "row",
+                        // alignItems: "center",
+                        // gap: 5,
+                        // backgroundColor:"red",
+                        width:120,
                       }}
                     >
                       <Text style={styles.productName}>
                         {i18n.language === "en"
                           ? item?.item_name
                           : item?.item_name_amh}
+                          {"  "}
+                          {parseInt(item?.variations?.quantity)}
+                        {item?.variations?.unit}
                       </Text>
                       <Text style={styles.productName}>
-                        {parseInt(item?.variations?.quantity)}
-                        {item?.variations?.unit}
+                       
                       </Text>
                     </View>
                     <Text style={styles.price}>
-                      {t("br")}
-                      {parseFloat(item.variations?.price || "0").toFixed(2)}
+                      {i18n.language === "en" ? t("br") : ""}
+                      {parseFloat(item.variations?.price || "0").toFixed(2)} {" "}
+                      {i18n.language === "amh" ? t("br") : ""}
                     </Text>
 
                     <View style={styles.quantityContainer}>
@@ -287,8 +307,9 @@ const CartScreen = () => {
 
                   <View style={styles.actionContainer}>
                     <Text style={styles.itemTotal}>
-                      {t("br")}
-                      {(item.total_price || 0).toFixed(2)}
+                      {i18n.language === "en" ? t("br") : ""}
+                      {(item.total_price || 0).toFixed(2)}{" "}
+                      {i18n.language === "amh" ? t("br") : ""}
                     </Text>
                     <TouchableOpacity
                       onPress={() => handleRemoveCartItems(item.variations.id)}
@@ -436,6 +457,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#445399",
+    textAlign: "center",
+    fontFamily: "Poppins-Bold",
   },
   // ... keep the rest of your existing styles
   scrollContainers: {
@@ -460,18 +484,19 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   detailsContainer: {
-    flex: 1,
+    display:"flex",
     justifyContent: "space-between",
   },
   productName: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: 1,
   },
   price: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,
+    // marginTop: 8,
   },
   quantityContainer: {
     flexDirection: "row",
@@ -494,7 +519,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   itemTotal: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "600",
   },
   deleteButton: {

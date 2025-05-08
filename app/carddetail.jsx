@@ -112,15 +112,35 @@ const toggleFavorite = () => {
         >
           <TouchableOpacity
             onPress={() => router.back()}
-            style={{ marginRight: 10, paddingHorizontal: 2 }}
+            style={{ 
+              marginRight: 10, 
+              paddingHorizontal: 2,
+              width:30, 
+              height:30,
+              flexDirection:"row",
+              justifyContent:"center",
+              alignItems:"center",
+              borderWidth:1,
+              borderRadius:50,
+              borderColor:"#445399",
+              paddingVertical:2,
+            
+            }}
             className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
           >
             <Ionicons name="arrow-back" size={24} color="#445399" />
           </TouchableOpacity>
-          <View className="flex flex-row justify-between items-center">
+          <View 
+          style={{
+            flexDirection:"row",
+            justifyContent:"space-between",
+            alignItems:"center",
+          }}
+          // className="flex flex-row justify-between items-center"
+          >
             <Text
               className="text-primary font-poppins-bold mt-6 mb-10"
-              style={{ fontSize: 18, fontWeight: 700 }}
+              style={{ fontSize: 18, fontWeight: 700, color:"#445399", marginTop:10, marginBottom:12 }} 
             >
               {i18n.language === "en"?product.category?.name:product.category?.name_amh}
             </Text>
@@ -139,15 +159,15 @@ const toggleFavorite = () => {
               >
                 <Text style={styles.stockText}>
                   {product.variation?.in_stock
-                    ? "In Stock"
-                    : "Out of Stock"}
+                    ? i18n.language === "en"? "In Stock" : "In Stock"
+                    : i18n.language === "en"? "Out of Stock" : "Out of Stock"}
                 </Text>
               </View>
             </View>
           </View>
           <Text
             className="text-primary font-poppins-bold"
-            style={{ fontSize: 18, fontWeight: 700, textAlign: "center" }}
+            style={{ fontFamily:"Poppins-bold",color:"#445399",fontSize: 18, fontWeight: 700, textAlign: "center" }}
           >
             {i18n.language === "en"?product.item_name:product.item_name_amh}
           </Text>
@@ -165,14 +185,26 @@ const toggleFavorite = () => {
             resizeMode="contain"
           />
           <Text
-            className="text-primary absolute left-10 bottom-1 font-poppins-bold mt-6 mb-10"
-            style={{ fontSize: 18, fontWeight: 700 }}
+            // className="text-primary absolute left-10 bottom-1 font-poppins-bold mt-6 mb-10"
+            style={{ 
+              fontSize: 18, 
+              fontWeight: 700, 
+              color:"#445399",
+              marginTop:10,
+              marginBottom:12,
+              position: "absolute",
+              left: 10,
+              bottom: 10,
+              fontFamily:"Poppins-bold",
+              fontWeight: 700,
+            }}
           >
-            {t('br')} {parseInt(product.variation?.price)}
+            {i18n.language === "en" ? t('br') : ""} {parseInt(product.variation?.price)} {i18n.language === "amh" ? t('br') : ""}
           </Text>
           <View
             style={styles.quantityContainer}
-            className="absolute right-10 bottom-6"
+            // className="absolute right-10 bottom-6"
+            
           >
             <TouchableOpacity
               onPress={() => setQuantity(Math.max(1, quantity - 1))}
@@ -390,6 +422,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 24,
+    marginTop:14
   },
   priceText: {
     fontSize: 22,
@@ -495,6 +528,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     padding: 2,
+    position: "absolute",
+    right: 10,
+    bottom: 10,
   },
   quantityButton: {
     padding: 8,

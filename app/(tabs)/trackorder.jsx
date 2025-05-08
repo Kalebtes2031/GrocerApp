@@ -1,4 +1,4 @@
-import { confirmOrder, fetchDeliveryNeedOrderHistory } from "@/hooks/useFetch";
+import { confirmOrder, fetchOrderHistory } from "@/hooks/useFetch";
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -15,7 +15,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import AnimatedCountdown from "@/components/AnimatedCountdown";
 import { useTranslation } from "react-i18next";
-// import OrderMapView from "@/components/OrderMapView";
+import OrderMapView from "@/components/OrderMapView";
 import ShopTracking from "@/components/ShopTracking";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from '@react-navigation/native';
@@ -52,7 +52,7 @@ const OrderTrackingScreen = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const data = await fetchDeliveryNeedOrderHistory();
+      const data = await fetchOrderHistory();
       // Sort orders descending by id
       const sortedData = data.sort((a, b) => b.id - a.id);
       setOrders(sortedData);
@@ -128,11 +128,14 @@ const OrderTrackingScreen = () => {
     };
   };
 
-  const renderOrderItem = ({ item }) => {
+  const renderOrderItem = ({ item,section }) => {
     const nowDate = new Date(now);
     const scheduled = new Date(item.scheduled_delivery);
     const isMissed = scheduled < nowDate && item.status !== "Delivered";
-
+    const shouldShowMap =
+    section.title === t("active") && item.need_delivery;
+    const dontshowstatus = section.title ===t('missed')
+    const dontshowtime = section.title ===t('missed') || section.title ===t('completed')
     const timeInfo =
       item.status === "Delivered"
         ? {
@@ -157,22 +160,6 @@ const OrderTrackingScreen = () => {
         >
           <View style={styles.headerLeft}>
             <Text style={styles.orderNumber}>ORDER #{item.id}</Text>
-          </View>
-          <View
-            style={{
-              padding: 1,
-              // height:200,
-            }}
-          >
-            {/* <Image
-              style={{
-                padding: 1,
-                height: 150,
-                width: 300,
-              }}
-              source={require("@/assets/images/yasonmap.jpg")}
-            /> */}
-            {/* <OrderMapView order={item} /> */}
             {new Date(item.scheduled_delivery) < new Date() &&
               item.status !== "Delivered" && (
                 <TouchableOpacity
@@ -191,6 +178,26 @@ const OrderTrackingScreen = () => {
                 </TouchableOpacity>
               )}
           </View>
+          <View
+            style={{
+              padding: 1,
+              // height:200,
+            }}
+          >
+            {/* <Image
+              style={{
+                padding: 1,
+                height: 150,
+                width: 300,
+              }}
+              source={require("@/assets/images/yasonmap.jpg")}
+            /> */}
+            
+             {shouldShowMap && <OrderMapView order={item} />}
+             
+            
+           
+          </View>
           <View style={styles.countdownWrapper}>
             {item.status === "Delivered" ? (
               <View style={styles.deliveredBadge}>
@@ -200,11 +207,11 @@ const OrderTrackingScreen = () => {
                 </Text>
               </View>
             ) : (
-              <AnimatedCountdown
+              !dontshowtime && (<AnimatedCountdown
                 scheduledTime={item.scheduled_delivery}
                 warningColor={COLORS.warning}
                 successColor={COLORS.success}
-              />
+              />)
             )}
           </View>
         </LinearGradient>
@@ -220,7 +227,7 @@ const OrderTrackingScreen = () => {
         </View> */}
 
         {/* Delivery Progress */}
-        <ShopTracking status={item.status} prepared={item.prepared} />
+        {!dontshowstatus && <ShopTracking status={item.status} prepared={item.prepared} />}
 
         {/* Order Details */}
         <View style={styles.detailsContainer}>
@@ -380,7 +387,7 @@ const OrderTrackingScreen = () => {
             data: orders.filter((o) => o.status === "Delivered"),
           },
         ]}
-        renderItem={renderOrderItem}
+        renderItem={(props)=>renderOrderItem(props)}
         renderSectionHeader={({ section }) => (
           <Text style={styles.sectionHeader}>{section.title}</Text>
         )}
@@ -494,7 +501,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerLeft: {
-    flex: 1,
+    flexDirection:"row",
+    justifyContent:"space-between",
+    alignItems:"center"
   },
   orderNumber: {
     fontSize: 16,
@@ -502,9 +511,7 @@ const styles = StyleSheet.create({
     color: "#2D4150",
   },
 
-  headerLeft: {
-    flex: 1,
-  },
+  
   orderNumber: {
     fontSize: 16,
     fontWeight: "700",

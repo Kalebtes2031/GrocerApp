@@ -7,7 +7,7 @@
     "icon": "./assets/images/yasonlogo.png",
     "scheme": "myfreshapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": { "supportsTablet": true },
     "android": {
       "adaptiveIcon": {
@@ -16,8 +16,12 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.abeniexpo.MyFreshApp",
-      "googleServicesFile": "./google-services.json"
-      
+      "googleServicesFile": "./google-services.json",
+      "buildProperties": {
+         "gradleProperties": {
+              "MAPBOX_DOWNLOADS_TOKEN": "sk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY21hMjBiM2piMjc5YTJxczc5YjJodnR1eCJ9.HwvUBWRoj3Sj9q9Zhsg0iA"
+          }
+      }
     },
     "web": {
       "bundler": "metro",

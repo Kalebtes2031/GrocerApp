@@ -115,7 +115,7 @@ export default function OrderInfo() {
             >
               <Text>{t('payment')} : </Text>
               <Text>
-                {ourOrder.total_payment === "0.00" ? t('cash') : t('bank')}
+                {ourOrder.payment_option === "Cash" ? t('cash') : t('bank')}
               </Text>
             </View>
           </View>
