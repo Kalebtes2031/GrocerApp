@@ -1,6 +1,26 @@
 {
-    "title": "ያሶን እንኳን ደህና መጡ",
-    "subtitle": "የማጣጫ አፕሊኬሽን",
+  "onboarding": {
+    "skip": "እለፍ",
     "next": "ቀጣይ",
-    "skip": "ላይ ሰርዝ"
+    "createAccount": "አካካውንት ይፍጠሩ",
+    "signIn": "ይግቡ",
+    "slide1": {
+      "title": "እንኳን ወደ ያሶን በደህና መጡ",
+      "subtitle": ""
+    },
+    "slide2": {
+      "title": "የተለያዩ የፍጆታ",
+      "subtitle": "ምርቶችን እናቀርባለን"
+    },
+    "slide3": {
+      "title": "መዳረሻው ድረስ",
+      "subtitle": "እናደርሳለን"
+    }
+  },
+  "accessibility": {
+    "back": "ይመለሱ"
+  },
+  "errors": {
+    "generic": "ይቅርታ እንደገና ይሞክሩ"
   }
+}

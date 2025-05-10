@@ -445,8 +445,9 @@ const CheckoutPage = () => {
                 </Text>
               </View>
               <Text style={styles.itemPrice}>
-                {t("br")}
+                {i18n.language === "en" ? t("br") : ""}
                 {item.total_price.toFixed(2)}
+                {i18n.language === "amh" ? t("br") : ""}
               </Text>
             </View>
           ))}
@@ -459,8 +460,9 @@ const CheckoutPage = () => {
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>{t("total")}:</Text>
               <Text style={styles.grandTotal}>
-                {t("br")}
+                {i18n.language === "en" ? t("br") : ""}
                 {cart.total.toFixed(2)}
+                {i18n.language === "amh" ? t("br") : ""}
               </Text>
             </View>
           </View>
@@ -508,7 +510,14 @@ const CheckoutPage = () => {
                 ]}
               />
             </View>
-            <Text style={styles.radioText}>{t("direct")}</Text>
+            <Text
+              style={{
+                marginRight: 4,
+                fontSize: i18n.language === "en" ? 12 : 12,
+              }}
+            >
+              {t("direct")}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.radioLabel}
@@ -527,7 +536,14 @@ const CheckoutPage = () => {
                 ]}
               />
             </View>
-            <Text style={styles.radioText}>{t("cash")}</Text>
+            <Text
+              style={{
+                fontSize: i18n.language === "en" ? 12 : 12,
+                marginRight: 4,
+              }}
+            >
+              {t("cash")}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -834,10 +850,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
-  },
-  radioText: {
-    marginLeft: 10,
-    fontSize: 16,
   },
   radioSelected: {
     height: 12,

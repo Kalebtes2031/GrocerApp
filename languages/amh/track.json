@@ -16,5 +16,8 @@
     "nomissedelivery":"ሰእቱ ያለፈበት ትዕዛዝ የለም።",
     "noactivedelivery":"አዲስ ማድረስ የሚያስፈልገው ትዕዛዝ የለም።",
     "waiting":"ይታገሱ",
-    "confirm":"ያረጋግጡ"
+    "confirm":"ያረጋግጡ",
+  "missed": "ቀናቸው ያለፉ ትዕዛዞች",
+  "reschedule": "የማድረሻ ቀን ይምረጡ",
+  "notassigned":"ትዕዛዝዎን የሚያደርስ ሰው አልተመደበልዎትም"
 }

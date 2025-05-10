@@ -18,5 +18,7 @@
   "waiting": "Waiting",
   "confirm": "Confirm",
   "missed": "Missed Deliveries",
-  "reschedule": "Reschedule"
+  "reschedule": "Reschedule",
+  "notassigned":"Delivery Person Not Assigned"
+
 }

@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Redirect, router } from "expo-router";
-import { View, Text, Image, TouchableOpacity, FlatList, Dimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, FlatList, Dimensions ,  PixelRatio } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const Welcome = () => {
   const colorScheme = useColorScheme();
@@ -20,6 +20,11 @@ const Welcome = () => {
   const [showOnboarding, setShowOnboarding] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const flatListRef = useRef(null);
+
+  // Responsive scaling functions
+const widthPercentage = (percentage) => SCREEN_WIDTH * (percentage / 100);
+const heightPercentage = (percentage) => SCREEN_HEIGHT * (percentage / 100);
+const scaleFont = (size) => size * PixelRatio.getFontScale();
 
   const slides = [
     {
@@ -222,7 +227,7 @@ const Welcome = () => {
         </View>
 
         {/* Footer */}
-        <View style={{ marginBottom: 12, flex:1, justifyContent:"center", alignItems:"center" }}>
+        <View style={{ marginBottom: 12, flex:1, justifyContent:"center", alignItems:"center", gap:12, }}>
           {currentSlide === slides.length - 1 ? (
             <>
               <CustomButton
@@ -238,7 +243,7 @@ const Welcome = () => {
                   borderWidth: 2,
                   borderColor: "#445399",
                   borderRadius: 32,
-                  paddingVertical: 16,
+                  paddingVertical: 8,
                   alignItems: "center",
                   width:304,
                 }}
@@ -268,7 +273,7 @@ const Welcome = () => {
           )}
         </View>
 
-        <View style={{ alignItems: "center", marginBottom: 10 }}>
+        <View style={{ alignItems: "center", marginVertical: 8 }}>
           <Text
             style={{
               textAlign: "center",

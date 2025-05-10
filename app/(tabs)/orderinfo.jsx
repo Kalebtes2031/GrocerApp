@@ -99,7 +99,7 @@ export default function OrderInfo() {
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
               <Text>{t('total')} : </Text>
-              <Text>{t('br')} {ourOrder.total}</Text>
+              <Text>{i18n.language === "en" ? t("br") : ""} {ourOrder.total} {i18n.language === "amh" ? t("br") : ""}</Text>
             </View>
           </View>
           <View
@@ -146,7 +146,7 @@ export default function OrderInfo() {
                 {ourOrder.first_name} {ourOrder.last_name} 
               </Text>
             </View>
-            <Text>{ourOrder.customer_address}</Text>
+            {/* <Text>{ourOrder.customer_address}</Text> */}
             {/* <Text>ADDIS ABABA, ETHIOPIA</Text> */}
             <View
               style={{

@@ -33,15 +33,16 @@ import * as Location from "expo-location";
 // import { GebetaMap, MapMarker } from "@gebeta/tiles";
 import Toast from "react-native-toast-message";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+// import MapView, { Marker } from "react-native-maps";
 
 // import Mapbox from "@rnmapbox/maps";
-import MapboxGL from "@rnmapbox/maps"; // Import MapboxGL from '@rnmapbox/maps'; // Ensure you have the correct import for your version
+// import MapboxGL from "@rnmapbox/maps"; // Import MapboxGL from '@rnmapbox/maps'; // Ensure you have the correct import for your version
 import debounce from "lodash.debounce";
 
-MapboxGL.setAccessToken(
-  "pk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY205ZHdkMXJ0MGhlMTJpcXQ4bzgyYjFnZiJ9.Lhg5WUbonFe4mhCmEpSUKg"
-);
+// MapboxGL.setAccessToken(
+//   "pk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY205ZHdkMXJ0MGhlMTJpcXQ4bzgyYjFnZiJ9.Lhg5WUbonFe4mhCmEpSUKg"
+// );
 
 const ScheduleDeliveryScreen = () => {
   const { t, i18n } = useTranslation("schedule");
@@ -65,16 +66,40 @@ const ScheduleDeliveryScreen = () => {
   // const [text, setText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   // const [selectedLocation, setSelectedLocation] = useState(null);
-  const [selectedAddress, setSelectedAddress] = useState("");
+  // const [selectedAddress, setSelectedAddress] = useState("");
 
   // this ensures we never access null before location is set
-  const initialCoords = selectedLocation || currentLocation;
+  // const initialCoords = selectedLocation || currentLocation;
 
   // memoize & debounce so it’s stable across renders:
   // const debouncedFetch = useCallback(debounce(fetchPlaces, 300), []);
 
-  const screenWidth = Dimensions.get('window').width;
-const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
+  const screenWidth = Dimensions.get("window").width;
+  const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
+
+  // permission
+ useEffect(() => {
+    // fetchCustomerProfile();
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Toast.show({
+          type: "error",
+          text1: "Location permission not granted",
+          visibilityTime: 2000,
+        });
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      setCurrentLocation(coords);
+      // Set the default selected location to current location
+      setSelectedLocation(coords);
+    })();
+  }, [user]);
 
   const fetchOrderData = async () => {
     const response = await fetchOrderDetail(orderId);
@@ -129,10 +154,10 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
       });
       return;
     }
-    if (!initialCoords) {
-      Toast.show({ type: "error", text1: t("select_location") });
-      return;
-    }
+    // if (!initialCoords) {
+    //   Toast.show({ type: "error", text1: t("select_location") });
+    //   return;
+    // }
     let customer_latitude = selectedLocation.latitude;
     let customer_longitude = selectedLocation.longitude;
     setLoading(true);
@@ -142,7 +167,7 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
         selectedDate.toISOString(),
         customer_latitude,
         customer_longitude,
-        selectedAddress
+        // selectedAddress
       );
       navigation.push(
         `/(tabs)/orderinfo?orderId=${encodeURIComponent(
@@ -210,7 +235,7 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
         >
           {t("address")}
         </Text>
-        <View style={{ marginBottom: 10 }}>
+        {/* <View style={{ marginBottom: 10 }}>
           <TextInput
             style={{
               height: 50,
@@ -260,22 +285,22 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
               ))}
             </View>
           )}
-        </View>
+        </View> */}
 
-        {/* <TextInput
-        style={{
-          height: 50,
-          width: "100%",
-          borderColor: "gray",
-          borderWidth: 1,
-          paddingHorizontal: 15,
-          marginBottom: 10,
-          borderRadius: 39,
-        }}
-        placeholder="Type your home address"
-        onChangeText={(value) => setText(value)}
-        value={text}
-      /> */}
+        <TextInput
+          style={{
+            height: 50,
+            width: "100%",
+            borderColor: "gray",
+            borderWidth: 1,
+            paddingHorizontal: 15,
+            marginBottom: 10,
+            borderRadius: 39,
+          }}
+          placeholder={t("type")}
+          onChangeText={(value) => setText(value)}
+          value={text}
+        />
       </View>
       {/* <View
         style={{
@@ -286,7 +311,7 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
       </View> */}
 
       {/* Location Choice Section */}
-      <View style={styles.locationSection}>
+      {/* <View style={styles.locationSection}>
         <View style={styles.choiceContainer}>
           <TouchableOpacity
             style={[
@@ -371,8 +396,84 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
           </Text>
             </View>
         )}
-      </View>
+      </View> */}
+      {/* react-native-maps */}
+       {/* <View style={styles.locationSection}>
+        <View style={styles.choiceContainer}>
+          <TouchableOpacity
+            style={[
+              styles.choiceButton,
+              locationChoice === "current" && styles.selectedChoice,
+            ]}
+            onPress={() => {
+              setLocationChoice("current");
+              if (currentLocation) {
+                setSelectedLocation(currentLocation);
+              }
+            }}
+          >
+            <Text>Use Current Location</Text>
+          </TouchableOpacity>
 
+          <TouchableOpacity
+            style={[
+              styles.choiceButton,
+              locationChoice === "custom" && styles.selectedChoice,
+            ]}
+            onPress={() => {
+              setLocationChoice("custom");
+              // optionally preset to currentLocation:
+              if (!selectedLocation && currentLocation) {
+                setSelectedLocation(currentLocation);
+              }
+            }}
+          >
+            <Text>Select on Map</Text>
+          </TouchableOpacity>
+        </View>
+
+        {(locationChoice === "current" || locationChoice === "custom") && (
+          <View style={styles.mapContainer}>
+            <MapView
+              style={styles.map}
+              region={
+                selectedLocation && {
+                  latitude: selectedLocation.latitude,
+                  longitude: selectedLocation.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }
+              }
+              onPress={
+                locationChoice === "custom"
+                  ? (e) => {
+                      const { latitude, longitude } = e.nativeEvent.coordinate;
+                      setSelectedLocation({ latitude, longitude });
+                    }
+                  : undefined
+              }
+              scrollEnabled={locationChoice === "custom"}
+              zoomEnabled={locationChoice === "custom"}
+            >
+              {selectedLocation && (
+                <Marker
+                  coordinate={selectedLocation}
+                  draggable={locationChoice === "custom"}
+                  onDragEnd={
+                    locationChoice === "custom"
+                      ? (e) => {
+                          const { latitude, longitude } =
+                            e.nativeEvent.coordinate;
+                          setSelectedLocation({ latitude, longitude });
+                        }
+                      : undefined
+                  }
+                />
+              )}
+            </MapView>
+          </View>
+        )}
+      </View> */}
       <Text
         style={{ fontSize: 18, paddingLeft: 8, marginTop: 15 }}
         className="text-start font-poppins-bold text-gray-800 text-[14px] mb-4"
@@ -463,7 +564,7 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
           </View>
 
           <TouchableOpacity
-            style={[styles.timePickerButton,{flexDirection:"column"}]}
+            style={[styles.timePickerButton, { flexDirection: "column" }]}
             onPress={() => setShowTimePicker(true)}
           >
             <FontAwesome6 name="clock" size={24} color="#445399" />
@@ -498,51 +599,65 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
             />
           </View>
         )}
-        // Confirm Button
+        {/* confirm button */}
         <View
           style={{
-            paddding:50,
-            flexDirection:"column",
-            justifyContent:"center",
-            alignItems:"center",  
+            paddding: 50,
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
-        <View style={{ marginBottom: 10, width:"100%", paddingHorizontal:2, flexDirection:"row", justifyContent:"space-between", alignItems:"center"}}>
-          <TouchableOpacity
-            style={[
-              styles.button,
-              styles.buttonContainer,
-              loading && { opacity: 0.6 },
-            ]}
-            onPress={handleSchedule}
-            disabled={loading}
-            activeOpacity={0.8}
+          <View
+            style={{
+              marginBottom: 10,
+              width: "100%",
+              paddingHorizontal: 2,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+            <TouchableOpacity
+              style={[
+                styles.button,
+                styles.buttonContainer,
+                loading && { opacity: 0.6 },
+              ]}
+              onPress={handleSchedule}
+              disabled={loading}
+              activeOpacity={0.8}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
-              ) : (
-                <MaterialIcons
-                  name="check-circle"
-                  size={20}
-                  color="#fff"
-                  style={{ marginRight: 10 }}
-                />
-              )}
-              <Text style={{ color: "white", fontSize: i18n.language === "amh" ? 12 : 16  }}>
-                {loading ? t("scheduling") : t("confirm")}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        {/* OR Divider and Pickup Button */}
-        <View>
-          {/* <View
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
+                ) : (
+                  <MaterialIcons
+                    name="check-circle"
+                    size={20}
+                    color="#fff"
+                    style={{ marginRight: 10 }}
+                  />
+                )}
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: i18n.language === "amh" ? 12 : 16,
+                  }}
+                >
+                  {loading ? t("scheduling") : t("confirm")}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {/* OR Divider and Pickup Button */}
+            <View>
+              {/* <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -557,40 +672,48 @@ const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
             <View style={{ flex: 1, height: 1, backgroundColor: "#e5e7eb" }} />
           </View> */}
 
-          <TouchableOpacity
-            style={[
-              styles.button1,
-              styles.buttonContainer1,
-              loading && { opacity: 0.6 },
-            ]}
-            onPress={handleScheduleForPickFromStore}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
-              ) : (
-                <MaterialIcons
-                  name="store"
-                  size={20}
-                  color="#fff"
-                  style={{ marginRight: 10 }}
-                />
-              )}
-              <Text style={{ color: "white", fontSize: i18n.language === "amh" ? 12 : 16 }}>
-                {loading ? t("scheduling") : t("pick")}
-              </Text>
+              <TouchableOpacity
+                style={[
+                  styles.button1,
+                  styles.buttonContainer1,
+                  loading && { opacity: 0.6 },
+                ]}
+                onPress={handleScheduleForPickFromStore}
+                disabled={loading}
+                activeOpacity={0.8}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {loading ? (
+                    <ActivityIndicator
+                      color="#fff"
+                      style={{ marginRight: 10 }}
+                    />
+                  ) : (
+                    <MaterialIcons
+                      name="store"
+                      size={20}
+                      color="#fff"
+                      style={{ marginRight: 10 }}
+                    />
+                  )}
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: i18n.language === "amh" ? 12 : 16,
+                    }}
+                  >
+                    {loading ? t("scheduling") : t("pick")}
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        </View>
-        </View>
+          </View>
         </View>
         {/* <View style={{ marginTop: 12 }}>
         <Button title="Show Date Picker" onPress={showDatePicker} />

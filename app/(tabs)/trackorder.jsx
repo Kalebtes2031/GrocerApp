@@ -15,10 +15,10 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import AnimatedCountdown from "@/components/AnimatedCountdown";
 import { useTranslation } from "react-i18next";
-import OrderMapView from "@/components/OrderMapView";
+// import OrderMapView from "@/components/OrderMapView";
 import ShopTracking from "@/components/ShopTracking";
 import { useRouter } from "expo-router";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 
 // Color Constants
 const COLORS = {
@@ -100,7 +100,6 @@ const OrderTrackingScreen = () => {
       return () => clearInterval(timer);
     }, [])
   );
-  
 
   const formatCountdown = (scheduledTime) => {
     const scheduled = new Date(scheduledTime);
@@ -128,14 +127,14 @@ const OrderTrackingScreen = () => {
     };
   };
 
-  const renderOrderItem = ({ item,section }) => {
+  const renderOrderItem = ({ item, section }) => {
     const nowDate = new Date(now);
     const scheduled = new Date(item.scheduled_delivery);
     const isMissed = scheduled < nowDate && item.status !== "Delivered";
-    const shouldShowMap =
-    section.title === t("active") && item.need_delivery;
-    const dontshowstatus = section.title ===t('missed')
-    const dontshowtime = section.title ===t('missed') || section.title ===t('completed')
+    const shouldShowMap = section.title === t("active") && item.need_delivery;
+    const dontshowstatus = section.title === t("missed");
+    const dontshowtime =
+      section.title === t("missed") || section.title === t("completed");
     const timeInfo =
       item.status === "Delivered"
         ? {
@@ -173,7 +172,15 @@ const OrderTrackingScreen = () => {
                   {isLoading ? (
                     <ActivityIndicator color="#fff" />
                   ) : (
-                    <Text style={styles.buttonText}>{t("reschedule")}</Text>
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontWeight: "600",
+                        fontSize: i18n.language==="en"? 15: 12,
+                      }}
+                    >
+                      {t("reschedule")}
+                    </Text>
                   )}
                 </TouchableOpacity>
               )}
@@ -192,11 +199,8 @@ const OrderTrackingScreen = () => {
               }}
               source={require("@/assets/images/yasonmap.jpg")}
             /> */}
-            
-             {shouldShowMap && <OrderMapView order={item} />}
-             
-            
-           
+
+            {/* {shouldShowMap && <OrderMapView order={item} />} */}
           </View>
           <View style={styles.countdownWrapper}>
             {item.status === "Delivered" ? (
@@ -207,11 +211,13 @@ const OrderTrackingScreen = () => {
                 </Text>
               </View>
             ) : (
-              !dontshowtime && (<AnimatedCountdown
-                scheduledTime={item.scheduled_delivery}
-                warningColor={COLORS.warning}
-                successColor={COLORS.success}
-              />)
+              !dontshowtime && (
+                <AnimatedCountdown
+                  scheduledTime={item.scheduled_delivery}
+                  warningColor={COLORS.warning}
+                  successColor={COLORS.success}
+                />
+              )
             )}
           </View>
         </LinearGradient>
@@ -227,7 +233,9 @@ const OrderTrackingScreen = () => {
         </View> */}
 
         {/* Delivery Progress */}
-        {!dontshowstatus && <ShopTracking status={item.status} prepared={item.prepared} />}
+        {!dontshowstatus && (
+          <ShopTracking status={item.status} prepared={item.prepared} />
+        )}
 
         {/* Order Details */}
         <View style={styles.detailsContainer}>
@@ -250,7 +258,7 @@ const OrderTrackingScreen = () => {
               >
                 <View style={styles.productInfo}>
                   <Text style={styles.productName}>
-                    {product.variant.product.item_name}
+                    {i18n.language==="en"? product.variant.product.item_name : product.variant.product.item_name_amh}
                   </Text>
 
                   <Text style={styles.productMeta}>
@@ -261,7 +269,7 @@ const OrderTrackingScreen = () => {
                   <Text style={styles.productName}>{t("subtotal")}</Text>
 
                   <Text style={styles.productMeta}>
-                    Br{product.total_price}
+                    {i18n.language === "en" ? t("br") : ""}{product.total_price} {i18n.language === "amh" ? t("br") : ""}
                   </Text>
                 </View>
               </View>
@@ -271,8 +279,9 @@ const OrderTrackingScreen = () => {
           <View style={styles.totalContainer}>
             <Text style={styles.totalLabel}>{t("totalamount")}:</Text>
             <Text style={styles.totalValue}>
-              {t("br")}
+              {i18n.language === "en" ? t("br") : ""}
               {item.total}
+              {i18n.language === "amh" ? t("br") : ""}
             </Text>
           </View>
         </View>
@@ -325,7 +334,7 @@ const OrderTrackingScreen = () => {
                   </View>
                 )
               ) : (
-                <Text>Delivery Person Not Assigned</Text>
+                <Text>{t("notassigned")}</Text>
               )}
             </View>
             <View>
@@ -373,7 +382,7 @@ const OrderTrackingScreen = () => {
                 new Date(o.scheduled_delivery) >= new Date()
             ),
           },
-          
+
           {
             title: t("missed"), // Overdue Deliveries
             data: orders.filter(
@@ -387,7 +396,7 @@ const OrderTrackingScreen = () => {
             data: orders.filter((o) => o.status === "Delivered"),
           },
         ]}
-        renderItem={(props)=>renderOrderItem(props)}
+        renderItem={(props) => renderOrderItem(props)}
         renderSectionHeader={({ section }) => (
           <Text style={styles.sectionHeader}>{section.title}</Text>
         )}
@@ -399,7 +408,7 @@ const OrderTrackingScreen = () => {
                 <Text style={styles.emptySectionText}>
                   {section.title === t("active")
                     ? t("noactivedelivery") // for example, "No active deliveries"
-                    : section.title===t("missed")
+                    : section.title === t("missed")
                     ? t("nomissedelivery")
                     : t("nocompletedelivery")}
                   {/* e.g. "No completed deliveries" */}
@@ -501,9 +510,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerLeft: {
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center"
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   orderNumber: {
     fontSize: 16,
@@ -511,7 +520,6 @@ const styles = StyleSheet.create({
     color: "#2D4150",
   },
 
-  
   orderNumber: {
     fontSize: 16,
     fontWeight: "700",

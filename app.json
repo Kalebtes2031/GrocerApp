@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "MyFreshApp",
+    "name": "Yason",
     "slug": "MyFreshApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,9 @@
     "scheme": "myfreshapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": { "supportsTablet": true },
+    "ios": {
+      "supportsTablet": true
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/yasonlogo.png",
@@ -16,23 +18,22 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.abeniexpo.MyFreshApp",
-      "googleServicesFile": "./google-services.json",
-      "buildProperties": {
-         "gradleProperties": {
-              "MAPBOX_DOWNLOADS_TOKEN": "sk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY21hMjBiM2piMjc5YTJxczc5YjJodnR1eCJ9.HwvUBWRoj3Sj9q9Zhsg0iA"
-          }
-      }
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "experiments": { "typedRoutes": true },
-    "extra": {
-      "router": {},
-      "eas": { "projectId": "78d50598-1814-4c5b-9cc9-6ffbfbbc13c0" }
+    "experiments": {
+      "typedRoutes": true
     },
-    "owner": "abeniexpo"
+    "extra": {
+      "apiUrl": "https://yasonbackend.yasonsc.com",
+      "router": {},
+      "eas": {
+        "projectId": "e389b01d-846b-4f8e-a649-e38d0dedda06"
+      }
+    }
   }
 }
