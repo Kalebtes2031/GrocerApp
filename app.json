@@ -16,7 +16,7 @@
         "foregroundImage": "./assets/images/yasonlogo.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "package": "com.abeniexpo.MyFreshApp",
       "googleServicesFile": "./google-services.json"
     },

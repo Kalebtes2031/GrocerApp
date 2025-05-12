@@ -246,21 +246,21 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    height: 200,
+    height: 164,
     backgroundColor: "#445399",
     paddingHorizontal: 20,
     paddingTop: 50,
   },
   searchContainer: {
     position: "absolute",
-    top: 210, // Adjusted to appear below header titles
+    top: 130, // Adjusted to appear below header titles
     left: 0,
     right: 0,
     zIndex: 1000,
     paddingHorizontal: 16,
   },
   flatListContent: {
-    paddingTop: 40, // Space for search bar
+    // paddingTop: 10, // Space for search bar
     paddingBottom: 16,
   },
   columnWrapper: {
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   listHeaderSpacer: {
-    height: 60, // Space between search and first row
+    height: 40, // Space between search and first row
   },
 
   container: {
@@ -308,11 +308,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
-    marginTop:32,
+    marginTop:12,
   },
   categoryTitle2: {
     position: "absolute",
-    top: 150,
+    top: 100,
     left: 20,
     color: "#fff",
     fontSize: 16,
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     zIndex: 1000,
-    height: 70,
+    height: 50,
   },
   contentContainer: {
     flex: 1,

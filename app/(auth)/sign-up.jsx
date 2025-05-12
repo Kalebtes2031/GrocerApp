@@ -9,6 +9,8 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  Linking,
+  StyleSheet,
 } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
@@ -81,7 +83,7 @@ const SignUp = () => {
       if (response) {
         Toast.show({
           type: "success",
-          text1: "Account created successfully!",
+          text1: t('account_created'),
         });
 
         // Reset form
@@ -102,11 +104,32 @@ const SignUp = () => {
       Toast.show({
         type: "error",
         text1: "Registration failed",
-        text2: error.response?.data?.message || "Please check your information",
+        text2: extractErrorDetails(error),
+        visibilityTime: 4000, 
       });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const extractErrorDetails = (error) => {
+    if (error?.response?.data) {
+      const data = error.response.data;
+
+      // If it's a simple error message
+      if (typeof data === "string") return data;
+
+      // If it's a dict of field-specific errors
+      const messages = Object.entries(data)
+        .map(
+          ([key, value]) =>
+            `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
+        )
+        .join("\n");
+
+      return messages || "An unknown error occurred.";
+    }
+    return "An unknown error occurred.";
   };
 
   return (
@@ -374,7 +397,7 @@ const SignUp = () => {
               paddingHorizontal: 24,
             }}
           >
-            {t("by")}{" "}
+            {t("by")} <Text style={{ color: "#445399" }}>{t("by2")}</Text>
             <Text
               // style={{
               //   color: "#7E0201",
@@ -427,11 +450,11 @@ const SignUp = () => {
             </Text>
             <TouchableOpacity onPress={() => router.push("/sign-in")}>
               <Text
-                // style={{
-                //   fontSize: 14,
-                //   color: "#7E0201",
-                //   fontWeight: "600",
-                // }}
+                style={{
+                  fontSize: 14,
+                  color: "#445399",
+                  fontWeight: "600",
+                }}
                 className="text-primary font-poppins-medium text-[14px]"
               >
                 {t("login")}
@@ -439,21 +462,38 @@ const SignUp = () => {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ alignItems: "center", marginTop: 10 }}>
+        <View style={styles.poweredBy}>
+          <Text style={styles.poweredText}>Powered by </Text>
           <Text
-            style={{
-              textAlign: "center",
-              color: colorScheme === "dark" ? "#fff" : "#000",
-              fontSize: 12,
-            }}
+            style={styles.poweredBold}
+            onPress={() => Linking.openURL("https://activetechet.com")}
           >
-            Powered by{" "}
-            <Text style={{ fontWeight: "bold" }}>Active Technology</Text>
+            Active Technology PLC
           </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
+// Responsive size calculation
+const responsiveSize = (size) => {
+  const scaleFactor = width / 375; // Base width from design (e.g., iPhone 375)
+  return size * scaleFactor;
+};
+const styles = StyleSheet.create({
+  poweredBy: {
+    alignItems: "center",
+    marginTop: responsiveSize(10),
+  },
+  poweredText: {
+    textAlign: "center",
+    fontSize: responsiveSize(12),
+    color: "#1f2937",
+  },
+  poweredBold: {
+    fontWeight: "bold",
+    color: "#8F3C01",
+  },
+});
 
 export default SignUp;

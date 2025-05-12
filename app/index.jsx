@@ -1,6 +1,16 @@
 import { StatusBar } from "expo-status-bar";
 import { Redirect, router } from "expo-router";
-import { View, Text, Image, TouchableOpacity, FlatList, Dimensions ,  PixelRatio } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  PixelRatio,
+  Linking,
+  StyleSheet,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
@@ -11,8 +21,8 @@ import { useEffect, useRef, useState } from "react";
 import CustomButton from "@/components/CustomButton";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { widths } = Dimensions.get("window");
 const Welcome = () => {
   const colorScheme = useColorScheme();
   const { t } = useTranslation("welcome");
@@ -22,9 +32,9 @@ const Welcome = () => {
   const flatListRef = useRef(null);
 
   // Responsive scaling functions
-const widthPercentage = (percentage) => SCREEN_WIDTH * (percentage / 100);
-const heightPercentage = (percentage) => SCREEN_HEIGHT * (percentage / 100);
-const scaleFont = (size) => size * PixelRatio.getFontScale();
+  const widthPercentage = (percentage) => SCREEN_WIDTH * (percentage / 100);
+  const heightPercentage = (percentage) => SCREEN_HEIGHT * (percentage / 100);
+  const scaleFont = (size) => size * PixelRatio.getFontScale();
 
   const slides = [
     {
@@ -129,11 +139,15 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
           }}
         >
           {currentSlide > 0 && (
-            <TouchableOpacity onPress={() => {
-              if (flatListRef.current) {
-                flatListRef.current.scrollToIndex({ index: currentSlide - 1 });
-              }
-            }}>
+            <TouchableOpacity
+              onPress={() => {
+                if (flatListRef.current) {
+                  flatListRef.current.scrollToIndex({
+                    index: currentSlide - 1,
+                  });
+                }
+              }}
+            >
               <Ionicons
                 name="arrow-back"
                 size={28}
@@ -206,7 +220,13 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
         />
 
         {/* Indicators */}
-        <View style={{ flexDirection: "row", justifyContent: "center", marginBottom: 24 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            marginBottom: 24,
+          }}
+        >
           {slides.map((_, index) => (
             <View
               key={index}
@@ -227,7 +247,15 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
         </View>
 
         {/* Footer */}
-        <View style={{ marginBottom: 12, flex:1, justifyContent:"center", alignItems:"center", gap:12, }}>
+        <View
+          style={{
+            marginBottom: 12,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 12,
+          }}
+        >
           {currentSlide === slides.length - 1 ? (
             <>
               <CustomButton
@@ -245,7 +273,7 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
                   borderRadius: 32,
                   paddingVertical: 8,
                   alignItems: "center",
-                  width:304,
+                  width: 304,
                 }}
               >
                 <Text
@@ -264,7 +292,9 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
               title={t("onboarding.next")}
               handlePress={() => {
                 if (flatListRef.current) {
-                  flatListRef.current.scrollToIndex({ index: currentSlide + 1 });
+                  flatListRef.current.scrollToIndex({
+                    index: currentSlide + 1,
+                  });
                 }
               }}
               containerStyles="w-full"
@@ -273,16 +303,13 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
           )}
         </View>
 
-        <View style={{ alignItems: "center", marginVertical: 8 }}>
+        <View style={styles.poweredBy}>
+          <Text style={styles.poweredText}>Powered by </Text>
           <Text
-            style={{
-              textAlign: "center",
-              color: colorScheme === "dark" ? "#fff" : "#000",
-              fontSize: 12,
-            }}
+            style={styles.poweredBold}
+            onPress={() => Linking.openURL("https://activetechet.com")}
           >
-            Powered by{" "}
-            <Text style={{ fontWeight: "bold" }}>Active Technology</Text>
+            Active Technology PLC
           </Text>
         </View>
       </View>
@@ -292,5 +319,25 @@ const scaleFont = (size) => size * PixelRatio.getFontScale();
     </SafeAreaView>
   );
 };
-
+// Responsive size calculation
+const responsiveSize = (size) => {
+  const scaleFactor = widths / 375; // Base width from design (e.g., iPhone 375)
+  return size * scaleFactor;
+};
+const styles = StyleSheet.create({
+  poweredBy: {
+    alignItems: "center",
+    marginTop: responsiveSize(10),
+    marginBottom: responsiveSize(4),
+  },
+  poweredText: {
+    textAlign: "center",
+    fontSize: responsiveSize(11),
+    color: "#1f2937",
+  },
+  poweredBold: {
+    fontWeight: "bold",
+    color: "#8F3C01",
+  },
+});
 export default Welcome;

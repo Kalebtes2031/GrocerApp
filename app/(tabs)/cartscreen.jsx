@@ -70,7 +70,9 @@ const CartScreen = () => {
     }
   };
   const handlePress = (product) => {
-    router.push(`/carddetail?product=${encodeURIComponent(JSON.stringify(product))}`);
+    router.push(
+      `/carddetail?product=${encodeURIComponent(JSON.stringify(product))}`
+    );
   };
   if (!cart || !cart.items) {
     return (
@@ -97,20 +99,18 @@ const CartScreen = () => {
           <View style={styles.headerContainer}>
             <TouchableOpacity
               onPress={() => router.back()}
-              style={{ 
-                marginHorizontal: 10, 
+              style={{
+                marginHorizontal: 10,
                 paddingHorizontal: 2,
-                width:10,
-                height:10,
+                width: 10,
+                height: 10,
                 borderRadius: 10,
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
                 padding: 1,
-                
-                // 
 
-              
+                //
               }}
               // className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
             >
@@ -133,7 +133,6 @@ const CartScreen = () => {
             </View>
           </View>
           <Text
-
             className="font-poppins-bold text-center text-primary mb-4"
             style={styles.headerTitle}
           >
@@ -194,7 +193,6 @@ const CartScreen = () => {
                 <TouchableOpacity
                   onPress={() => router.push("/(tabs)/watchlistscreen")}
                 >
-
                   <MaterialIcons
                     name="favorite-border"
                     size={28}
@@ -217,14 +215,13 @@ const CartScreen = () => {
               {cart.items.map((item) => (
                 <View key={item.id} style={styles.itemContainer}>
                   <TouchableOpacity
-                    // onPress={() => handlePress(item)}
+                  // onPress={() => handlePress(item)}
                   >
-
-                  <Image
-                    source={{ uri: item?.image }}
-                    style={styles.productImage}
-                    resizeMode="contain"
-                  />
+                    <Image
+                      source={{ uri: item?.image }}
+                      style={styles.productImage}
+                      resizeMode="contain"
+                    />
                   </TouchableOpacity>
 
                   <View style={styles.detailsContainer}>
@@ -236,27 +233,26 @@ const CartScreen = () => {
                         // alignItems: "center",
                         // gap: 5,
                         // backgroundColor:"red",
-                        width:120,
+                        width: 120,
                       }}
                     >
                       <Text style={styles.productName}>
                         {i18n.language === "en"
                           ? item?.item_name
                           : item?.item_name_amh}
-                          {"  "}
-                          {parseInt(item?.variations?.quantity)}
+                        {"  "}
+                        {parseInt(item?.variations?.quantity)}
                         {item?.variations?.unit}
                       </Text>
-                      <Text style={styles.productName}>
-                       
-                      </Text>
+                      <Text style={styles.productName}></Text>
                     </View>
                     <Text style={styles.price}>
+                    
                       {i18n.language === "en" ? t("br") : ""}
                       {parseFloat(item.variations?.price || "0").toFixed(2)} {" "}
                       {i18n.language === "amh" ? t("br") : ""}
                     </Text>
-
+                    
                     <View style={styles.quantityContainer}>
                       <TouchableOpacity
                         onPress={() =>
@@ -306,10 +302,13 @@ const CartScreen = () => {
                   </View>
 
                   <View style={styles.actionContainer}>
-                    <Text style={styles.itemTotal}>
+                    {/* <Text style={styles.itemTotal}>
                       {i18n.language === "en" ? t("br") : ""}
                       {(item.total_price || 0).toFixed(2)}{" "}
                       {i18n.language === "amh" ? t("br") : ""}
+                    </Text> */}
+                    <Text>
+                      {t("price")} / {item.variations?.unit}{" "}
                     </Text>
                     <TouchableOpacity
                       onPress={() => handleRemoveCartItems(item.variations.id)}
@@ -467,15 +466,15 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flexDirection: "row",
-    backgroundColor: "#D6F3D5",
+    backgroundColor: "rgba(150, 166, 234, 0.4)",
     borderRadius: 12,
     marginBottom: 12,
     padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
+    // elevation: 3,
   },
   productImage: {
     width: 100,
@@ -484,7 +483,7 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   detailsContainer: {
-    display:"flex",
+    display: "flex",
     justifyContent: "space-between",
   },
   productName: {

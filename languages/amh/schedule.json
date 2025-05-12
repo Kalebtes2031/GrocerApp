@@ -6,5 +6,12 @@
   "scheduling": "በትዕግስት ይጠብቁ...",
   "please": "እባክዎ የወደፊት ቀን እና ሰዓት ይምረጡ",
   "pick": "ከያሶን መደብር ይውሰዱ",
-  "type":"አድራሻ ይፈልጉ"
+  "type":"አድራሻ ይፈልጉ",
+  "selected_address":"የመረጡት አድራሻ",
+  "search_address":"አድራሻ ይፈልጉ...",
+  "no_address_selected":"የተመረጠ አድራሻ የለም",
+  "use_current":"አሁን ያሉበትን ቦታ ይጠቀሙ",
+  "selectonmap":"በካርታው ይምረጡ",
+  "please_select":"እባክዎ የወደፊት ቀን እና ሰዓት ይምረጡ",
+  "please_select_address":"እባክዎ የማድረሻ ቦታዎን ይምረጡ"
 }

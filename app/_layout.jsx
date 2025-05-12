@@ -17,8 +17,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message"; // Import Toast component
-import Header from "@/components/Header"; // Import the Header component
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';import Header from "@/components/Header"; // Import the Header component
 import SearchComp from "@/components/SearchComp";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalProvider from "@/context/GlobalProvider";
@@ -28,6 +27,7 @@ import { LanguageProvider } from "@/context/LanguageProvider";
 import { View } from "react-native";
 import { Text } from "react-native";
 import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
+// import NetInfo from "@react-native-community/netinfo";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,9 +45,46 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error]);
 
+  // useEffect(() => {
+  //   const unsubscribe = NetInfo.addEventListener((state) => {
+  //     if (!state.isConnected) {
+  //       Toast.show({
+  //         type: "error",
+  //         text1: "No Internet Connection",
+  //         text2: "Turn on mobile data to fetch data.",
+  //         position: "top",
+  //       });
+  //     }
+  //   });
+
+  //   return () => unsubscribe();
+  // }, []);
+  
   if (!fontsLoaded) {
     return null; // Show loading screen/image here
   }
+
+  const toastConfig = {
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      text1Style={{
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'red',
+      }}
+      text2Style={{
+        fontSize: 16,
+        color: '#333',
+      }}
+      style={{
+        borderLeftColor: 'red',
+        padding: 12,
+        borderRadius: 8,
+      }}
+    />
+  ),
+};
 
   return (
     <SafeAreaProvider>
@@ -132,7 +169,8 @@ export default function RootLayout() {
 
                       <Stack.Screen name="+not-found" />
                     </Stack>
-                    <Toast />
+                    {/* <Toast /> */}
+                    <Toast config={toastConfig} />
                     </LanguageProvider>
                   </WatchlistProvider>
                 </CartProvider>

@@ -1,4 +1,9 @@
 {
-    "reset": "Reset Password",
-    "send":"Send OTP"
+  "title": "Set New Password",
+  "new_password": "New Password",
+  "confirm_password": "Confirm Password",
+  "reset_button": "Reset Password",
+  "password_mismatch": "Passwords do not match.",
+  "password_reset_success": "Password reset successfully.",
+  "password_reset_failed": "Failed to reset password."
 }

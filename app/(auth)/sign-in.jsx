@@ -118,7 +118,7 @@ const SignIn = () => {
             size={responsiveSize(24)}
             color="#445399"
           />
-          <LanguageToggle bgcolor="#445399" textcolor="#445399" />
+          <LanguageToggle bgcolor="#55B051" textcolor="#55B051" />
         </View>
 
         {/* Logo */}
@@ -212,7 +212,7 @@ const responsiveSize = (size) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#7E0201",
+    backgroundColor: "#fff",
   },
   upperContainer: {
     height: responsiveSize(250),
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   signupLink: {
     color: "#445399",
     fontFamily: "Poppins-Bold",
-    fontSize: responsiveSize(14),
+    fontSize: responsiveSize(16),
   },
   poweredBy: {
     alignItems: "center",

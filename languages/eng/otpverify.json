@@ -1,5 +1,10 @@
 {
-    "enter":"Enter the OTP sent to",
-    "via":"via",
-    "verify":"Verify OTP"
+  "instruction": "Enter the OTP sent to ",
+  "instruction1": "via",
+  "new":"",
+  "otp_placeholder": "OTP",
+  "verify_button": "Verify OTP",
+  "invalid_otp": "Please enter a valid 6-digit OTP.",
+  "otp_verified": "OTP verified.",
+  "verification_failed": "OTP verification failed."
 }

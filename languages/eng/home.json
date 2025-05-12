@@ -2,10 +2,13 @@
   "categories": "Categories",
   "morning": "Good Morning",
   "afternoon": "Good Afternoon",
+  "afternoon1": "Good Afternoon",
   "evening": "Good Evening",
   "night": "Good Evening",
   "recommended": "Popular Products",
   "loading": "Loading popular products...",
   "more":"MORE",
-  "norecommended":"No Recommended Products found"
+  "norecommended":"No Popular Products found",
+  "nocategory":"No Category found",
+  "noannounce":"No announcement found"
 }

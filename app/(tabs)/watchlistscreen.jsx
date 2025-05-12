@@ -39,7 +39,17 @@ const WatchlistScreen = () => {
       </View>
       <Text style={styles.title}>{t('my')}</Text>
       {watchlist.length === 0 ? (
-        <Text style={styles.emptyMessage}>{t('your')}</Text>
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+ <View style={styles.iconWrapper}>
+          <TouchableOpacity>
+            <MaterialIcons name="favorite-border" size={200} color="#BE3144" />
+          </TouchableOpacity>
+          <View style={styles.badge1}>
+            <Text style={styles.badgeText1}>{watchlist.length}</Text>
+          </View>
+        </View>
+          <Text style={styles.emptyMessage}>{t('your')}</Text>
+          </View>
       ) : (
         // Render using a FlatList or map method
         <View style={styles.popularContainer}>
@@ -89,6 +99,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
   },
+  badge1: {
+    position: "absolute",
+    top: 1,
+    right: 6,
+    backgroundColor: "#BE3144",
+    borderRadius: 50,
+    width: 45,
+    height: 45,
+    justifyContent: "center",
+    alignItems: "center",
+    // borderWidth: 1,
+  },
+  badgeText1: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   title: {
     fontSize: 20,
     fontWeight: "bold",
@@ -116,6 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
     textAlign: "center",
+    marginTop:43
   },
 });
 

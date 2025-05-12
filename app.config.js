@@ -19,6 +19,9 @@ export default ({ config }) => ({
         backgroundColor: "#ffffff",
       },
     ],
+    [
+      "@maplibre/maplibre-react-native"
+    ],
     "expo-build-properties",
     "expo-dev-client"
   ],

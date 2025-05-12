@@ -1,4 +1,9 @@
 {
-    "reset": "የይለፍ ቃል ይቀይሩ",
-    "send": "የአንድ ጊዜ መለያ ይላኩ"
+  "title": "አዲስ የይለፍ ቃል ያስገቡ",
+  "new_password": "አዲስ የይለፍ ቃል",
+  "confirm_password": "የይለፍ ቃል ያረጋግጡ",
+  "reset_button": "ይለፍ ቃል ቀይር",
+  "password_mismatch": "የይለፍ ቃሎች አንድ አይነት አይደሉም።",
+  "password_reset_success": "የይለፍ ቃል በተሳካ ሁኔታ ተቀይሯል።",
+  "password_reset_failed": "የይለፍ ቃል መቀየር አልተሳካም።"
 }

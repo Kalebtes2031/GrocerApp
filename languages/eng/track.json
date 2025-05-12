@@ -19,6 +19,7 @@
   "confirm": "Confirm",
   "missed": "Missed Deliveries",
   "reschedule": "Reschedule",
-  "notassigned":"Delivery Person Not Assigned"
+  "notassigned":"Delivery Person Not Assigned",
+  "outdelivery":"Out Delivery"
 
 }

@@ -21,9 +21,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 
-
 const ProfileScreen = () => {
-  const { t, i18n } = useTranslation('profile');
+  const { t, i18n } = useTranslation("profile");
   const router = useRouter();
   const { user, setUser, logout } = useGlobalContext();
   const [editMode, setEditMode] = useState(false);
@@ -163,7 +162,7 @@ const ProfileScreen = () => {
           });
         }
 
-        const response = await updateUserProfile(formDataToSend)
+        const response = await updateUserProfile(formDataToSend);
 
         if (response.status === 200) {
           setUser(response.data);
@@ -186,13 +185,13 @@ const ProfileScreen = () => {
       </View>
     );
 
-    const handleLogout = () => {
-        console.log("logout");
-        console.log("user is : ", user);
-        // console.log("isLogged is : ", isLogged);
-        logout();
-        router.replace("/(auth)/sign-in");
-      };
+  const handleLogout = () => {
+    console.log("logout");
+    console.log("user is : ", user);
+    // console.log("isLogged is : ", isLogged);
+    logout();
+    router.replace("/(auth)/sign-in");
+  };
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -242,15 +241,18 @@ const ProfileScreen = () => {
                   className="font-poppins-medium"
                   style={styles.editButtonText}
                 >
-                  {editMode ? t("cancel") : t('edit')}
+                  {editMode ? t("cancel") : t("edit")}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.logoutButton} onPress={()=>handleLogout()}>
+              <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={() => handleLogout()}
+              >
                 <Text
                   style={styles.logoutButtonText}
                   className="font-poppins-medium"
                 >
-                  {t('signout')}
+                  {t("signout")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -262,54 +264,55 @@ const ProfileScreen = () => {
               <View
                 style={[styles.inputContainer, { flex: 1, marginRight: 10 }]}
               >
-                <Text className="font-poppins-medium" style={styles.inputLabel}>
-                  {t('first_name')}
+                <Text
+                  className="font-poppins-medium"
+                  style={[styles.inputLabel, { marginLeft: 6 }]}
+                >
+                  {t("first_name")}
                 </Text>
                 <TextInput
                   value={formData.first_name}
                   onChangeText={(v) => handleChange("first_name", v)}
-                  style={styles.input}
+                  style={editMode? styles.input1: styles.input}
                   editable={editMode}
                 />
               </View>
               <View style={[styles.inputContainer, { flex: 1 }]}>
-                <Text className="font-poppins-medium" style={styles.inputLabel}>
-                {t('last_name')}
+                <Text
+                  className="font-poppins-medium"
+                  style={[styles.inputLabel, { marginLeft: 8 }]}
+                >
+                  {t("last_name")}
                 </Text>
                 <TextInput
                   value={formData.last_name}
                   onChangeText={(v) => handleChange("last_name", v)}
-                  style={styles.input}
+                  style={editMode? styles.input1: styles.input}
                   editable={editMode}
                 />
               </View>
             </View>
 
-            {[t("username"), t("email"), t("phone_number")].map((field) => (
-              <View key={field} style={styles.inputContainer}>
-                <Text className="font-poppins-medium" style={styles.inputLabel}>
-                  {field.replace("_", " ").toUpperCase()}
+            {["username", "email", "phone_number"].map((key) => (
+              <View key={key} style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>
+                  {t(key)} {/* translate the label */}
                 </Text>
                 <TextInput
-                  value={formData[field]}
-                  onChangeText={(v) => handleChange(field, v)}
-                  style={styles.input}
+                  value={formData[key]}
+                  onChangeText={(v) => handleChange(key, v)}
+                  style={editMode? styles.input1: styles.input}
                   editable={editMode}
                   keyboardType={
-                    field === "email"
+                    key === "email"
                       ? "email-address"
-                      : field === "phone_number"
+                      : key === "phone_number"
                       ? "phone-pad"
                       : "default"
                   }
                 />
-                {errors[field] && (
-                  <Text
-                    className="font-poppins-medium"
-                    style={styles.errorText}
-                  >
-                    {errors[field]}
-                  </Text>
+                {errors[key] && (
+                  <Text style={styles.errorText}>{errors[key]}</Text>
                 )}
               </View>
             ))}
@@ -333,7 +336,7 @@ const ProfileScreen = () => {
                     className="font-poppins-medium"
                     style={styles.buttonText}
                   >
-                    {t('save')}
+                    {t("save")}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -400,14 +403,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profileImage: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
     backgroundColor: "#e1e4e8",
   },
   profileImagePlaceholder: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
     backgroundColor: "#e1e4e8",
     justifyContent: "center",
@@ -417,7 +420,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#007bff",
+    backgroundColor: "#445399",
     width: 36,
     height: 36,
     borderRadius: 18,
@@ -430,10 +433,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: "#e9ecef",
+    backgroundColor: "#445399",
   },
   editButtonText: {
-    color: "#007bff",
+    color: "white",
     fontWeight: "500",
   },
   formContainer: {
@@ -448,10 +451,10 @@ const styles = StyleSheet.create({
   },
   nameContainer: {
     flexDirection: "row",
-    marginBottom: 16,
+    marginBottom: 10,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   inputLabel: {
     color: "#6c757d",
@@ -461,7 +464,17 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#f8f9fa",
-    borderRadius: 8,
+    borderRadius: 58,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: "#ccc",
+    borderWidth: 1,
+    borderColor: "#dee2e6",
+  },
+  input1: {
+    backgroundColor: "#f8f9fa",
+    borderRadius: 58,
     paddingVertical: 12,
     paddingHorizontal: 16,
     fontSize: 16,
@@ -470,19 +483,21 @@ const styles = StyleSheet.create({
     borderColor: "#dee2e6",
   },
   button: {
-    backgroundColor: "#007bff",
-    borderRadius: 8,
+    backgroundColor: "#445399",
+    borderRadius: 58,
     padding: 16,
     alignItems: "center",
     marginTop: 24,
   },
   buttonDisabled: {
-    opacity: 0.7,
+    // opacity: 0.7,
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
+    width: "100%",
+    textAlign: "center",
   },
   errorText: {
     color: "#dc3545",

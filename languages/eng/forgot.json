@@ -1,4 +1,7 @@
 {
     "reset": "Reset Password",
-    "send":"Send OTP"
+    "send":"Send OTP",
+    "enter_email_phone":"Enter your email",
+    "otp_sent":"OTP sent to your email",
+    "otp_failed":"Failed to send OTP"
 }

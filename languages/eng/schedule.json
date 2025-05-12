@@ -6,5 +6,12 @@
   "scheduling":"Scheduling...",
   "please":"Please select a future date and time",
   "pick":"Self Pick Up",
-  "type":"Type your home address"
+  "type":"Type your home address",
+  "selected_address":"Selected Address",
+  "search_address":"Search Address...",
+  "no_address_selected":"No Address Selected",
+  "use_current":"Use Current Location",
+  "selectonmap":"Select on Map",
+  "please_select":"please select future date & time",
+  "please_select_address":"Please select your delivery location."
 }

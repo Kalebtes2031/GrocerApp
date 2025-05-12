@@ -1,10 +1,14 @@
 {
   "categories": "መደቦች",
   "morning": "እንደምን አደሩ",
-  "afternoon": "እንደምን አረፈዱ",
+  "afternoon": "እንደምን ዋሉ",
+  "afternoon1": "እንደምን አረፈዱ",
   "evening": "እንደምን አመሹ",
   "night": "Good night",
   "recommended": "ተመራጭ ምርቶች",
   "loading": "በትዕግስት ይጠብቁ",
-  "more":"ተጨማሪ"
+  "more":"ተጨማሪ",
+  "norecommended":"ምንም የተመረጡ ምርቶች የሉም",
+  "nocategory":"ምንም መደቦች የሉም",
+  "noannounce":"ምንም ማስታወቂያ የለም"
 }

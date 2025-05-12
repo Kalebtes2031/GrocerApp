@@ -191,46 +191,47 @@ const Header = () => {
 
         {/* Icons on the right */}
         {/* Icons on the right */}
-        <View style={{position:"relative"}}>
-
-        <ThemedView
-          style={[
-            styles.iconContainer,
-            { backgroundColor: colorScheme === "dark" ? "#333" : "#fff" },
-          ]}
-        >
-          <View>
-            
-          </View>
-          <TouchableOpacity onPress={toggleSearch}>
-            <MaterialIcons
-              name="search"
-              size={24}
-              style={{ color: colorScheme === "dark" ? "#fff" : "#445399" }}
-            />
-          </TouchableOpacity>
-          {showSearch && (
-            <View style={styles.searchOverlay}>
-              <SearchComponent />
-            </View>
-          )}
-
-          <View style={styles.iconWrapper}>
-            <TouchableOpacity
-              onPress={() => route.push("/(tabs)/watchlistscreen")}
-            >
-              <MaterialIcons name="favorite-border" size={24} color="#445399" />
+        <View style={{ position: "relative" }}>
+          <ThemedView
+            style={[
+              styles.iconContainer,
+              { backgroundColor: colorScheme === "dark" ? "#333" : "#fff" },
+            ]}
+          >
+            <View></View>
+            <TouchableOpacity onPress={toggleSearch}>
+              <MaterialIcons
+                name="search"
+                size={24}
+                style={{ color: colorScheme === "dark" ? "#fff" : "#445399" }}
+              />
             </TouchableOpacity>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{watchlist.length}</Text>
-              {/* <Text style={styles.badgeText}>0</Text> */}
-            </View>
-          </View>
+            {showSearch && (
+              <View style={styles.searchOverlay}>
+                <SearchComponent />
+              </View>
+            )}
 
-          <TouchableOpacity onPress={() => route.push("/(tabs)/profile")}>
-            <Ionicons name="person" size={24} color="#445399" />
-          </TouchableOpacity>
-        </ThemedView>
+            <View style={styles.iconWrapper}>
+              <TouchableOpacity
+                onPress={() => route.push("/(tabs)/watchlistscreen")}
+              >
+                <MaterialIcons
+                  name="favorite-border"
+                  size={24}
+                  color="#445399"
+                />
+              </TouchableOpacity>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{watchlist.length}</Text>
+                {/* <Text style={styles.badgeText}>0</Text> */}
+              </View>
+            </View>
+
+            <TouchableOpacity onPress={() => route.push("/(tabs)/profile")}>
+              <Ionicons name="person" size={24} color="#445399" />
+            </TouchableOpacity>
+          </ThemedView>
         </View>
       </ThemedView>
 
@@ -309,7 +310,10 @@ const Header = () => {
                   style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
                 >
                   <SimpleLineIcons name="logout" size={14} color="white" />
-                  <Text className=" font-poppins-medium text-white">
+                  <Text
+                    style={{ color: "white" }}
+                    className=" font-poppins-medium text-white"
+                  >
                     {t("signout")}
                   </Text>
                 </View>
@@ -347,14 +351,26 @@ const Header = () => {
                       </View>
                     )}
                   </TouchableOpacity>
-                  <View style={{ position: "absolute", bottom: 10, left: 38 }}>
+                  <View style={{ position: "absolute", bottom: 10, left: 32,  }}>
                     <TouchableOpacity
                       style={styles.editButton}
                       onPress={handleImagePick}
                     >
-                     <Icon name="edit" size={i18n.language === "en" ? 15 : 10} color="#445399"/>
+                      <Icon
+                        name="edit"
+                        size={i18n.language === "en" ? 15 : 10}
+                        color="#445399"
+                      />
 
-                      <Text style={styles.editButtonText}>{t("edit")}</Text>
+                      <Text
+                        style={{
+                          color: "#445399",
+                          fontWeight: "500",
+                          fontSize: i18n.language === "en"?10:9,
+                        }}
+                      >
+                        {t("edit")}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -462,13 +478,13 @@ const styles = StyleSheet.create({
   },
   searchOverlay: {
     position: "absolute",
-    top:28,       // adjust as needed
-    right:0,   // if you want full screen overlay, or just position relative to your header
+    top: 28, // adjust as needed
+    right: 0, // if you want full screen overlay, or just position relative to your header
     backgroundColor: "white", // optional semi-transparent background
     // additional styling (padding, etc.) if needed
-    borderRadius:43,
-    width:340,
-    zIndex:10,
+    borderRadius: 43,
+    width: 340,
+    zIndex: 10,
     // padding:0,
   },
   profileHeader: {
@@ -514,12 +530,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 2,
+    paddingHorizontal: 6,
     borderRadius: 20,
     backgroundColor: "#e9ecef",
     // width: 44,
     borderWidth: 1,
     borderColor: "#445399",
+    padding:4
   },
   editButtonText: {
     color: "#445399",
@@ -536,11 +553,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap:10,
+    gap: 10,
     width: 100,
     marginRight: 10,
     // marginTop:8,
-  
   },
   iconWrapper: {
     position: "relative",

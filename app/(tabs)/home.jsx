@@ -223,7 +223,9 @@ export default function HomeScreen() {
       setGreeting(t("night")); // Midnight to 6 AM
     } else if (currentHour < 12) {
       setGreeting(t("morning")); // 6 AM to 12 PM
-    } else if (currentHour < 18) {
+    } else if (currentHour < 15) {
+      setGreeting(t("afternoon1")); // 12 PM to 19 PM
+    }else if (currentHour < 18) {
       setGreeting(t("afternoon")); // 12 PM to 6 PM
     } else {
       setGreeting(t("evening")); // 6 PM to Midnight
@@ -346,8 +348,8 @@ export default function HomeScreen() {
         {loading ? (
           [0, 1, 2].map((i) => <SkeletonCard key={i} />)
         ) : announcements.length === 0 ? (
-          <Text className="text-gray-500 text-center">
-            No announcement found
+          <Text style={{textAlign:"center"}} className="text-gray-500 text-center">
+            {t('noannounce')}
           </Text>
         ) : (
           extendedAnnouncements.map((item, index) => (
@@ -483,7 +485,7 @@ export default function HomeScreen() {
                 }}
                 className="text-gray-500 text-center"
               >
-                No Category found
+                {t('nocategory')}
               </Text>
             )}
           </ScrollView>

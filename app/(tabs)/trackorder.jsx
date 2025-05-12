@@ -15,7 +15,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import AnimatedCountdown from "@/components/AnimatedCountdown";
 import { useTranslation } from "react-i18next";
-// import OrderMapView from "@/components/OrderMapView";
+import OrderMapView from "@/components/OrderMapView";
 import ShopTracking from "@/components/ShopTracking";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
@@ -158,7 +158,7 @@ const OrderTrackingScreen = () => {
           style={styles.cardHeaderNew}
         >
           <View style={styles.headerLeft}>
-            <Text style={styles.orderNumber}>ORDER #{item.id}</Text>
+            <Text style={styles.orderNumber}>{t('order')} #{item.id}</Text>
             {new Date(item.scheduled_delivery) < new Date() &&
               item.status !== "Delivered" && (
                 <TouchableOpacity
@@ -187,7 +187,7 @@ const OrderTrackingScreen = () => {
           </View>
           <View
             style={{
-              padding: 1,
+              // padding: 1,
               // height:200,
             }}
           >
@@ -200,7 +200,7 @@ const OrderTrackingScreen = () => {
               source={require("@/assets/images/yasonmap.jpg")}
             /> */}
 
-            {/* {shouldShowMap && <OrderMapView order={item} />} */}
+            {shouldShowMap && <OrderMapView order={item} />}
           </View>
           <View style={styles.countdownWrapper}>
             {item.status === "Delivered" ? (
@@ -262,7 +262,7 @@ const OrderTrackingScreen = () => {
                   </Text>
 
                   <Text style={styles.productMeta}>
-                    {product.quantity}x {product.variant.price}
+                    {product.quantity} x {product.variant.price} {i18n.language === "en" ? t("br") : ""}{product.total_price} {i18n.language === "amh" ? t("br") : ""}
                   </Text>
                 </View>
                 <View>
@@ -485,6 +485,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     color: COLORS.muted,
+    // padding: 12,
   },
   statusBadge: {
     flexDirection: "row",
@@ -498,7 +499,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "start",
-    padding: 12,
+    // padding: 12,
     gap: 12,
     paddingleft: 16,
     borderRadius: 10,
@@ -513,6 +514,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingHorizontal: 12,
+    marginTop:8
   },
   orderNumber: {
     fontSize: 16,
@@ -528,6 +531,7 @@ const styles = StyleSheet.create({
   countdownWrapper: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent:"center"
   },
   deliveredBadge: {
     flexDirection: "row",

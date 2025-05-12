@@ -1,94 +1,115 @@
-// auth/forgot-password.jsx
 import React, { useState } from "react";
-import { View, StyleSheet, Alert } from "react-native";
-import { TextInput, Button, Text } from "react-native-paper";
+import { View, StyleSheet, TextInput, Text, TouchableOpacity, ActivityIndicator, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+import Toast from "react-native-toast-message";
 
 const baseUrl = "https://yasonbackend.yasonsc.com/account/"; // Adjust to your API base URL
 
-const ForgotPasswordScreen = () => {
+export default function ForgotPasswordScreen() {
+  const { t } = useTranslation('forgot');
   const router = useRouter();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [channel, setChannel] = useState("email"); // 'sms' or 'email'
   const [loading, setLoading] = useState(false);
 
+  const showToast = (type, message) => {
+    Toast.show({
+      type,
+      text1: message,
+      position: 'top',
+    });
+  };
+
   const handleSendOTP = async () => {
     if (!emailOrPhone) {
-      Alert.alert("Error", "Please enter your email or phone.");
+      showToast('error', t('enter_email_phone'));
       return;
     }
     try {
       setLoading(true);
       await axios.post(
         `${baseUrl}auth/password-reset/`,
-        {
-          email_or_phone: emailOrPhone,
-          channel,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { email_or_phone: emailOrPhone, channel },
+        { headers: { "Content-Type": "application/json" } }
       );
-      Alert.alert("Success", "OTP sent. Please check your messages.");
+      showToast('success', t('otp_sent'));
       router.push({
         pathname: "/(auth)/otp-verification",
         params: { emailOrPhone, channel },
       });
     } catch (error) {
-      Alert.alert(
-        "Error",
-        error.response?.data?.error || "Failed to send OTP."
-      );
+      showToast('error', error.response?.data?.error || t('otp_failed'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Reset Password</Text>
-      <TextInput
-        label={channel === "sms" ? "Phone Number" : "Email"}
-        value={emailOrPhone}
-        onChangeText={setEmailOrPhone}
-        style={styles.input}
-        keyboardType={channel === "sms" ? "phone-pad" : "email-address"}
-      />
-      {/* <Button
-        mode="outlined"
-        onPress={() => setChannel((prev) => (prev === "sms" ? "email" : "sms"))}
-        style={styles.toggleButton}
-      >
-        <Text className="font-poppins-medium" style={{ color: "#445399" }}>
-          Use {channel === "sms" ? "Email" : "SMS"} instead
-        </Text>
-      </Button> */}
-      <Button
-        mode="contained"
-        onPress={handleSendOTP}
-        loading={loading}
-        disabled={!emailOrPhone || loading}
-        style={{backgroundColor: "#445399"}}
-      >
-        <Text style={{ color: "white", }}>Send OTP</Text>
-      </Button>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>{t('reset')}</Text>
+        <TextInput
+          style={styles.input}
+          placeholder={channel === "sms" ? t('phone') : t('email')}
+          value={emailOrPhone}
+          onChangeText={setEmailOrPhone}
+          keyboardType={channel === "sms" ? "phone-pad" : "email-address"}
+          editable={!loading}
+        />
+        <TouchableOpacity
+          style={[styles.button, (!emailOrPhone || loading) && styles.buttonDisabled]}
+          onPress={handleSendOTP}
+          disabled={!emailOrPhone || loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>{t('send')}</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center" },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+  },
   title: {
     fontSize: 24,
     marginBottom: 20,
     textAlign: "center",
-    color: "#445399",
+    color: "#445399"
   },
-  input: { marginBottom: 15, backgroundColor: "white" },
-  toggleButton: { marginBottom: 15, color: "#445399" },
+  input: {
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#445399',
+    padding: 10,
+    borderRadius: 24,
+    color: "#445399"
+  },
+  button: {
+    backgroundColor: "#445399",
+    paddingVertical: 12,
+    borderRadius: 24,
+    alignItems: "center"
+  },
+  buttonDisabled: {
+    backgroundColor: "#999"
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold"
+  }
 });
-
-export default ForgotPasswordScreen;

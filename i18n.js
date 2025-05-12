@@ -27,6 +27,8 @@ const resources = {
     forgot: require("@/languages/eng/forgot.json"),
     otpverify: require("@/languages/eng/otpverify.json"),
     newpass: require("@/languages/eng/newpass.json"),
+    animatedcountdown: require("@/languages/eng/animatedcountdown.json"),
+    shoptracking: require("@/languages/eng/shoptracking.json"),
   },
   amh: {
     welcome: require("@/languages/amh/welcome.json"),
@@ -52,6 +54,8 @@ const resources = {
     forgot: require("@/languages/amh/forgot.json"),
     otpverify: require("@/languages/amh/otpverify.json"),
     newpass: require("@/languages/amh/newpass.json"),
+    animatedcountdown: require("@/languages/amh/animatedcountdown.json"),
+    shoptracking: require("@/languages/amh/shoptracking.json"),
   },
 };
 

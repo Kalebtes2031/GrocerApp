@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import CountdownBox from "./CountdownBox";
+import { useTranslation } from "react-i18next";
 
 
 const AnimatedCountdown = ({ scheduledTime, warningColor, successColor }) => {
+  const { t} = useTranslation("animatedcountdown");
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -33,10 +35,10 @@ const AnimatedCountdown = ({ scheduledTime, warningColor, successColor }) => {
 
   return (
     <View style={styles.container}>
-      <CountdownBox value={timeLeft.days} label="Days" />
-      <CountdownBox value={timeLeft.hours} label="Hrs" />
-      <CountdownBox value={timeLeft.minutes} label="Min" />
-      <CountdownBox value={timeLeft.seconds} label="Sec" />
+      <CountdownBox value={timeLeft.days} label={t('days')} />
+      <CountdownBox value={timeLeft.hours} label={t('hours')}/>
+      <CountdownBox value={timeLeft.minutes} label={t('minutes')} />
+      <CountdownBox value={timeLeft.seconds} label={t('seconds')} />
     </View>
   );
 };

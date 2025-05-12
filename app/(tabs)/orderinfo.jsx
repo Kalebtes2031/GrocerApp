@@ -134,6 +134,8 @@ export default function OrderInfo() {
             >
               {t('address')}
             </Text>
+            <Text>{ourOrder.customer_address}</Text>
+            {/* <Text>ADDIS ABABA, ETHIOPIA</Text> */}
             <View
               style={{
                 flexDirection: "row",
@@ -146,8 +148,7 @@ export default function OrderInfo() {
                 {ourOrder.first_name} {ourOrder.last_name} 
               </Text>
             </View>
-            {/* <Text>{ourOrder.customer_address}</Text> */}
-            {/* <Text>ADDIS ABABA, ETHIOPIA</Text> */}
+            
             <View
               style={{
                 flexDirection: "row",
