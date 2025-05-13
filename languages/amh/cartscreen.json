@@ -1,9 +1,15 @@
 {
   "shopping": "ዘንቢል",
   "empty":"ባዶ ዘንቢል",
-  "place":"ይዘዙ",
+  "place":"አሁን ይዘዙ",
   "br":"ብር",
   "total":"ጠቅላላ ድምር",
   "birr":"ብር",
-  "cartupdated":""
+  "cartupdated":"",
+  "price":"ዋጋ",
+  "L": "ሊ",
+    "ml": "ሚሊ",
+    "kg": "ኪግ",
+    "g": "ግ",
+    "piece": "PCs"
 }

@@ -13,5 +13,10 @@
   "direct":"Direct Bank Transfer",
   "cash":"Cash on Delivery",
   "qty": "Qty",
-  "schedule": "Schedule Delivery"
+  "schedule": "Schedule Delivery",
+   "L": "L",
+    "ml": "ml",
+    "kg": "Kg",
+    "g": "g",
+    "piece": "PCs"
 }

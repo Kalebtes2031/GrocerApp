@@ -2,5 +2,10 @@
   "category": "Category",
   "br": "Br",
   "noproduct": "No products found",
-  "search": "Search products..."
+  "search": "Search products...",
+    "L": "L",
+    "ml": "ml",
+    "kg": "Kg",
+    "g": "g",
+    "piece": "PCs"
 }

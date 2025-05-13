@@ -20,6 +20,11 @@
   "missed": "Missed Deliveries",
   "reschedule": "Reschedule",
   "notassigned":"Delivery Person Not Assigned",
-  "outdelivery":"Out Delivery"
+  "outdelivery":"Out Delivery",
+   "L": "L",
+    "ml": "ml",
+    "kg": "Kg",
+    "g": "g",
+    "piece": "PCs"
 
 }

@@ -27,11 +27,14 @@ import { LanguageProvider } from "@/context/LanguageProvider";
 import { View } from "react-native";
 import { Text } from "react-native";
 import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
-// import NetInfo from "@react-native-community/netinfo";
+import NetInfo from "@react-native-community/netinfo";
+import { useTranslation } from "react-i18next";
+
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const { t } = useTranslation('first')
   const colorScheme = useColorScheme();
   const [fontsLoaded, error] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
@@ -59,6 +62,34 @@ export default function RootLayout() {
 
   //   return () => unsubscribe();
   // }, []);
+
+
+  useEffect(() => {
+  const unsubscribe = NetInfo.addEventListener(state => {
+    if (!state.isConnected) {
+      // show an “offline” toast that stays until we reconnect
+      Toast.show({
+        type: "error",
+        text1: t("no_internet"),         
+        text2: t("check_connection"),     
+        position: "top",
+        autoHide: false,                
+      });
+    } else {
+      // hide the offline toast and show a “back online” toast briefly
+      Toast.hide();
+      Toast.show({
+        type: "success",
+        text1: t("back_online"),         
+        position: "top",
+        visibilityTime: 2000,           
+      });
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
   
   if (!fontsLoaded) {
     return null; // Show loading screen/image here

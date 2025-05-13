@@ -12,5 +12,16 @@
   "name":"NAME",
   "email":"EMAIL",
   "phone":"PHONE No",
-  "track":"Track Order"
+  "track":"Track Order",
+  "orderinfo":"Order Detail",
+  "product":"Product",
+  "price":"Price",
+  "pay":"Pay Now",
+  "direct":"Direct Bank Transfer",
+  "qty": "Qty",
+   "L": "L",
+    "ml": "ml",
+    "kg": "Kg",
+    "g": "g",
+    "piece": "PCs"
 }

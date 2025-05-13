@@ -132,7 +132,7 @@ const OrderTrackingScreen = () => {
     const scheduled = new Date(item.scheduled_delivery);
     const isMissed = scheduled < nowDate && item.status !== "Delivered";
     const shouldShowMap = section.title === t("active") && item.need_delivery;
-    const dontshowstatus = section.title === t("missed");
+    const dontshowstatus = section.title === t("missed") || item.need_delivery===false;
     const dontshowtime =
       section.title === t("missed") || section.title === t("completed");
     const timeInfo =
@@ -287,6 +287,8 @@ const OrderTrackingScreen = () => {
         </View>
 
         {/* Delivery Info */}
+        {item.need_delivery === true && (
+
         <View style={styles.deliveryInfo}>
           <Icon name="local-shipping" size={20} color={COLORS.secondary} />
           {/* <View style={styles.deliveryDetails}> */}
@@ -357,6 +359,7 @@ const OrderTrackingScreen = () => {
             </TouchableOpacity>
           )}
         </View>
+        )}
       </View>
     );
   };
@@ -648,6 +651,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: COLORS.primary,
+    width:83
   },
   deliveryInfo: {
     flexDirection: "row",

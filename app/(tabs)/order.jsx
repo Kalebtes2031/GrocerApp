@@ -111,7 +111,7 @@ const Order = () => {
             style={styles.productImage}
           />
           <Text>
-            {t("price")} / {item.variant?.unit}{" "}
+            {t("price")} / {t(`${item.variant?.unit}`)}{" "}
           </Text>
         </View>
         <View style={styles.itemDetails}>
@@ -120,7 +120,7 @@ const Order = () => {
               ? item.variant.product?.item_name
               : item.variant.product?.item_name_amh}{" "}
             {parseInt(item.variant?.quantity)}
-            {item.variant?.unit}
+            {t(`${item.variant?.unit}`)}
           </Text>
           <View style={styles.priceRow}>
             <Text style={styles.itemPrice}>
@@ -217,7 +217,7 @@ const Order = () => {
           <Text style={styles.orderId}>
             {t("order")} #{order.id}
           </Text>
-          {renderOrderStatus(order.status)}
+          {/* {renderOrderStatus(order.status)} */}
         </View>
 
         <View style={styles.orderMeta}>
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   orderId: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#1A1A1A",
+    color: "black",
   },
   orderMeta: {
     marginBottom: 16,

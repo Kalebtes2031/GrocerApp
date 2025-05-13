@@ -4,5 +4,11 @@
   "place":"PLACE ORDER",
   "br":"Br",
   "total":"Total",
-  "birr":"Birr"
+  "birr":"Birr",
+  "price":"Price",
+   "L": "L",
+    "ml": "ml",
+    "kg": "Kg",
+    "g": "g",
+    "piece": "PCs"
 }

@@ -116,7 +116,7 @@ const toggleFavorite = () => {
           <View style={styles.priceContainer}>
             <Text style={styles.unitText}>
               {parseInt(product?.variation?.quantity)}{" "}
-              {product?.variation?.unit}
+              {t(`${product?.variation?.unit}`)}
             </Text>
             <Text style={styles.priceText}>
               {i18n.language === "en"? "Birr":""} {product.variation?.price} {i18n.language === "amh"? "ብር":""} 

@@ -13,5 +13,10 @@
   "tele":"Telebirr",
   "cbe":"Commercial Bank of Ethiopia",
   "abyssinia":"Bank of Abysinia",
-  "coop":"Cooperative Bank of Oromia"
+  "coop":"Cooperative Bank of Oromia",
+  "errormessage":"Error",
+  "errormessage1":"Please upload a receipt",
+  "errormessage2":"Please Select a Bank",
+  "errormessage3":"File size exceeds 5MB limit",
+  "instruction":"choose a bank and upload a payment receipt"
 }

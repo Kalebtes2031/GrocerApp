@@ -102,7 +102,7 @@ const CategoryDetail = () => {
           {t("br")} {parseInt(item.variation.price)}
         </Text>
         <Text style={styles.unitText}>
-          {parseInt(item.variation.quantity)} /{item.variation.unit}
+          {parseInt(item.variation.quantity)} /{t(`${item.variation.unit}`)}
         </Text>
       </View>
     </TouchableOpacity>

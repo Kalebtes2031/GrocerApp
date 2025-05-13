@@ -259,7 +259,7 @@ const CheckoutPage = () => {
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => route.push("/(tabs)/cartscreen")}
-          style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+          style={{ marginHorizontal: 10, paddingHorizontal: 2, borderWidth:1, borderRadius:52, paddingVertical:2 ,  borderColor:"#445399",}}
           className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
         >
           <Ionicons name="arrow-back" size={24} color="#445399" />
@@ -272,13 +272,24 @@ const CheckoutPage = () => {
             <Text style={styles.badgeText}>0</Text>
           </View>
         </View> */}
-      </View>
       <Text
         className="font-poppins-bold text-center text-primary mb-4"
-        style={styles.headerTitle}
+        style={{
+           fontSize: 20,
+            fontWeight: "bold",
+            textAlign: "center",
+            color: "#445399",
+            marginTop:23,
+
+            // position:"absolute",
+            // top:12,
+            // right:160
+        }}
       >
         {t("check")}
       </Text>
+      <View style={{paddingHorizontal:32}}></View>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Order Summary Section */}
         <View style={styles.sectiona}>
@@ -405,13 +416,14 @@ const CheckoutPage = () => {
         <View style={styles.section}>
           <View
             style={{
-              display: "flex",
+              // display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginHorizontal: 10,
+              // marginHorizontal: 10,
               borderBottomWidth: 1,
               borderBottomColor: "#445399",
+              
             }}
           >
             <Text style={styles.sectionTitle}>{t("product")}</Text>
@@ -437,7 +449,7 @@ const CheckoutPage = () => {
                   </Text>
                   <Text style={styles.quantity1}>
                     {parseInt(item.variations.quantity)}
-                    {item.variations.unit}
+                    {t(`${item.variations.unit}`)}
                   </Text>
                 </View>
                 <Text style={styles.quantity}>
@@ -476,6 +488,7 @@ const CheckoutPage = () => {
             justifyContent: "space-between",
             alignItems: "center",
             paddingHorizontal: 14,
+            gap:6
           }}
         >
           {/* <View style={styles.paymentMethod}>
@@ -661,12 +674,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   headerContainer: {
-    height: 60,
-    backgroundColor: "#fff",
+    // height: 40,
+    // backgroundColor: "red",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
+    // marginBottom:20,
+    paddingTop:0,
+    // paddingBottom:3
     // borderBottomWidth: 1,
     // borderBottomColor: "#eee",
   },
@@ -703,6 +719,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     color: "#445399",
+    // position:"absolute",
+    // top:-12
     marginBottom: 10,
   },
   scrollContent: {
@@ -733,9 +751,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
-    fontSize: 15,
+    fontSize: 12,
     marginBottom: 4,
     color: "#445399",
+    marginLeft:12
   },
   input: {
     height: 40,
@@ -754,9 +773,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
     marginBottom: 6,
+    width:52,
     color: "#333",
   },
   itemRow: {
@@ -766,6 +786,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+    width: "100%",
+    // backgroundColor: "red",
+    // textAlign: "center",
   },
   itemInfo: {
     flex: 1,
@@ -789,12 +812,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     color: "#333",
-  },
-  totalContainer: {
-    marginTop: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
   },
   totalRow: {
     flexDirection: "row",
@@ -831,17 +848,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingLeft: 8,
-    marginRight: 12,
+    marginRight: 4,
   },
-  radioButton: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "gray",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  // radioButton: {
+  //   height: 20,
+  //   width: 20,
+  //   borderRadius: 10,
+  //   borderWidth: 2,
+  //   borderColor: "gray",
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   marginLeft:4
+  // },
   // radioSelected: {
   //   backgroundColor: "green", // Conditional green color
   //   borderColor: "green",
@@ -870,22 +888,29 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopWidth: 1,
     borderTopColor: "#eee",
+    width: "100%",
+    textAlign: "center",
   },
   placeOrderButton: {
     backgroundColor: "#445399",
     borderRadius: 38,
     padding: 16,
     alignItems: "center",
+    
   },
   placeOrderText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+    width: "100%",
+    textAlign: "center",
   },
   placeOrderText1: {
     color: "white",
     fontSize: 12,
     fontWeight: "600",
+    width: "100%",
+    textAlign: "center",
   },
   //starts here
   modalOverlay: {
@@ -970,7 +995,7 @@ const styles = StyleSheet.create({
     fontSize: 12, // text-[12px]
   },
   locationSection: { marginVertical: 16 },
-  label: { fontSize: 16, fontWeight: "bold", marginBottom: 8 },
+  // label: { fontSize: 16, fontWeight: "bold", marginBottom: 8 },
   choiceContainer: { flexDirection: "row", marginBottom: 8 },
   choiceButton: {
     flex: 1,

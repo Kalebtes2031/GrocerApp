@@ -196,6 +196,7 @@ const ScheduleDeliveryScreen = () => {
   }, [user]);
 
   // fetch function (debounced if you like):
+  // 
   // 2. Improve your Nominatim fetch so it really returns JSON
   const fetchAddresses = async (q) => {
     if (q.length < 3) return setSearchResults([]);
@@ -336,27 +337,27 @@ const ScheduleDeliveryScreen = () => {
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => navigation.back()}
-          style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+           style={{ marginHorizontal: 10, paddingHorizontal: 2, borderWidth:1, borderRadius:52, paddingVertical:2 ,  borderColor:"#445399",}}
           className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
         >
           <Ionicons name="arrow-back" size={24} color="#445399" />
         </TouchableOpacity>
-      </View>
-      <Text
-        // className="font-poppins-bold text-center text-primary mb-4"
-        style={{
-          fontSize: 20,
-          fontWeight: "bold",
-          fontFamily: "Poppins-bold",
-          textAlign: "center",
-          color: "#445399",
-          marginBottom: 4,
-        }}
-      >
-        {t("schedule")}
-      </Text>
-      <View style={{ paddingHorizontal: 12, marginBottom: 6 }}>
         <Text
+          // className="font-poppins-bold text-center text-primary mb-4"
+          style={{
+           fontSize: 16,
+            fontWeight: "bold",
+            textAlign: "center",
+            color: "#445399",
+            marginTop:4,
+          }}
+        >
+          {t("schedule")}
+        </Text>
+        <View style={{paddingHorizontal:22}}></View>
+      </View>
+      <View>
+        {/* <Text
           style={{
             fontSize: 18,
             paddingLeft: 8,
@@ -366,7 +367,7 @@ const ScheduleDeliveryScreen = () => {
           className="text-start font-poppins-bold text-gray-800 text-[14px]"
         >
           {t("address")}
-        </Text>
+        </Text> */}
         {/* <View style={{ marginBottom: 10 }}>
           <TextInput
             style={{
@@ -585,7 +586,7 @@ const ScheduleDeliveryScreen = () => {
               }
             }}
           >
-            <Text>{t("use_current")}</Text>
+            <Text style={{color: locationChoice === "current"? "white":"#445399"}}>{t("use_current")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -601,10 +602,9 @@ const ScheduleDeliveryScreen = () => {
               }
             }}
           >
-            <Text>{t("selectonmap")}</Text>
+            <Text style={{color: locationChoice !== "current"? "white":"#445399"}}>{t("selectonmap")}</Text>
           </TouchableOpacity>
         </View>
-
         {(locationChoice === "current" || locationChoice === "custom") && (
           // inside your render return, replacing the <MapView> block:
           <View style={styles.mapContainer}>
@@ -654,7 +654,7 @@ const ScheduleDeliveryScreen = () => {
       )}
 
       <Text
-        style={{ fontSize: 18, paddingLeft: 8, marginTop: 15 }}
+        style={{ fontSize: 18, paddingLeft: 8, marginTop: 5, textAlign:"center",color:"#445399", fontSize:14, fontWeight:"bold"  }}
         className="text-start font-poppins-bold text-gray-800 text-[14px] mb-4"
       >
         {t("date")}
@@ -677,8 +677,8 @@ const ScheduleDeliveryScreen = () => {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "center",
-            gap: 12,
+            alignItems: "start",
+            // gap: 12,
             padding: 4,
           }}
         >
@@ -791,7 +791,7 @@ const ScheduleDeliveryScreen = () => {
             style={{
               marginBottom: 10,
               width: "100%",
-              paddingHorizontal: 2,
+              paddingHorizontal: 12,
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
@@ -909,6 +909,18 @@ const ScheduleDeliveryScreen = () => {
 };
 
 const styles = StyleSheet.create({
+   headerContainer: {
+    height: 40,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingTop:0,
+    marginBottom:6
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#eee",
+  },
   markerContainer: {
     display: "flex",
     alignItems: "center",
@@ -923,9 +935,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginVertical: 8,
     backgroundColor: "#cce5ff",
-    padding:4,
+    padding:6,
     marginHorizontal:24,
-    borderRadius: 4,
+    borderRadius: 54,
     color:"#445399"
   },
 
@@ -1008,9 +1020,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     alignItems: "center",
     marginHorizontal: 4,
-    borderRadius: 4,
+    borderRadius: 54,
   },
-  selectedChoice: { backgroundColor: "#d0e8ff" },
+  selectedChoice: { backgroundColor: "#445399" ,color:"white"},
   locationText: { marginTop: 8, fontSize: 14 },
   mapContainer: {
     width: 350,
@@ -1020,7 +1032,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 4,
     overflow: "hidden",
-    marginTop: 8,
+    marginTop: 2,
   },
   map: { width: "100%", height: "100%" },
   title: {
@@ -1038,7 +1050,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: "hidden",
     alignSelf: "center",
-    marginBottom: 25,
+    marginBottom: 15,
     elevation: 3,
     backgroundColor: "white",
     shadowColor: "#000",
@@ -1053,9 +1065,10 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: "white",
     borderRadius: 10,
-    marginVertical: 10,
+    // marginVertical: 10,
     elevation: 2,
     marginRight: 3,
+    height:243
   },
   timeText: {
     fontSize: 18,
@@ -1069,7 +1082,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   buttonContainer: {
-    marginTop: 20,
+    // marginTop: 20,
     borderRadius: 50,
   },
   button1: {
@@ -1078,7 +1091,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   buttonContainer1: {
-    marginTop: 20,
+    // marginTop: 20,
     borderRadius: 50,
   },
   errorContainer: {

@@ -2,5 +2,10 @@
   "etb": "ETB",
   "product": "product added to cart",
   "removed": "Removed from Watchlist",
-  "added": "Added to Watchlist"
+  "added": "Added to Watchlist",
+   "L": "L",
+    "ml": "ml",
+    "kg": "Kg",
+    "g": "g",
+    "piece": "PCs"
 }

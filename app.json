@@ -4,16 +4,16 @@
     "slug": "MyFreshApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/yasonlogo.png",
+    "icon": "./assets/images/yason.png",
     "scheme": "myfreshapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": {
+    "ios": { 
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/yasonlogo.png",
+        "foregroundImage": "./assets/images/yason.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": false,
@@ -23,7 +23,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/yason.png"
     },
     "experiments": {
       "typedRoutes": true

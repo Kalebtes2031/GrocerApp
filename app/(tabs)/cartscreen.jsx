@@ -104,11 +104,15 @@ const CartScreen = () => {
                 paddingHorizontal: 2,
                 width: 10,
                 height: 10,
-                borderRadius: 10,
+                // borderRadius: 10,
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
                 padding: 1,
+                borderWidth: 2,
+                borderRadius: 52,
+                borderColor: "#445399",
+                paddingVertical: 2,
 
                 //
               }}
@@ -184,7 +188,14 @@ const CartScreen = () => {
             <View style={styles.headerContainer}>
               <TouchableOpacity
                 onPress={() => router.back()}
-                style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+                style={{
+                  marginHorizontal: 10,
+                  paddingHorizontal: 2,
+                  borderWidth: 1,
+                  borderRadius: 52,
+                  borderColor: "#445399",
+                  paddingVertical: 2,
+                }}
                 className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
               >
                 <Ionicons name="arrow-back" size={24} color="#445399" />
@@ -206,7 +217,15 @@ const CartScreen = () => {
             </View>
             <Text
               className="font-poppins-bold text-center text-primary mb-4"
-              style={styles.headerTitle}
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                color: "#445399",
+                textAlign: "center",
+                fontFamily: "Poppins-Bold",
+                postion: "absolute",
+                top:-13
+              }}
             >
               {t("shopping")}
             </Text>
@@ -220,13 +239,13 @@ const CartScreen = () => {
                     <Image
                       source={{ uri: item?.image }}
                       style={styles.productImage}
-                      resizeMode="contain"
+                      resizeMode="cover"
                     />
                   </TouchableOpacity>
 
                   <View style={styles.detailsContainer}>
                     <View
-                      className="flex"
+                      // className="flex"
                       style={{
                         // display: "flex",
                         // flexDirection: "row",
@@ -236,23 +255,23 @@ const CartScreen = () => {
                         width: 120,
                       }}
                     >
-                      <Text style={styles.productName}>
+                      <Text
+                        includeFontPadding={false}
+                        style={styles.productName}
+                      >
                         {i18n.language === "en"
                           ? item?.item_name
                           : item?.item_name_amh}
                         {"  "}
                         {parseInt(item?.variations?.quantity)}
-                        {item?.variations?.unit}
+                        {t(`${item?.variations?.unit}`)}
                       </Text>
-                      <Text style={styles.productName}></Text>
+                      <Text
+                        includeFontPadding={false}
+                        style={styles.productName}
+                      ></Text>
                     </View>
-                    <Text style={styles.price}>
-                    
-                      {i18n.language === "en" ? t("br") : ""}
-                      {parseFloat(item.variations?.price || "0").toFixed(2)} {" "}
-                      {i18n.language === "amh" ? t("br") : ""}
-                    </Text>
-                    
+
                     <View style={styles.quantityContainer}>
                       <TouchableOpacity
                         onPress={() =>
@@ -272,7 +291,7 @@ const CartScreen = () => {
                           <MaterialIcons
                             name="remove-circle-outline"
                             size={28}
-                            color={item.quantity === 1 ? "#ccc" : "#000"}
+                            color={item.quantity === 1 ? "#ccc" : "#445399"}
                           />
                         )}
                       </TouchableOpacity>
@@ -294,10 +313,26 @@ const CartScreen = () => {
                           <MaterialIcons
                             name="add-circle-outline"
                             size={28}
-                            color="#000"
+                            color="#445399"
                           />
                         )}
                       </TouchableOpacity>
+                    </View>
+                    {/* price */}
+                    <View style={{ marginTop: 10, marginLeft: 8 }}>
+                      <Text style={styles.price}>
+                        {item?.quantity} x
+                        {i18n.language === "en" ? t("br") : ""}
+                        {parseFloat(item.variations?.price || "0").toFixed(
+                          2
+                        )}{" "}
+                        {i18n.language === "amh" ? t("br") : ""}
+                      </Text>
+                      <Text style={styles.itemTotal}>
+                        = {i18n.language === "en" ? t("br") : ""}
+                        {(item.total_price || 0).toFixed(2)}{" "}
+                        {i18n.language === "amh" ? t("br") : ""}
+                      </Text>
                     </View>
                   </View>
 
@@ -308,7 +343,7 @@ const CartScreen = () => {
                       {i18n.language === "amh" ? t("br") : ""}
                     </Text> */}
                     <Text>
-                      {t("price")} / {item.variations?.unit}{" "}
+                      {t("price")} / {t(`${item.variations?.unit}`)}{" "}
                     </Text>
                     <TouchableOpacity
                       onPress={() => handleRemoveCartItems(item.variations.id)}
@@ -393,12 +428,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   headerContainer: {
-    height: 60,
+    height: 50,
     backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
+    // backgroundColor:"red"
     // borderBottomWidth: 1,
     // borderBottomColor: "#eee",
   },
@@ -462,7 +498,7 @@ const styles = StyleSheet.create({
   },
   // ... keep the rest of your existing styles
   scrollContainers: {
-    padding: 16,
+    paddingHorizontal: 16,
   },
   itemContainer: {
     flexDirection: "row",
@@ -479,22 +515,24 @@ const styles = StyleSheet.create({
   productImage: {
     width: 100,
     height: 100,
-    borderRadius: 8,
+    borderRadius: 20,
     marginRight: 16,
   },
   detailsContainer: {
-    display: "flex",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    // gap: 8,
+    // justifyContent: "space-between",
   },
   productName: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 1,
+    // fontSize: 16,
+    // fontWeight: "600",
+    // height:12,
+    // marginBottom: 1,
   },
   price: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 8,
+    // marginBottom: 8,
     // marginTop: 8,
   },
   quantityContainer: {
@@ -507,6 +545,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     minWidth: 24,
     textAlign: "center",
+    color: "#445399",
   },
   quantityText: {
     marginHorizontal: 10,
@@ -520,6 +559,7 @@ const styles = StyleSheet.create({
   itemTotal: {
     fontSize: 12,
     fontWeight: "600",
+    // textAlign: "right",
   },
   deleteButton: {
     padding: 4,

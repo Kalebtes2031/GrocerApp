@@ -34,21 +34,19 @@ const DirectBankTransfer = () => {
   const fetchBanksData = async () => {
     try {
       const response = await fetchBanks();
-      setBanks(response)
+      setBanks(response);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching banks:", error);
       setLoading(false);
       // Alert.alert("Error", "Failed to fetch banks data");
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
   useEffect(() => {
-    fetchBanksData(); 
+    fetchBanksData();
   }, []);
-
-
 
   if (typeof rawPaymentData === "string") {
     try {
@@ -119,7 +117,7 @@ const DirectBankTransfer = () => {
 
         // Validate file size
         if (file.size > 5 * 1024 * 1024) {
-          Alert.alert("Error", "File size exceeds 5MB limit");
+          Alert.alert(t("errormessage"), "File size exceeds 5MB limit");
           return;
         }
 
@@ -156,10 +154,10 @@ const DirectBankTransfer = () => {
   const handleSubmit = async () => {
     // if (isSubmitting) return;
     // setIsSubmitting(true);
-    if (!bankPaymentForm.receipt) {
-      Alert.alert("Error", "Please upload a receipt");
-      return;
-    }
+    // if (!bankPaymentForm.receipt) {
+    //   Alert.alert(t('errormessage'), t('errormessage1'));
+    //   return;
+    // }
     console.log("FormData contents:", {
       orderId: orderId,
       amountToPay: amountToPay,
@@ -204,92 +202,133 @@ const DirectBankTransfer = () => {
   const handleSchedule = async () => {
     // if (isSubmitting) return;
     if (!bankPaymentForm.bank) {
-      Alert.alert("Error", "Please Select a Bank");
+      Alert.alert(t("errormessage"), t("errormessage2"));
       return;
     }
     if (!bankPaymentForm.receipt) {
-      Alert.alert("Error", "Please upload a receipt");
+      Alert.alert(t("errormessage"), t("errormessage1"));
       return;
     }
 
-    setIsSubmitting(true);                  // <-- enter loading state
-  try {
-    await handleSubmit();                 // <-- wait for backend call
-    // only navigate once the POST completes
-    router.push(
-      `./schedule?orderId=${encodeURIComponent(JSON.stringify(orderId))}`
-    );
-  } catch (err) {
-    console.error(err);
-    Alert.alert("Error", "Something went wrong, please try again.");
-  } finally {
-    setIsSubmitting(false);               // <-- exit loading state
-  }
+    setIsSubmitting(true); // <-- enter loading state
+    try {
+      await handleSubmit(); // <-- wait for backend call
+      // only navigate once the POST completes
+      router.push(
+        `./schedule?orderId=${encodeURIComponent(JSON.stringify(orderId))}`
+      );
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error", "Something went wrong, please try again.");
+    } finally {
+      setIsSubmitting(false); // <-- exit loading state
+    }
   };
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
-            onPress={() => router.back()}
-            style={{ marginHorizontal: 1, paddingHorizontal: 2 }}
+            onPress={() => router.push('/(tabs)/home')}
+            style={{
+              marginHorizontal: 10,
+              paddingHorizontal: 2,
+              borderWidth: 1,
+              borderRadius: 52,
+              paddingVertical: 2,
+              borderColor: "#445399",
+            }}
             className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
           >
             <Ionicons name="arrow-back" size={24} color="#445399" />
           </TouchableOpacity>
+          <Text
+            className="font-poppins-bold text-center text-primary mb-4"
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#445399",
+              marginTop: 13,
+
+              // position:"absolute",
+              // top:12,
+              // right:160
+            }}
+          >
+            {t("bank")}
+          </Text>
+          <View style={{ paddingHorizontal: 32 }}></View>
         </View>
-        <Text
+        {/* <Text
           className="font-poppins-bold text-center text-primary mb-4"
           style={styles.headerTitle}
         >
           {t("bank")}
-        </Text>
+        </Text> */}
         <View style={styles.sectiona}>
           <Text style={styles.sectionTitle}>{t("yason")}</Text>
-         {loading
-           ? <ActivityIndicator style={{ marginTop: 20 }} />
-           : (
-             <View style={styles.bankGrid}>
-               {banks.map((account, idx) => (
-                 <View key={account.id} style={styles.bankCard}>
-                   <Image
-                     source={{ uri: account.logo }}
-                     style={styles.bankLogo}
-                     resizeMode="contain"
-                   />
-                   <View style={styles.bankDetails}>
-                     <Text style={styles.accountName}>{account.name}</Text>
-                     <View style={styles.accountNumberContainer}>
-                       <Text style={styles.accountNumber}>
-                         {account.account_number}
-                       </Text>
-                       <TouchableOpacity
-                         onPress={() =>
-                           copyToClipboard(
-                             account.account_number,
-                             idx,
-                             account.bank_name
-                           )
-                         }
-                         style={styles.copyButton}
-                       >
-                         {copiedIndex === idx
-                           ? <Feather name="check-circle" size={12} color="green" />
-                           : <Feather name="copy" size={12} color="gray" />
-                         }
-                       </TouchableOpacity>
-                     </View>
-                   </View>
-                 </View>
-               ))}
-             </View>
-           )
-         }
+
+          <Text
+            style={{
+              fontSize: 12,
+              color: "#445399",
+              fontFamily: "Poppins-semibold",
+              textAlign: "center",
+              paddingTop: 6,
+              marginBottom: 6,
+            }}
+          >
+            {t('instruction')}
+          </Text>
+          {loading ? (
+            <ActivityIndicator style={{ marginTop: 20 }} />
+          ) : (
+            <View style={styles.bankGrid}>
+              {banks.map((account, idx) => (
+                <View key={account.id} style={styles.bankCard}>
+                  <Image
+                    source={{ uri: account.logo }}
+                    style={styles.bankLogo}
+                    resizeMode="contain"
+                  />
+                  <View style={styles.bankDetails}>
+                    {/* <Text style={styles.accountName}>{account.name}</Text> */}
+                    <View style={styles.accountNumberContainer}>
+                      <Text style={styles.accountNumber}>
+                        {account.account_number}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          copyToClipboard(
+                            account.account_number,
+                            idx,
+                            account.bank_name
+                          )
+                        }
+                        style={styles.copyButton}
+                      >
+                        {copiedIndex === idx ? (
+                          <Feather
+                            name="check-circle"
+                            size={14}
+                            color="green"
+                          />
+                        ) : (
+                          <Feather name="copy" size={14} color="gray" />
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
 
           <View style={styles.formContainer}>
             <Text style={styles.label}>{t("select")}</Text>
             <View style={styles.pickerContainer}>
-              <Picker
+              {/* <Picker
                 selectedValue={bankPaymentForm.bank}
                 onValueChange={(value) =>
                   setBankPaymentForm({ ...bankPaymentForm, bank: value })
@@ -304,7 +343,12 @@ const DirectBankTransfer = () => {
                     value={bank.bank_name}
                   />
                 ))}
-              </Picker>
+              </Picker> */}
+              <View style={styles.picker}>
+                <Text style={{ textAlign: "center", color: "#948979" }}>
+                  {bankPaymentForm.bank ? bankPaymentForm.bank : t("select")}
+                </Text>
+              </View>
             </View>
 
             <Text style={styles.label}>{t("upload")}</Text>
@@ -332,29 +376,29 @@ const DirectBankTransfer = () => {
           }}
         >
           <TouchableOpacity
-  style={[
-    i18n.language === "en"
-      ? styles.submitButton
-      : styles.submitButton1,
-    isSubmitting && { opacity: 0.6 }   // visual feedback when disabled
-  ]}
-  onPress={handleSchedule}
-  disabled={isSubmitting}              // prevents double‑taps
->
-  {isSubmitting ? (
-    <ActivityIndicator color="#fff" />
-  ) : (
-    <Text
-      style={
-        i18n.language === "en"
-          ? styles.submitButtonText
-          : styles.submitButtonText1
-      }
-    >
-      {t("schedule")}
-    </Text>
-  )}
-</TouchableOpacity>
+            style={[
+              i18n.language === "en"
+                ? styles.submitButton
+                : styles.submitButton1,
+              isSubmitting && { opacity: 0.6 }, // visual feedback when disabled
+            ]}
+            onPress={handleSchedule}
+            disabled={isSubmitting} // prevents double‑taps
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text
+                style={
+                  i18n.language === "en"
+                    ? styles.submitButtonText
+                    : styles.submitButtonText1
+                }
+              >
+                {t("schedule")}
+              </Text>
+            )}
+          </TouchableOpacity>
 
           {/* <TouchableOpacity
             onPress={() =>
@@ -382,8 +426,8 @@ const DirectBankTransfer = () => {
               }
             >
               {/* {isSubmitting ? "Processing..." : "Submit Payment"} */}
-              {/* {t("pick")} */}
-            {/* </Text> */}
+          {/* {t("pick")} */}
+          {/* </Text> */}
           {/* </TouchableOpacity> */}
         </View>
       </ScrollView>
@@ -399,7 +443,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   container: {
-    paddingVertical: 20,
+    paddingBottom: 20,
     paddingHorizontal: 16,
   },
   title: {
@@ -424,12 +468,14 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   headerContainer: {
-    height: 30,
+    height: 40,
     backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
+    paddingTop: 0,
+    marginBottom: 13,
     // borderBottomWidth: 1,
     // borderBottomColor: "#eee",
   },
@@ -443,8 +489,9 @@ const styles = StyleSheet.create({
   sectiona: {
     backgroundColor: "rgba(150, 166, 234, 0.4)",
     borderRadius: 32,
-    padding: 16,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+
+    // marginBottom: 16,
     borderWidth: 1,
     borderColor: "#445399",
   },
@@ -453,27 +500,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#445399",
-    marginVertical: 15,
+    marginTop: 15,
   },
   bankGrid: {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  justifyContent: "space-between",
-},
-bankCard: {
-  width: "48%",            // two cards per row
-  backgroundColor: "#fff",
-  paddingHorizontal: 4,
-  paddingVertical: 12,
-  borderRadius: 8,
-  marginBottom: 12,
-  // keep your shadows/elevation here…
-},
-bankLogo: {
-  width: "100%",           // fill card width
-  height: 40,
-  marginBottom: 8,
-},
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  bankCard: {
+    width: "48%", // two cards per row
+    backgroundColor: "#fff",
+    paddingHorizontal: 4,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    // keep your shadows/elevation here…
+  },
+  bankLogo: {
+    width: "100%", // fill card width
+    height: 40,
+    marginBottom: 8,
+  },
   // bankCard: {
   //   flexDirection: "column",
   //   backgroundColor: "#fff",
@@ -511,7 +558,7 @@ bankLogo: {
     color: "#4B5563",
   },
   copyButton: {
-    marginLeft: 8,
+    marginRight: 4,
     padding: 6,
     backgroundColor: "#E5E7EB",
     borderRadius: 4,
@@ -520,28 +567,32 @@ bankLogo: {
     marginBottom: 16,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "500",
-    color: "#4B5563",
+    color: "#445399",
     marginBottom: 8,
   },
   pickerContainer: {
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 8,
+    borderRadius: 58,
     marginBottom: 16,
     overflow: "hidden",
     backgroundColor: "#f5f5f5",
+    paddingLeft: 13,
   },
   picker: {
-    height: 53,
+    height: 45,
     width: "100%",
-    color: "#000",
+    flexDirection: "row",
+    justifyContent: "start",
+    alignItems: "center",
+    marginLeft: 8,
   },
   uploadButton: {
     backgroundColor: "#E5E7EB",
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 58,
     alignItems: "center",
     marginBottom: 16,
     flexDirection: "row",
@@ -557,14 +608,14 @@ bankLogo: {
     padding: 16,
     borderRadius: 38,
     alignItems: "center",
-    width:"100%"
+    width: "100%",
   },
   submitButton1: {
     backgroundColor: "#445399",
     padding: 16,
     borderRadius: 38,
     alignItems: "center",
-    width:"100%"
+    width: "100%",
   },
   submitButton2: {
     backgroundColor: "#55B051",
@@ -587,5 +638,7 @@ bankLogo: {
     fontSize: 12,
     color: "#fff",
     fontWeight: "600",
+    width: "100%",
+    textAlign: "center",
   },
 });

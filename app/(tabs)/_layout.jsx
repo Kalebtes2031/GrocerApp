@@ -81,15 +81,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="order"
-        options={{
-          title: t("myorders"),
-          tabBarIcon: ({ color }) => (
-            <MaterialIcons name="work-history" size={28} color={color} />
-          ),
-        }}
-      />
+
       <Tabs.Screen
         name="trackorder"
         options={{
@@ -100,6 +92,15 @@ export default function TabLayout() {
               size={24}
               color={color}
             />
+          ),
+        }}
+      /> 
+           <Tabs.Screen
+        name="order"
+        options={{
+          title: t("myorders"),
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="work-history" size={28} color={color} />
           ),
         }}
       />
