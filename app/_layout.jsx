@@ -17,7 +17,8 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';import Header from "@/components/Header"; // Import the Header component
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import Header from "@/components/Header"; // Import the Header component
 import SearchComp from "@/components/SearchComp";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalProvider from "@/context/GlobalProvider";
@@ -30,11 +31,10 @@ import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
 import NetInfo from "@react-native-community/netinfo";
 import { useTranslation } from "react-i18next";
 
-
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const { t } = useTranslation('first')
+  const { t } = useTranslation("first");
   const colorScheme = useColorScheme();
   const [fontsLoaded, error] = useFonts({
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
@@ -63,59 +63,71 @@ export default function RootLayout() {
   //   return () => unsubscribe();
   // }, []);
 
-
   useEffect(() => {
-  const unsubscribe = NetInfo.addEventListener(state => {
-    if (!state.isConnected) {
-      // show an “offline” toast that stays until we reconnect
-      Toast.show({
-        type: "error",
-        text1: t("no_internet"),         
-        text2: t("check_connection"),     
-        position: "top",
-        autoHide: false,                
-      });
-    } else {
-      // hide the offline toast and show a “back online” toast briefly
-      Toast.hide();
-      Toast.show({
-        type: "success",
-        text1: t("back_online"),         
-        position: "top",
-        visibilityTime: 2000,           
-      });
-    }
-  });
+    // 1. Check the **initial** state
+    NetInfo.fetch().then((state) => {
+      if (!state.isConnected) {
+        Toast.show({
+          type: "error",
+          text1: t("no_internet"),
+          text2: t("check_connection"),
+          position: "top",
+          autoHide: false,
+        });
+      }
+    });
 
-  return () => unsubscribe();
-}, []);
+    // 2. Then subscribe to changes
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      if (!state.isConnected) {
+        // if we go offline later
+        Toast.show({
+          type: "error",
+          text1: t("no_internet"),
+          text2: t("check_connection"),
+          position: "top",
+          autoHide: false,
+        });
+      } else {
+        // back online
+        Toast.hide();
+        Toast.show({
+          type: "success",
+          text1: t("back_online"),
+          position: "top",
+          visibilityTime: 2000,
+        });
+      }
+    });
 
-  
+    return () => unsubscribe();
+  }, [t]);
+
   if (!fontsLoaded) {
     return null; // Show loading screen/image here
   }
 
   const toastConfig = {
-  error: (props) => (
-    <ErrorToast
-      {...props}
-      text1Style={{
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: 'red',
-      }}
-      text2Style={{
-        fontSize: 16,
-        color: '#333',
-      }}
-      style={{
-        borderLeftColor: 'red',
-        padding: 12,
-        borderRadius: 8,
-      }}
-    />
-  ),
-};
+    error: (props) => (
+      <ErrorToast
+        {...props}
+        text1Style={{
+          fontSize: 16,
+          fontWeight: "bold",
+          color: "red",
+        }}
+        text2Style={{
+          fontSize: 15,
+          color: "#333",
+        }}
+        style={{
+          borderLeftColor: "red",
+          padding: 12,
+          borderRadius: 8,
+        }}
+      />
+    ),
+  };
 
   return (
     <SafeAreaProvider>
@@ -129,11 +141,11 @@ export default function RootLayout() {
           {/* <Header /> */}
 
           <ErrorBoundary>
-              <GlobalProvider>
-                <CartProvider>
-                  <WatchlistProvider>
-                    <LanguageProvider>
-                      {/* <SearchComp /> */}
+            <GlobalProvider>
+              <CartProvider>
+                <WatchlistProvider>
+                  <LanguageProvider>
+                    {/* <SearchComp /> */}
                     <Stack>
                       <Stack.Screen
                         name="(auth)"
@@ -202,10 +214,10 @@ export default function RootLayout() {
                     </Stack>
                     {/* <Toast /> */}
                     <Toast config={toastConfig} />
-                    </LanguageProvider>
-                  </WatchlistProvider>
-                </CartProvider>
-              </GlobalProvider>
+                  </LanguageProvider>
+                </WatchlistProvider>
+              </CartProvider>
+            </GlobalProvider>
           </ErrorBoundary>
           <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         </SafeAreaView>

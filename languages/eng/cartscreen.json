@@ -10,5 +10,7 @@
     "ml": "ml",
     "kg": "Kg",
     "g": "g",
-    "piece": "PCs"
+    "piece": "PCs",
+  "cartupdated":"Cart Updated",
+  "itemremoved":"Item removed"
 }

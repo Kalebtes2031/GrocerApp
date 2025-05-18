@@ -4,16 +4,16 @@
     "slug": "MyFreshApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/yason.png",
+    "icon": "./assets/images/yason-icon.png",
     "scheme": "myfreshapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "ios": { 
+    "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/yason.png",
+        "foregroundImage": "./assets/images/yason-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": false,
@@ -23,7 +23,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/yason.png"
+      "favicon": "./assets/images/yason-icon.png"
     },
     "experiments": {
       "typedRoutes": true
@@ -32,7 +32,7 @@
       "apiUrl": "https://yasonbackend.yasonsc.com",
       "router": {},
       "eas": {
-        "projectId": "e389b01d-846b-4f8e-a649-e38d0dedda06"
+        "projectId": "63deaabe-a75f-46ec-9c1b-7574c3312e7f"
       }
     }
   }

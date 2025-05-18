@@ -14,5 +14,6 @@
   "signup": "Sign Up",
   "already":"Already have an account?",
     "login":"Login",
-    "account_created":"Account created successfully!"
+    "account_created":"Account created successfully!",
+  "fill":"Please fill all required fields"
 }

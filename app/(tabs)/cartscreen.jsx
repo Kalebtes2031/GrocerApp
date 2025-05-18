@@ -38,7 +38,7 @@ const CartScreen = () => {
       await loadCartData();
       Toast.show({
         type: "success",
-        text1: "Cart updated",
+        text1: t('cartupdated'),
         visibilityTime: 2000,
       });
     } catch (error) {
@@ -58,7 +58,7 @@ const CartScreen = () => {
       await loadCartData();
       Toast.show({
         type: "success",
-        text1: "Item removed",
+        text1: t('itemremoved'),
         visibilityTime: 2000,
       });
     } catch (error) {
@@ -98,28 +98,19 @@ const CartScreen = () => {
         <View>
           <View style={styles.headerContainer}>
             <TouchableOpacity
-              onPress={() => router.back()}
-              style={{
-                marginHorizontal: 10,
-                paddingHorizontal: 2,
-                width: 10,
-                height: 10,
-                // borderRadius: 10,
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 1,
-                borderWidth: 2,
-                borderRadius: 52,
-                borderColor: "#445399",
-                paddingVertical: 2,
-
-                //
-              }}
-              // className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
-            >
-              <Ionicons name="arrow-back" size={24} color="#445399" />
-            </TouchableOpacity>
+                onPress={() => router.back()}
+                style={{
+                  marginHorizontal: 10,
+                  paddingHorizontal: 2,
+                  borderWidth: 1,
+                  borderRadius: 52,
+                  borderColor: "#445399",
+                  paddingVertical: 2,
+                }}
+                className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
+              >
+                <Ionicons name="arrow-back" size={24} color="#445399" />
+              </TouchableOpacity>
             <View style={styles.iconWrapper}>
               <TouchableOpacity
                 onPress={() => router.push("/(tabs)/watchlistscreen")}

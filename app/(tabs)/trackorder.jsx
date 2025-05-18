@@ -132,7 +132,8 @@ const OrderTrackingScreen = () => {
     const scheduled = new Date(item.scheduled_delivery);
     const isMissed = scheduled < nowDate && item.status !== "Delivered";
     const shouldShowMap = section.title === t("active") && item.need_delivery;
-    const dontshowstatus = section.title === t("missed") || item.need_delivery===false;
+    const dontshowstatus =
+      section.title === t("missed") || item.need_delivery === false;
     const dontshowtime =
       section.title === t("missed") || section.title === t("completed");
     const timeInfo =
@@ -158,7 +159,9 @@ const OrderTrackingScreen = () => {
           style={styles.cardHeaderNew}
         >
           <View style={styles.headerLeft}>
-            <Text style={styles.orderNumber}>{t('order')} #{item.id}</Text>
+            <Text style={styles.orderNumber}>
+              {t("order")} #Yas-{item.id}
+            </Text>
             {new Date(item.scheduled_delivery) < new Date() &&
               item.status !== "Delivered" && (
                 <TouchableOpacity
@@ -176,7 +179,9 @@ const OrderTrackingScreen = () => {
                       style={{
                         color: "#fff",
                         fontWeight: "600",
-                        fontSize: i18n.language==="en"? 15: 12,
+                        fontSize: i18n.language === "en" ? 15 : 12,
+                        width: "100%",
+                        textAlign: "center",
                       }}
                     >
                       {t("reschedule")}
@@ -186,10 +191,12 @@ const OrderTrackingScreen = () => {
               )}
           </View>
           <View
-            style={{
-              // padding: 1,
-              // height:200,
-            }}
+            style={
+              {
+                // padding: 1,
+                // height:200,
+              }
+            }
           >
             {/* <Image
               style={{
@@ -207,7 +214,7 @@ const OrderTrackingScreen = () => {
               <View style={styles.deliveredBadge}>
                 <Icon name="check-circle" size={18} color={timeInfo.color} />
                 <Text style={[styles.deliveredText, { color: timeInfo.color }]}>
-                  Delivered
+                  {t('delivered')}
                 </Text>
               </View>
             ) : (
@@ -258,18 +265,25 @@ const OrderTrackingScreen = () => {
               >
                 <View style={styles.productInfo}>
                   <Text style={styles.productName}>
-                    {i18n.language==="en"? product.variant.product.item_name : product.variant.product.item_name_amh}
+                    {i18n.language === "en"
+                      ? product.variant.product.item_name
+                      : product.variant.product.item_name_amh}
                   </Text>
 
                   <Text style={styles.productMeta}>
-                    {product.quantity} x {product.variant.price} {i18n.language === "en" ? t("br") : ""}{product.total_price} {i18n.language === "amh" ? t("br") : ""}
+                    {product.quantity} x {product.variant.price}{" "}
+                    {/* {i18n.language === "en" ? t("br") : ""}
+                    {product.total_price}{" "}
+                    {i18n.language === "amh" ? t("br") : ""} */}
                   </Text>
                 </View>
                 <View>
                   <Text style={styles.productName}>{t("subtotal")}</Text>
 
                   <Text style={styles.productMeta}>
-                    {i18n.language === "en" ? t("br") : ""}{product.total_price} {i18n.language === "amh" ? t("br") : ""}
+                    {i18n.language === "en" ? t("br") : ""}
+                    {product.total_price}{" "}
+                    {i18n.language === "amh" ? t("br") : ""}
                   </Text>
                 </View>
               </View>
@@ -288,77 +302,76 @@ const OrderTrackingScreen = () => {
 
         {/* Delivery Info */}
         {item.need_delivery === true && (
-
-        <View style={styles.deliveryInfo}>
-          <Icon name="local-shipping" size={20} color={COLORS.secondary} />
-          {/* <View style={styles.deliveryDetails}> */}
-          {/* <Text style={styles.driverText}>
+          <View style={styles.deliveryInfo}>
+            <Icon name="local-shipping" size={20} color={COLORS.secondary} />
+            {/* <View style={styles.deliveryDetails}> */}
+            {/* <Text style={styles.driverText}>
               {item.delivery_person || t("await")}
             </Text> */}
-          {/* <Text style={styles.contactText}>Contact: {item.phone_number}</Text> */}
-          {/* </View> */}
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "start",
-              alignItems: "center",
-            }}
-          >
-            <View>
-              {item?.delivery_person ? (
-                item?.delivery_person?.user?.image ? (
-                  <Image
-                    source={{
-                      uri: item?.delivery_person?.user?.image,
-                    }}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 38,
-                      marginRight: 12,
-                      borderWidth: 1,
-                    }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 38,
-                      marginRight: 12,
-                      borderWidth: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Icon name="person" size={40} color="#666" />
-                  </View>
-                )
-              ) : (
-                <Text>{t("notassigned")}</Text>
-              )}
-            </View>
-            <View>
-              <Text>
-                {item?.delivery_person?.user?.first_name}{" "}
-                {item?.delivery_person?.user?.last_name}
-              </Text>
-              <Text>{item?.delivery_person?.user.phone_number}</Text>
-            </View>
-          </View>
-          {item.status === "In Transit" && (
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: "#4CAF50" }]}
-              onPress={() => handleConfirm(item.id)}
-              disabled={confirmingId === item.id}
+            {/* <Text style={styles.contactText}>Contact: {item.phone_number}</Text> */}
+            {/* </View> */}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "start",
+                alignItems: "center",
+              }}
             >
-              <Text style={styles.buttonText}>
-                {confirmingId === item.id ? t("waiting") : t("confirm")}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+              <View>
+                {item?.delivery_person ? (
+                  item?.delivery_person?.user?.image ? (
+                    <Image
+                      source={{
+                        uri: item?.delivery_person?.user?.image,
+                      }}
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 38,
+                        marginRight: 12,
+                        borderWidth: 1,
+                      }}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 38,
+                        marginRight: 12,
+                        borderWidth: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Icon name="person" size={40} color="#666" />
+                    </View>
+                  )
+                ) : (
+                  <Text>{t("notassigned")}</Text>
+                )}
+              </View>
+              <View>
+                <Text>
+                  {item?.delivery_person?.user?.first_name}{" "}
+                  {item?.delivery_person?.user?.last_name}
+                </Text>
+                <Text>{item?.delivery_person?.user.phone_number}</Text>
+              </View>
+            </View>
+            {item.status === "In Transit" && (
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: "#4CAF50" }]}
+                onPress={() => handleConfirm(item.id)}
+                disabled={confirmingId === item.id}
+              >
+                <Text style={styles.buttonText}>
+                  {confirmingId === item.id ? t("waiting") : t("confirm")}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         )}
       </View>
     );
@@ -483,6 +496,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 15,
+    width: "100%",
+    textAlign: "center",
   },
   orderNumber: {
     fontSize: 14,
@@ -518,7 +533,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 12,
-    marginTop:8
+    marginTop: 8,
   },
   orderNumber: {
     fontSize: 16,
@@ -534,7 +549,7 @@ const styles = StyleSheet.create({
   countdownWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent:"center"
+    justifyContent: "center",
   },
   deliveredBadge: {
     flexDirection: "row",
@@ -548,6 +563,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     marginLeft: 4,
+    width:"100%"
   },
   countdownContainer: {
     flexDirection: "row",
@@ -651,7 +667,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: COLORS.primary,
-    width:83
+    width: 83,
   },
   deliveryInfo: {
     flexDirection: "row",

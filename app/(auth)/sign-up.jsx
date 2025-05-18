@@ -60,7 +60,7 @@ const SignUp = () => {
     ) {
       Toast.show({
         type: "error",
-        text1: "Please fill all required fields",
+        text1: t("fill"),
       });
       return;
     }
@@ -83,7 +83,7 @@ const SignUp = () => {
       if (response) {
         Toast.show({
           type: "success",
-          text1: t('account_created'),
+          text1: t("account_created"),
         });
 
         // Reset form
@@ -105,7 +105,7 @@ const SignUp = () => {
         type: "error",
         text1: "Registration failed",
         text2: extractErrorDetails(error),
-        visibilityTime: 4000, 
+        visibilityTime: 4000,
       });
     } finally {
       setIsSubmitting(false);

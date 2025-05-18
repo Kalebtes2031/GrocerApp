@@ -309,13 +309,10 @@ const Header = () => {
                 <View
                   style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
                 >
-                  <SimpleLineIcons name="logout" size={14} color="white" />
-                  <Text
-                    style={{ color: "white" }}
-                    className=" font-poppins-medium text-white"
-                  >
+                  <Text  style={{ color: "white" }} className=" font-poppins-medium text-white">
                     {t("signout")}
                   </Text>
+                  <Feather name="log-out" size={14} color="white" />
                 </View>
               </TouchableOpacity>
             </View>

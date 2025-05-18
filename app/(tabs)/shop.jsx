@@ -26,8 +26,11 @@ import SearchProducts from "@/components/SearchComponent";
 import useDebounce from "@/hooks/useDebounce";
 import SearchLocal from "@/components/SearchLocal";
 import { useFocusEffect } from "@react-navigation/native";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useWatchlist } from "@/context/WatchlistProvider";
 
 const Shop = () => {
+    const { watchlist } = useWatchlist();
   const { t, i18n } = useTranslation("shop");
   const { width, height } = Dimensions.get("window");
   const [refreshing, setRefreshing] = useState(false);
@@ -63,9 +66,9 @@ const Shop = () => {
 
   useFocusEffect(
     useCallback(() => {
-      loadProducts()
+      loadProducts();
     }, [])
-  )
+  );
 
   // After fetching products:
   const flattenedProducts = products.flatMap((product) =>
@@ -137,6 +140,17 @@ const Shop = () => {
         </TouchableOpacity>
 
         <Text style={styles.categoryTitle}>{t("products")}</Text>
+        <View style={styles.iconWrapper}>
+          <TouchableOpacity
+            onPress={() => router.push("/(tabs)/watchlistscreen")}
+          >
+            <MaterialIcons name="favorite-border" size={28} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.badge}>
+            {/* <Text style={styles.badgeText}>0</Text> */}
+            <Text style={styles.badgeText}>{watchlist.length}</Text>
+          </View>
+        </View>
         <Text style={styles.categoryTitle2}>
           {flattenedProducts.length} {t("items")}
         </Text>
@@ -192,12 +206,37 @@ const Shop = () => {
           <Text style={styles.emptyText}>{t("no_products_found")}</Text>
         </View>
       )} */}
-
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  iconWrapper: {
+    position: "absolute",
+    top:15,
+    right:4,
+    marginRight: 16,
+  },
+
+  badge: {
+    position: "absolute",
+    top: -8,
+    left: 15,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    // zIndex: 10, // Ensures the badge is on top
+  },
+
+  badgeText: {
+    color: "#445399",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -213,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     // margin: 8,
-    marginTop:55,
+    marginTop: 55,
     width: "100%",
   },
 
@@ -246,14 +285,14 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    height: 164,
+    height: 134,
     backgroundColor: "#445399",
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 10,
   },
   searchContainer: {
     position: "absolute",
-    top: 130, // Adjusted to appear below header titles
+    top: 100, // Adjusted to appear below header titles
     left: 0,
     right: 0,
     zIndex: 1000,
@@ -292,7 +331,7 @@ const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
     left: 20,
-    top: 40,
+    top: 10,
     backgroundColor: "#445399",
     width: 40,
     height: 40,
@@ -304,15 +343,15 @@ const styles = StyleSheet.create({
     borderColor: "white",
   },
   categoryTitle: {
-    textAlign:"center",
+    textAlign: "center",
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
-    marginTop:12,
+    marginTop: 2,
   },
   categoryTitle2: {
     position: "absolute",
-    top: 100,
+    top: 65,
     left: 20,
     color: "#fff",
     fontSize: 16,

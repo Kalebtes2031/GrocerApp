@@ -11,7 +11,7 @@
   "full":"Full Payment",
   "ordertotal":"Order Total",
   "br":"Br",
-  "payment":"Payment",
+  "payment":"Payment Status",
   "items":"ITEMS",
   "order":"Order",
   "no":"No orders found. Start shopping!",
@@ -22,5 +22,6 @@
     "ml": "ml",
     "kg": "Kg",
     "g": "g",
-    "piece": "PCs"
+    "piece": "PCs",
+    "scheduled":"Scheduled"
 }
