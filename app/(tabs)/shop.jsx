@@ -222,18 +222,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     left: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#EB5B00",
     borderRadius: 10,
     width: 18,
     height: 18,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    // borderWidth: 1,
     // zIndex: 10, // Ensures the badge is on top
   },
 
   badgeText: {
-    color: "#445399",
+    color: "#fff",
     fontSize: 10,
     fontWeight: "bold",
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 24,
     fontWeight: "bold",
-    marginTop: 2,
+    marginTop: 10,
   },
   categoryTitle2: {
     position: "absolute",

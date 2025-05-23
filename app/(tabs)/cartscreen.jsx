@@ -21,36 +21,56 @@ import { useTranslation } from "react-i18next";
 const CartScreen = () => {
   const { t, i18n } = useTranslation("cartscreen");
   const { watchlist } = useWatchlist();
-  const { cart, loadCartData, updateItemQuantity, removeItemFromCart } =
-    useCart();
+  const {
+    cart,
+    setCart,
+    loadCartData,
+    updateItemQuantity,
+    removeItemFromCart,
+  } = useCart();
   const [localLoading, setLocalLoading] = useState(null);
   const router = useRouter();
+  const [isCartLoading, setIsCartLoading] = useState(true);
+  const items = cart?.items ?? [];
+  const total = cart?.total ?? 0;
+  const [globalLoading, setGlobalLoading] = useState(false);
 
-  useEffect(() => {
-    console.log("check the cart now: ", cart);
-  }, []);
   const handleQuantityUpdate = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return;
+    // 1) keep a copy
+    const prevCart = cart;
+
+    // 2) optimistically patch:
+    const patchedItems = cart.items.map((it) => {
+      if (it.variations.id === itemId) {
+        const unitPrice = parseFloat(it.variations.price) || 0;
+        return {
+          ...it,
+          quantity: newQuantity,
+          total_price: unitPrice * newQuantity,
+        };
+      }
+      return it;
+    });
+    const patchedTotal = patchedItems.reduce(
+      (sum, it) => sum + it.total_price,
+      0
+    );
+    setCart({ ...cart, items: patchedItems, total: patchedTotal });
 
     try {
       setLocalLoading(itemId);
       await updateItemQuantity(itemId, newQuantity);
-      await loadCartData();
-      Toast.show({
-        type: "success",
-        text1: t('cartupdated'),
-        visibilityTime: 2000,
-      });
+      Toast.show({ type: "success", text1: t("cartupdated") });
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Update failed",
-        text2: "Please try again",
-      });
+      // 4) rollback if the API call fails
+      setCart(prevCart);
+      Toast.show({ type: "error", text1: "Update failed" });
     } finally {
       setLocalLoading(null);
     }
   };
+
   const handleRemoveCartItems = async (id) => {
     try {
       // setLocalLoading(id);
@@ -58,7 +78,7 @@ const CartScreen = () => {
       await loadCartData();
       Toast.show({
         type: "success",
-        text1: t('itemremoved'),
+        text1: t("itemremoved"),
         visibilityTime: 2000,
       });
     } catch (error) {
@@ -74,19 +94,17 @@ const CartScreen = () => {
       `/carddetail?product=${encodeURIComponent(JSON.stringify(product))}`
     );
   };
-  if (!cart || !cart.items) {
+  useEffect(() => {
+    const init = async () => {
+      await loadCartData();
+      setIsCartLoading(false);
+    };
+    init();
+  }, []);
+
+  if (isCartLoading) {
     return (
-      // <View style={styles.emptyContainer}>
-      //   <MaterialIcons name="remove-shopping-cart" size={60} color="#ccc" />
-      //   <Text style={styles.emptyText}>Your cart is empty</Text>
-      // </View>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
       </View>
     );
@@ -94,23 +112,24 @@ const CartScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      
       {cart.total === 0 ? (
         <View>
           <View style={styles.headerContainer}>
             <TouchableOpacity
-                onPress={() => router.back()}
-                style={{
-                  marginHorizontal: 10,
-                  paddingHorizontal: 2,
-                  borderWidth: 1,
-                  borderRadius: 52,
-                  borderColor: "#445399",
-                  paddingVertical: 2,
-                }}
-                className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
-              >
-                <Ionicons name="arrow-back" size={24} color="#445399" />
-              </TouchableOpacity>
+              onPress={() => router.back()}
+              style={{
+                marginHorizontal: 10,
+                paddingHorizontal: 2,
+                borderWidth: 1,
+                borderRadius: 52,
+                borderColor: "#445399",
+                paddingVertical: 2,
+              }}
+              className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
+            >
+              <Ionicons name="arrow-back" size={24} color="#445399" />
+            </TouchableOpacity>
             <View style={styles.iconWrapper}>
               <TouchableOpacity
                 onPress={() => router.push("/(tabs)/watchlistscreen")}
@@ -215,14 +234,14 @@ const CartScreen = () => {
                 textAlign: "center",
                 fontFamily: "Poppins-Bold",
                 postion: "absolute",
-                top:-13
+                top: -13,
               }}
             >
               {t("shopping")}
             </Text>
 
             <View style={styles.scrollContainers}>
-              {cart.items.map((item) => (
+              {items.map((item) => (
                 <View key={item.id} style={styles.itemContainer}>
                   <TouchableOpacity
                   // onPress={() => handlePress(item)}
@@ -365,6 +384,48 @@ const CartScreen = () => {
                 </Text>
               </View>
             </View>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+                marginTop: 33,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "60%",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push("/(tabs)/shop");
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#EB5B00",
+                    padding: 12,
+                    marginBottom: 22,
+                    borderRadius: 42,
+                    width: "100%",
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 18 }}
+                    className="font-poppins-medium"
+                  >
+                    {" "}
+                    {t("more")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </ScrollView>
 
           <View style={styles.totalContainers}>
@@ -403,6 +464,17 @@ const CartScreen = () => {
 
 // Add these new styles to your StyleSheet
 const styles = StyleSheet.create({
+  modalOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.25)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -461,13 +533,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     right: -8,
-    backgroundColor: "#445399",
+    backgroundColor: "#EB5B00",
     borderRadius: 10,
     width: 18,
     height: 18,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    // borderWidth: 1,
     // zIndex: 10, // Ensures the badge is on top
   },
 
@@ -569,23 +641,24 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center text vertically
     paddingVertical: 10, // Ensure proper spacing
     paddingHorizontal: 16,
-    backgroundColor: "#75767C",
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#eee",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#445399",
+
     gap: 4,
-    width: "70%", // Ensure proper width
-    borderRadius: 42,
+    width: "95%", // Ensure proper width
+    borderRadius: 12,
   },
 
   totalText: {
     fontSize: 18,
     fontWeight: "500",
-    color: "white",
+    color: "#445399",
   },
   totalAmount: {
     fontSize: 18,
     fontWeight: "700",
-    color: "white",
+    color: "#445399",
   },
   proceedCheckout: {
     paddingHorizontal: 12,

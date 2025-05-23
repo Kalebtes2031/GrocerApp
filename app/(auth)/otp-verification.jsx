@@ -63,9 +63,12 @@ export default function OTPVerificationScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View>
-          <Text style={{textAlign: "center",fontSize: 16}}>
-            {t("instruction")} <Text style={{color: "#445399"}}>{ emailOrPhone }</Text> {t("instruction1")} {i18n.language === "en" ? {channel} : ""}
+          <Text style={{ textAlign: "center", fontSize: 16 }}>
+            {t("instruction")}{" "}
+            <Text style={{ color: "#445399" }}>{emailOrPhone}</Text>{" "}
+            {t("instruction1")} {i18n.language === "en" ? channel : ""}
           </Text>
+
           <Text style={styles.instruction}>{t("new")}</Text>
         </View>
         <TextInput

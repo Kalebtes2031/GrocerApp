@@ -33,31 +33,31 @@ const ProductDetail = () => {
   const { cart, addItemToCart } = useCart();
   const router = useRouter();
   // const [isFavorited, setIsFavorited] = useState(false);
-  const { watchlist, addToWatchlist, removeFromWatchlist , isFavorite} = useWatchlist();
-
+  const { watchlist, addToWatchlist, removeFromWatchlist, isFavorite } =
+    useWatchlist();
 
   useEffect(() => {
-    console.log('try to work is hard:', watchlist)
-    console.log('try to work is nothard:', product)
-  },[])
+    console.log("try to work is hard:", watchlist);
+    console.log("try to work is nothard:", product);
+  }, []);
   const isFavorited = isFavorite(product.variation.id);
-const toggleFavorite = () => {
-  if (isFavorited) {
-    removeFromWatchlist(product.variation.id);
-    Toast.show({
-      type: "info",
-      text1:t('removed'),
-      visibilityTime: 2000,
-    });
-  } else {
-    addToWatchlist(product);
-    Toast.show({
-      type: "success",
-      text1: t('added'),
-      visibilityTime: 2000,
-    });
-  }
-};
+  const toggleFavorite = () => {
+    if (isFavorited) {
+      removeFromWatchlist(product.variation.id);
+      Toast.show({
+        type: "info",
+        text1: t("removed"),
+        visibilityTime: 2000,
+      });
+    } else {
+      addToWatchlist(product);
+      Toast.show({
+        type: "success",
+        text1: t("added"),
+        visibilityTime: 2000,
+      });
+    }
+  };
   // Create array of all available images
   const images = [
     product.image,
@@ -65,9 +65,17 @@ const toggleFavorite = () => {
     product.image_full,
     product.image_left,
     product.image_right,
-  ];
+  ].filter((img) => img);
 
   const handleAddToCart = () => {
+    if (product.variation.in_stock === false) {
+      Toast.show({
+        type: "info",
+        text1: t("out_stock"),
+        visibilityTime: 2000,
+      });
+      return;
+    }
     console.log("quantity", quantity);
     console.log("id", product.variation.id);
     addItemToCart(product.variation.id, quantity);
@@ -76,13 +84,13 @@ const toggleFavorite = () => {
       type: "success",
       text1: "Product added to cart",
     });
-    router.push('/(tabs)/cartscreen')
+    router.push("/(tabs)/cartscreen");
   };
 
   if (!product) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>{t('no')}</Text>
+        <Text style={styles.errorText}>{t("no")}</Text>
       </SafeAreaView>
     );
   }
@@ -102,7 +110,7 @@ const toggleFavorite = () => {
         {/* <Header /> */}
         <View
           style={{
-            height: 150,
+            height: 130,
             backgroundColor: "#fff",
             flexDirection: "column",
             justifyContent: "center",
@@ -110,39 +118,69 @@ const toggleFavorite = () => {
             paddingHorizontal: 20,
           }}
         >
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{ 
-              marginRight: 10, 
-              paddingHorizontal: 2,
-              width:30, 
-              height:30,
-              flexDirection:"row",
-              justifyContent:"center",
-              alignItems:"center",
-              borderWidth:1,
-              borderRadius:50,
-              borderColor:"#445399",
-              paddingVertical:2,
-            
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
-            className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
           >
-            <Ionicons name="arrow-back" size={24} color="#445399" />
-          </TouchableOpacity>
-          <View 
-          style={{
-            flexDirection:"row",
-            justifyContent:"space-between",
-            alignItems:"center",
-          }}
-          // className="flex flex-row justify-between items-center"
-          >
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{
+                marginRight: 10,
+                paddingHorizontal: 2,
+                width: 30,
+                height: 30,
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                borderWidth: 1,
+                borderRadius: 50,
+                borderColor: "#445399",
+                paddingVertical: 2,
+              }}
+              className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
+            >
+              <Ionicons name="arrow-back" size={24} color="#445399" />
+            </TouchableOpacity>
             <Text
               className="text-primary font-poppins-bold mt-6 mb-10"
-              style={{ fontSize: 18, fontWeight: 700, color:"#445399", marginTop:10, marginBottom:12 }} 
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#445399",
+                marginTop: 10,
+                marginBottom: 12,
+              }}
             >
-              {i18n.language === "en"?product.category?.name:product.category?.name_amh}
+              {i18n.language === "en"
+                ? product.category?.name
+                : product.category?.name_amh}
+            </Text>
+            <View style={{ width: 50 }}></View>
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+            // className="flex flex-row justify-between items-center"
+          >
+            <Text
+              className="text-primary font-poppins-bold"
+              style={{
+                fontFamily: "Poppins-bold",
+                color: "#445399",
+                fontSize: 18,
+                fontWeight: 700,
+                textAlign: "center",
+              }}
+            >
+              {i18n.language === "en"
+                ? product.item_name
+                : product.item_name_amh}
             </Text>
             {/* Price and Stock Status */}
             <View style={styles.priceContainer} className="mt-6">
@@ -159,18 +197,16 @@ const toggleFavorite = () => {
               >
                 <Text style={styles.stockText}>
                   {product.variation?.in_stock
-                    ? i18n.language === "en"? "In Stock" : "In Stock"
-                    : i18n.language === "en"? "Out of Stock" : "Out of Stock"}
+                    ? i18n.language === "en"
+                      ? "In Stock"
+                      : "In Stock"
+                    : i18n.language === "en"
+                    ? "Out of Stock"
+                    : "Out of Stock"}
                 </Text>
               </View>
             </View>
           </View>
-          <Text
-            className="text-primary font-poppins-bold"
-            style={{ fontFamily:"Poppins-bold",color:"#445399",fontSize: 18, fontWeight: 700, textAlign: "center" }}
-          >
-            {i18n.language === "en"?product.item_name:product.item_name_amh}
-          </Text>
         </View>
         {/* Main Product Image */}
         <View style={styles.mainImageContainer}>
@@ -184,41 +220,46 @@ const toggleFavorite = () => {
             style={styles.mainImage}
             resizeMode="contain"
           />
-          <Text
-            // className="text-primary absolute left-10 bottom-1 font-poppins-bold mt-6 mb-10"
-            style={{ 
-              fontSize: 18, 
-              fontWeight: 700, 
-              color:"#445399",
-              marginTop:10,
-              marginBottom:12,
-              position: "absolute",
-              left: 10,
-              bottom: 10,
-              fontFamily:"Poppins-bold",
-              fontWeight: 700,
-            }}
-          >
-            {i18n.language === "en" ? t('br') : ""} {parseInt(product.variation?.price)} {i18n.language === "amh" ? t('br') : ""}
-          </Text>
-          <View
-            style={styles.quantityContainer}
-            // className="absolute right-10 bottom-6"
-            
-          >
-            <TouchableOpacity
-              onPress={() => setQuantity(Math.max(1, quantity - 1))}
-              style={styles.quantityButton}
+          <View style={styles.infoOverlay}>
+            <Text
+              // className="text-primary absolute left-10 bottom-1 font-poppins-bold mt-6 mb-10"
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#fff",
+                marginTop: 10,
+                marginBottom: 12,
+                // position: "absolute",
+                // left: 10,
+                // bottom: 10,
+                fontFamily: "Poppins-bold",
+                fontWeight: 700,
+                zIndex: 10,
+                borderBottomRadius: 8,
+              }}
             >
-              <MaterialIcons name="remove" size={24} color="#445399" />
-            </TouchableOpacity>
-            <Text style={styles.quantityText}>{quantity}</Text>
-            <TouchableOpacity
-              onPress={() => setQuantity(quantity + 1)}
-              style={styles.quantityButton}
+              {i18n.language === "en" ? t("br") : ""}{" "}
+              {parseInt(product.variation?.price)}{" "}
+              {i18n.language === "amh" ? t("br") : ""}
+            </Text>
+            <View
+              style={styles.quantityContainer}
+              // className="absolute right-10 bottom-6"
             >
-              <MaterialIcons name="add" size={24} color="#445399" />
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                style={styles.quantityButton}
+              >
+                <MaterialIcons name="remove" size={24} color="#445399" />
+              </TouchableOpacity>
+              <Text style={styles.quantityText}>{quantity}</Text>
+              <TouchableOpacity
+                onPress={() => setQuantity(quantity + 1)}
+                style={styles.quantityButton}
+              >
+                <MaterialIcons name="add" size={24} color="#445399" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -334,7 +375,7 @@ const toggleFavorite = () => {
           onPress={handleAddToCart}
           style={styles.addToCartButton}
         >
-          <Text style={styles.addToCartText}>{t('add')}</Text>
+          <Text style={styles.addToCartText}>{t("add")}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -342,30 +383,46 @@ const toggleFavorite = () => {
 };
 
 const styles = StyleSheet.create({
+  infoOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "rgba(68, 83, 153, 0.95)", // 80% opacity
+    borderBottomRightRadius: 6,
+    borderBottomLeftRadius: 6,
+    // borderWidth:1,
+  },
   container: {
     flex: 1,
   },
   scrollContent: {
+    paddingHorizontal: 13,
     paddingBottom: 80, // Space for fixed action bar
   },
   mainImageContainer: {
     height: width * 0.8,
-    backgroundColor: "#D6F3D5",
+    // backgroundColor: "rgba(150, 166, 234, 0.4)",
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 44,
+    borderRadius: 8,
+    marginBottom: 16,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 6,
+    // elevation: 3,
+    borderRadius: 8,
     // borderRadius: 8,
-    marginVertical: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-    borderTopLeftRadius: 38,
-    borderTopRightRadius: 38,
+    borderWidth: 1,
+    borderColor: "#445399",
     position: "relative",
   },
   mainImage: {
-    width: "100%",
+    width: "80%",
     height: "60%",
     borderRadius: 8,
     position: "absolute",
@@ -390,6 +447,7 @@ const styles = StyleSheet.create({
   galleryImage: {
     width: "100%",
     height: "100%",
+    borderRadius: 8,
   },
   detailsContainer: {
     paddingHorizontal: 16,
@@ -421,8 +479,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
-    marginTop:14
+    // marginBottom: 8,
+    marginTop: 14,
   },
   priceText: {
     fontSize: 22,
@@ -468,7 +526,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     gap: 90,
-    paddingLeft:50,
+    paddingLeft: 50,
   },
 
   sectionTitle: {

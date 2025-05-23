@@ -49,11 +49,11 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#2D4150",
+    color: "#445399",
   },
   label: {
     fontSize: 12,
-    color: "#94A3B8",
+    color: "#445399",
     marginTop: 4,
   },
 });

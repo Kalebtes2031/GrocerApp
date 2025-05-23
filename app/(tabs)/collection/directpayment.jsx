@@ -148,7 +148,7 @@ const DirectBankTransfer = () => {
     await Clipboard.setStringAsync(text);
     setCopiedIndex(index);
     setBankPaymentForm({ ...bankPaymentForm, bank: bankName });
-    setTimeout(() => setCopiedIndex(null), 2000);
+    setTimeout(() => setCopiedIndex(null), 10000);
   };
 
   const handleSubmit = async () => {
@@ -229,7 +229,7 @@ const DirectBankTransfer = () => {
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.headerContainer}>
           <TouchableOpacity
-            onPress={() => router.push('/(tabs)/home')}
+            onPress={() => router.push("/(tabs)/home")}
             style={{
               marginHorizontal: 10,
               paddingHorizontal: 2,
@@ -279,7 +279,7 @@ const DirectBankTransfer = () => {
               marginBottom: 6,
             }}
           >
-            {t('instruction')}
+            {t("instruction")}
           </Text>
           {loading ? (
             <ActivityIndicator style={{ marginTop: 20 }} />
@@ -326,7 +326,7 @@ const DirectBankTransfer = () => {
           )}
 
           <View style={styles.formContainer}>
-            <Text style={styles.label}>{t("select")}</Text>
+            {/* <Text style={styles.label}>{t("select")}</Text> */}
             <View style={styles.pickerContainer}>
               {/* <Picker
                 selectedValue={bankPaymentForm.bank}
@@ -345,8 +345,11 @@ const DirectBankTransfer = () => {
                 ))}
               </Picker> */}
               <View style={styles.picker}>
-                <Text style={{ textAlign: "center", color: "#948979" }}>
-                  {bankPaymentForm.bank ? bankPaymentForm.bank : t("select")}
+                <Text style={{ textAlign: "center", color: "#445399", fontWeight: "500", }}>
+                  {t('total')}:
+                </Text>
+                <Text style={{ textAlign: "center", color: "#445399", fontWeight: "700", }}>
+                  {i18n.language === "en" ? t("br") : ""} {amountToPay} {i18n.language === "amh" ? t("br") : ""}
                 </Text>
               </View>
             </View>
@@ -573,21 +576,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   pickerContainer: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 58,
-    marginBottom: 16,
+    // borderWidth: 1,
+    // borderColor: "#ccc",
+    // borderRadius: 58,
+    marginBottom: 6,
     overflow: "hidden",
-    backgroundColor: "#f5f5f5",
-    paddingLeft: 13,
+    // backgroundColor: "#f5f5f5",
+    // paddingLeft: 13,
   },
   picker: {
     height: 45,
-    width: "100%",
+    width: "95%",
     flexDirection: "row",
     justifyContent: "start",
     alignItems: "center",
-    marginLeft: 8,
+    
+    // marginLeft: 8,
   },
   uploadButton: {
     backgroundColor: "#E5E7EB",

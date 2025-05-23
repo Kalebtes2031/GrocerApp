@@ -9,5 +9,6 @@
     "ml": "ሚሊ",
     "kg": "ኪግ",
     "g": "ግ",
-    "piece": "ፍሬ"
+    "piece": "ፍሬ",
+    "out_stock":"Item is out of stock"
 }

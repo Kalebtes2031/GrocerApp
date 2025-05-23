@@ -272,7 +272,7 @@ const Header = () => {
             >
               <TouchableOpacity
                 onPress={toggleModal}
-                style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+                style={{ marginHorizontal: 10, paddingHorizontal: 2, borderWidth:1, borderColor:"white", borderRadius:54, paddingVertical:1 }}
                 className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
               >
                 <Ionicons name="arrow-back" size={24} color="white" />
@@ -563,13 +563,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     right: -10,
-    backgroundColor: "#445399",
+    backgroundColor: "#EB5B00",
     borderRadius: 10,
     width: 18,
     height: 18,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    // borderWidth: 1,
     // zIndex: 10, // Ensures the badge is on top
   },
 

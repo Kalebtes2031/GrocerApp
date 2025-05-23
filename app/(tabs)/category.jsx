@@ -71,11 +71,24 @@ const CategoryScreen = () => {
       style={styles.categoryItem}
       onPress={() => handleCategoryPress(item.id, item.name, item.name_amh)}
     >
+       <View
+                          style={{
+                            width: 96,
+                            height: 96,
+                            borderRadius: 12,
+                            overflow: "hidden",
+                            borderWidth:1,
+                            borderColor:"#445399",
+                          }}
+                        >
+
       <Image
         source={{ uri: item.image }}
         style={styles.categoryImage}
         resizeMode="cover"
       />
+                        </View>
+
       <Text
         style={[
           styles.categoryText,
@@ -98,7 +111,7 @@ const CategoryScreen = () => {
   return (
     <View style={styles.container}>
       {/* Custom Header */}
-      <Header />
+      {/* <Header /> */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -197,23 +210,28 @@ const styles = StyleSheet.create({
 
   header: {
     flexDirection: "row",
+    justifyContent:"center",
     alignItems: "center",
-    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     // borderBottomWidth: 1,
     // borderBottomColor: "#eee",
   },
   backButton: {
-    padding: 10,
+    padding: 4,
     // backgroundColor:"red",
     borderRadius: "100%",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#445399",
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
     flex: 1,
-    textAlign: "center",
+    textAlign: "center", 
+    marginRight:40,
+    marginTop:25,
+    marginLeft:14
   },
   categoryItem: {
     width: ITEM_WIDTH,

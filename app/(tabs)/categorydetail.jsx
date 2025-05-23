@@ -13,16 +13,44 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { fetchSameCategoryProducts } from "@/hooks/useFetch";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { useCart } from "@/context/CartProvider";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const { width, height } = Dimensions.get("window");
 
 const CategoryDetail = () => {
+   const { addItemToCart } = useCart();
   const { t, i18n } = useTranslation("categorydetail");
   const { categoryId, name, name_amh } = useLocalSearchParams();
   const [products, setProducts] = useState([]);
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+
+
+   const handleAddCartClick = async() => {
+      if(products.variation.in_stock===false) {
+      Toast.show({
+        type: "info",
+        text1:t('out_stock'),
+        visibilityTime: 2000,
+      });
+      return
+    }
+      try {
+        // console.log('product.variations.id', product)
+        await addItemToCart(products.variation.id, 1);
+        Toast.show({
+          type: "success",
+          text1: t('product'),
+          visibilityTime: 2000,
+        });
+      } catch (error) {
+        console.error("Error when add item to cart", error);
+      }
+  
+  
+    };
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -92,7 +120,7 @@ const CategoryDetail = () => {
         <Image
           source={{ uri: item.image }}
           style={styles.productImage}
-          resizeMode="contain"
+          resizeMode="cover"
         />
       </View>
 
@@ -200,15 +228,15 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   header: {
-    height: height * 0.27,
+    height: height * 0.20,
     backgroundColor: "#445399",
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 20,
   },
   backButton: {
     position: "absolute",
     left: 20,
-    top: 40,
+    top: 20,
     backgroundColor: "#fff",
     width: 40,
     height: 40,
@@ -219,7 +247,7 @@ const styles = StyleSheet.create({
   },
   categoryTitle: {
     position: "absolute",
-    top: 100,
+    top: 70,
     left: 80,
     color: "#fff",
     fontSize: 24,
@@ -249,34 +277,34 @@ const styles = StyleSheet.create({
   },
   card: {
     width: width * 0.39, // Adjusted width for better grid alignment
-    backgroundColor: "#D6F3D5",
+    backgroundColor: "rgba(150, 166, 234, 0.4)",
     borderRadius: 15,
     marginHorizontal: 5,
-    padding: 15,
+    // padding: 15,
     borderBottomLeftRadius: 90,
     borderBottomRightRadius: 90,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 5,
-    height: 230, // Set a fixed height to ensure uniform card dimensions
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 6,
+    // elevation: 5,
+    height: 200, // Set a fixed height to ensure uniform card dimensions
     zIndex: 50,
   },
 
   imageContainer: {
-    backgroundColor: "#D6F3D5",
+  //  backgroundColor: "rgba(150, 166, 234, 0.4)",
     borderBottomLeftRadius: 48,
     borderBottomRightRadius: 48,
-    height: 150,
+    height: 140,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    // marginTop: 10,
   },
   productImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
+    width: "80%",
+    height: "80%",
+    resizeMode: "cover",
     borderBottomLeftRadius: 48,
     borderBottomRightRadius: 48,
   },
@@ -285,11 +313,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 10,
+     paddingHorizontal: 15,
+     paddingTop:8
   },
   priceCircle: {
     position: "absolute",
     right: -28,
-    top: 40,
+    top: 20,
     backgroundColor: "#4CAF50",
     width: 62,
     height: 62,

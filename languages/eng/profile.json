@@ -16,5 +16,13 @@
     "signout":"Sign Out",
     "edit":"Edit Profile",
     "cancel":"Cancel",
-    "save":"Save Changes"
+    "save":"Save Changes",
+     "current_password":"Current Password",
+    "new_password":"New Password",
+  "profile_updated":"Profile updated successfully",
+  "password_min": "Password must be at least 4 characters",
+    "invalid_email": "Invalid email address",
+    "invalid_phone": "Invalid phone number",
+    "current_password_required": "Current password is required"
+
 }

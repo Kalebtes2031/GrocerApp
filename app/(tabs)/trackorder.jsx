@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Animated,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -31,6 +32,11 @@ const COLORS = {
   text: "#2D4150",
   muted: "#94A3B8",
 };
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const TABS = ["active", "missed", "completed"];
+const TAB_COUNT = TABS.length;
+const INACTIVE_SCALE = 0.9;
+const INACTIVE_OPACITY = 0.6;
 
 const OrderTrackingScreen = () => {
   const { t, i18n } = useTranslation("track");
@@ -41,6 +47,25 @@ const OrderTrackingScreen = () => {
   const [confirmingId, setConfirmingId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const sectionListRef = useRef(null);
+
+  const handleTabPress = (index) => {
+    setActiveTab(index);
+    Animated.spring(scrollX, {
+      toValue: index * SCREEN_WIDTH,
+      useNativeDriver: true,
+    }).start();
+
+    sectionListRef.current?.scrollToLocation({
+      sectionIndex: 0,
+      itemIndex: 0,
+      animated: false,
+    });
+  };
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     loadData();
@@ -214,7 +239,7 @@ const OrderTrackingScreen = () => {
               <View style={styles.deliveredBadge}>
                 <Icon name="check-circle" size={18} color={timeInfo.color} />
                 <Text style={[styles.deliveredText, { color: timeInfo.color }]}>
-                  {t('delivered')}
+                  {t("delivered")}
                 </Text>
               </View>
             ) : (
@@ -388,76 +413,193 @@ const OrderTrackingScreen = () => {
 
   return (
     <View style={styles.container}>
-      <SectionList
-        sections={[
-          {
-            title: t("active"),
-            data: orders.filter(
-              (o) =>
-                o.status !== "Delivered" &&
-                new Date(o.scheduled_delivery) >= new Date()
-            ),
-          },
+      {/* Tab Bar */}
+      <View style={styles.tabContainer}>
+        {TABS.map((tab, index) => {
+          const isActive = activeTab === index;
+          const dynamicWidth = isActive
+            ? SCREEN_WIDTH * 0.4           // 40% width when active
+            : (SCREEN_WIDTH * 0.6) / (TAB_COUNT - 1); // split remaining
 
+          return (
+            <Animated.View
+              key={tab}
+              style={[
+                styles.tabWrapper,
+                {
+                  width: dynamicWidth,
+                  transform: [{ scale: isActive ? 1 : INACTIVE_SCALE }],
+                  opacity: isActive ? 1 : INACTIVE_OPACITY,
+                },
+              ]}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  isActive && styles.tabButtonActive,
+                ]}
+                onPress={() => handleTabPress(index)}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    isActive && styles.tabTextActive,
+                  ]}
+                >
+                  {t(tab)}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          );
+        })}
+      </View>
+
+      {/* Animated Content */}
+      <Animated.View
+        style={[
+          styles.contentContainer,
           {
-            title: t("missed"), // Overdue Deliveries
-            data: orders.filter(
-              (o) =>
-                o.status !== "Delivered" &&
-                new Date(o.scheduled_delivery) < new Date()
-            ),
-          },
-          {
-            title: t("completed"),
-            data: orders.filter((o) => o.status === "Delivered"),
+            transform: [
+              {
+                translateX: scrollX.interpolate({
+                  inputRange: [0, SCREEN_WIDTH, SCREEN_WIDTH * 2],
+                  outputRange: [0, -SCREEN_WIDTH, -SCREEN_WIDTH * 2],
+                }),
+              },
+            ],
           },
         ]}
-        renderItem={(props) => renderOrderItem(props)}
-        renderSectionHeader={({ section }) => (
-          <Text style={styles.sectionHeader}>{section.title}</Text>
-        )}
-        // Add renderSectionFooter to handle empty sections
-        renderSectionFooter={({ section }) => {
-          if (section.data.length === 0) {
-            return (
-              <View style={styles.emptySectionContainer}>
-                <Text style={styles.emptySectionText}>
-                  {section.title === t("active")
-                    ? t("noactivedelivery") // for example, "No active deliveries"
-                    : section.title === t("missed")
-                    ? t("nomissedelivery")
-                    : t("nocompletedelivery")}
-                  {/* e.g. "No completed deliveries" */}
-                </Text>
-              </View>
-            );
-          }
-          return null;
-        }}
-        keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Icon name="assignment" size={48} color={COLORS.muted} />
-            <Text style={styles.emptyText}>{t("noorder")}</Text>
+      >
+        {TABS.map((tab, index) => (
+          <View
+            key={tab}
+            style={{ width: SCREEN_WIDTH - 23, marginHorizontal: 3 }}
+          >
+            <SectionList
+              key={tab}
+              ref={sectionListRef}
+              sections={[
+                {
+                  title: t(tab),
+                  data: orders.filter((o) => {
+                    if (tab === "active") {
+                      return (
+                        o.status !== "Delivered" &&
+                        new Date(o.scheduled_delivery) >= new Date()
+                      );
+                    }
+                    if (tab === "missed") {
+                      return (
+                        o.status !== "Delivered" &&
+                        new Date(o.scheduled_delivery) < new Date()
+                      );
+                    }
+                    return o.status === "Delivered";
+                  }),
+                },
+              ]}
+              renderItem={(props) => renderOrderItem(props)}
+              // renderSectionHeader={({ section }) => (
+              //   <Text style={styles.sectionHeader}>{section.title}</Text>
+              // )}
+              renderSectionFooter={({ section }) => {
+                if (section.data.length === 0) {
+                  return (
+                    <View style={styles.emptySectionContainer}>
+                      <Text style={styles.emptySectionText}>
+                        {t(`no${tab}delivery`)}
+                      </Text>
+                    </View>
+                  );
+                }
+                return null;
+              }}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={styles.listContent}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
           </View>
-        }
-        contentContainerStyle={styles.listContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
+        ))}
+      </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  tabContainer: {
+    flexDirection: "row",
+    alignItems:"center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    backgroundColor: "#FFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EEE",
+    // paddingHorizontal: 6,
+  },
+  tabWrapper: {
+    alignItems: "center",
+    paddingHorizontal:12,
+    //  backgroundColor: "red",
+  },
+  tabButton: {
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: "#445399",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabButtonActive: {
+    backgroundColor: "#4CAF50",
+    // borderBottomWidth: 3,
+    // borderBottomColor: "#FF9800",
+    paddingHorizontal:8
+  },
+  tabText: {
+    fontSize: 14,
+    color: "#FFF",
+    fontWeight: "500",
+    textAlign:"center"
+  },
+  tabTextActive: {
+    fontSize: 16,
+    fontWeight: "700",
+    textAlign:"center"
+  },
+  activeTab: {
+    // borderBottomWidth: 2,
+    // borderBottomColor: COLORS.secondary,
+    backgroundColor: "#4CAF50",
+    // backgroundColor:"#EB5B00",
+  },
+  // tabText: {
+  //   fontSize: 14,
+  //   color:"white",
+  //   fontWeight: "500",
+  //   textAlign:"center",
+  // },
+  activeTabText: {
+    color: "white",
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  contentContainer: {
+    flexDirection: "row",
+    width: SCREEN_WIDTH * 3,
+    justifyContent: "center",
+    gap: 16,
+    // alignItems:"center",
+  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: "white",
   },
   listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
+    // paddingLeft: 8,
+    paddingBottom: 56,
+    // backgroundColor:"red",
+    // width:300
   },
   card: {
     backgroundColor: "#FFF",
@@ -556,14 +698,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#F1F5F9",
     paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 18,
     borderRadius: 8,
   },
   deliveredText: {
     fontSize: 14,
     fontWeight: "600",
     marginLeft: 4,
-    width:"100%"
+    width: "100%",
   },
   countdownContainer: {
     flexDirection: "row",
@@ -691,11 +833,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   sectionHeader: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "600",
-    color: COLORS.primary,
+    color: "white",
+    backgroundColor: "#445399",
     marginVertical: 16,
     paddingHorizontal: 16,
+    borderRadius: 8,
+    textAlign: "center",
+    paddingVertical: 4,
   },
   loadingContainer: {
     flex: 1,

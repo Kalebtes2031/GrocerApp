@@ -6,7 +6,8 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  SafeAreaView
+  SafeAreaView,
+  Image
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
@@ -21,6 +22,8 @@ export default function NewPasswordScreen() {
   const { reset_token } = useLocalSearchParams();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const showToast = (type, message) => {
@@ -52,22 +55,53 @@ export default function NewPasswordScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>{t('title')}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder={t('new_password')}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          editable={!loading}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={t('confirm_password')}
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          editable={!loading}
-        />
+
+        {/* Password Input */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder={t('new_password')}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+            editable={!loading}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Image
+              source={
+                !showPassword
+                  ? require('@/assets/icons/eye-hide.png')
+                  : require('@/assets/icons/eye.png')
+              }
+              style={styles.eyeIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Confirm Password Input */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder={t('confirm_password')}
+            secureTextEntry={!showConfirmPassword}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            editable={!loading}
+          />
+          <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+            <Image
+              source={
+                !showConfirmPassword
+                  ? require('@/assets/icons/eye-hide.png')
+                  : require('@/assets/icons/eye.png')
+              }
+              style={styles.eyeIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           style={[styles.button, (!password || loading) && styles.buttonDisabled]}
           onPress={handleResetPassword}
@@ -89,17 +123,32 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, padding: 20, justifyContent: 'center' },
   title: { fontSize: 24, marginBottom: 20, textAlign: 'center', color: '#445399' },
-  input: {
-    marginBottom: 15,
+
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 4
+    borderColor: '#445399',
+    borderRadius: 54,
+    paddingHorizontal: 10,
+    marginBottom: 15,
   },
+  input: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingRight: 10,
+    color: '#000',
+  },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+
   button: {
     backgroundColor: '#445399',
     paddingVertical: 12,
-    borderRadius: 4,
+    borderRadius: 54,
     alignItems: 'center',
     justifyContent: 'center'
   },

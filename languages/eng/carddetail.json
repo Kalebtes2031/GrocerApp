@@ -4,5 +4,6 @@
   "detail":"Item Details",
   "add":"Add to Cart",
    "removed": "Removed from Watchlist",
-  "added": "Added to Watchlist"
+  "added": "Added to Watchlist",
+  "out_stock":"Item is out of stock"
 }

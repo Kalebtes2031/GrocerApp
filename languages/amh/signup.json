@@ -16,5 +16,9 @@
   "terms_and_conditions": "ወቅታዊ የስርዓት እና የምርት ደንበኞች መመሪያዎችን እገነዘባለሁ",
   "privacy_policy": "የግለ መረጃ ደንበኞችን እንደ ወቅታዊ የስርዓት እና የምርት ደንበኞች መመሪያዎች እገነዘባለሁ",
   "account_created": "መለያዎ በተሳካ ሁኔታ ተፈጥሯል",
-"fill":"እባክዎ ሙሉ መረጃ ያስገቡ"
+"fill":"እባክዎ ሙሉ መረጃ ያስገቡ",
+"invalid_email": "እባክዎ ትክክለኛ የኢሜይል አድራሻ ያስገቡ (ለምሳሌ user@example.com).",
+  "invalid_phone": "እባክዎ የኢትዮጵያ ስልክ ቁጥር ያስገቡ (ለምሳሌ 09XXXXXXXX ወይም +2519XXXXXXX).",
+   "confirm_password": "የይለፍ ቃልዎን ያረጋግጡ",
+  "password_mismatch": "የይለፍ ቃሎቹ አይመሳሰሉም"
 }

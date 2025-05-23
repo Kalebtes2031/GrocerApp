@@ -1,6 +1,6 @@
 {
   "bank": "Bank Accounts",
-  "yason":"Yason Consumption Products Trading S.c",
+  "yason":"Yason Consumption Products Trading S.C",
   "name":"Abebe Demssie W/Mariam",
   "select":"Select Bank",
   "selecta":"Select a bank",
@@ -18,5 +18,7 @@
   "errormessage1":"Please upload a receipt",
   "errormessage2":"Please Select a Bank",
   "errormessage3":"File size exceeds 5MB limit",
-  "instruction":"choose a bank and upload a payment receipt"
+  "br":"Birr",
+  "instruction":"choose a bank and upload a payment receipt",
+   "total":"Total"
 }

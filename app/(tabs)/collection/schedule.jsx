@@ -1026,7 +1026,7 @@ const styles = StyleSheet.create({
   locationText: { marginTop: 8, fontSize: 14 },
   mapContainer: {
     width: 350,
-    height: 150,
+    height: 250,
     alignSelf: "center",
     borderWidth: 1,
     borderColor: "#ccc",

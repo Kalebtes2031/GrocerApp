@@ -6,36 +6,42 @@ const CustomButton = ({
   handlePress,
   containerStyles,
   textStyles,
-  isLoading,
+  isLoading = false,
 }) => {
+  // You can optionally use the colorScheme to adjust styles
   const colorScheme = useColorScheme();
+
   return (
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      style={{ 
+      disabled={isLoading}
+      style={{
         backgroundColor: "#445399",
         height: 42,
         borderRadius: 32,
         width: 304,
-        flexDirection:"row",
-        justifyContent:"center",
-        alignItems:"center",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        opacity: isLoading ? 0.6 : 1,
       }}
-      className={` flex flex-row justify-center items-center ${containerStyles} ${
-        isLoading ? "opacity-50" : ""
-      }`}
-      disabled={isLoading}
+      className={`${containerStyles}`}
     >
-      <Text 
-      style={{
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 700,
-      }}
-      className={`font-league-spartan text-lg ${textStyles}`}>
-        {title}
-      </Text>
+      {isLoading ? (
+        <ActivityIndicator size="small" color="#fff" />
+      ) : (
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: '700',
+          }}
+          className={`font-league-spartan text-lg ${textStyles}`}
+        >
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };

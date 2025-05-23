@@ -16,5 +16,12 @@
   "privacy_policy": "የግለ መረጃ ደንበኞችን እንደ ወቅታዊ የስርዓት እና የምርት ደንበኞች መመሪያዎች እገነዘባለሁ",
   "edit":"ያስተካክሉ",
     "cancel":"ሰርዝ",
-    "save":"ለውጦችን ያስቀምጡ"
+    "save":"ለውጦችን ያስቀምጡ",
+    "current_password":"ኡሁን የሚጠቀሙበት የይለፍ ቃል",
+    "new_password":"አዲስ የይለፍ ቃል",
+    "profile_updated":"አካውንትዎ በተሳካ ሁኔታ ተስተካክሏል",
+    "password_min": "የይለፍ ቃል ቢያንስ 4 ቁምፊ መያዝ ያስፈልጋል",
+    "invalid_email": "የኢሜይል አድራሻ ልክ አይደለም",
+    "invalid_phone": "የስልክ ቁጥር ልክ አይደለም",
+    "current_password_required": "የአሁኑ የይለፍ ቃል ያስፈልጋል"
 }

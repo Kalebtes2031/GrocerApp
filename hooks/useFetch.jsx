@@ -48,14 +48,25 @@ export const ActivateUser = async (c) => {
 //     const response = await auth.post("auth/jwt/create/", credentials);
 //     return response.data;
 // };
-export const GET_AUTH = async (form) => {
+// export const GET_AUTH = async (form) => {
+//   try {
+//     const response = await auth.post("auth/jwt/create/", form);
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(error.response?.data?.detail || "An error occurred");
+//   }
+// };
+// useFetch.jsx
+export const GET_AUTH = async (payload) => {
   try {
-    const response = await auth.post("auth/jwt/create/", form);
+    // now payload must have { login, password }
+    const response = await auth.post("auth/jwt/create/", payload);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.detail || "An error occurred");
   }
 };
+
 
 export const setTokens = (accessToken, refreshToken) => {
   sessionStorage.setItem("accessToken", accessToken);

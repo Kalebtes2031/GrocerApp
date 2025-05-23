@@ -110,7 +110,7 @@ export default function HomeScreen() {
         // …etc.
 
         category: v.product.category, // only if your serializer includes it
-
+        
         variation: {
           id: v.id,
           quantity: v.quantity,
@@ -392,8 +392,9 @@ export default function HomeScreen() {
             onPress={() => {
               route.push("/(tabs)/category");
             }}
+            style={{backgroundColor:"#445399", borderRadius:54, padding:4}}
           >
-            <Ionicons name="arrow-forward-sharp" size={32} color="#445399" />
+            <Ionicons name="arrow-forward-sharp" size={24} color="white" />
           </TouchableOpacity>
         </View>
         {loading ? (
@@ -432,7 +433,7 @@ export default function HomeScreen() {
                   onPress={() =>
                     handlecategory(product.id, product.name, product.name_amh)
                   }
-                  style={{ flexDirection: "column", marginHorizontal: 4 }}
+                  style={{ flexDirection: "column", marginHorizontal: 4,  }}
                   // className="flex justify-center items-center mx-2"
                 >
                   <View
@@ -441,6 +442,8 @@ export default function HomeScreen() {
                       height: 96,
                       borderRadius: 12,
                       overflow: "hidden",
+                      borderWidth:1,
+                      borderColor:"#445399",
                     }}
                   >
                     <Image
@@ -519,8 +522,9 @@ export default function HomeScreen() {
             onPress={() => {
               route.push("/(tabs)/shop");
             }}
+            style={{backgroundColor:"#445399", borderRadius:54, padding:4}}
           >
-            <Ionicons name="arrow-forward-sharp" size={32} color="#445399" />
+            <Ionicons name="arrow-forward-sharp" size={24} color="white" />
           </TouchableOpacity>
         </View>
         <View style={styles.popularContainer}>
@@ -655,13 +659,14 @@ const styles = StyleSheet.create({
   },
   popularContainer: {
     // marginBottom: 1,
+    marginLeft:8,
     padding: 16,
     flexDirection: "row",
     flexWrap: "wrap", // Allows wrapping to the next row
     justifyContent: "space-between", // Adds spacing between cards
   },
   cardWrapper: {
-    // backgroundColor: "#fff",
+    // backgroundColor: "red",
     width: "48%",
     marginBottom: 12, // Adds spacing between rows
   },

@@ -40,11 +40,25 @@ export const CartProvider = ({ children }) => {
   };
 
   // Update item quantity
-  const updateItemQuantity = async (itemId, quantity) => {
-    if (!isLogged) return;
-    const data = await updateCartItem(itemId, quantity);
-    setCart(data);
-  };
+  // const updateItemQuantity = async (itemId, quantity) => {
+  //   if (!isLogged) return;
+  //   const data = await updateCartItem(itemId, quantity);
+  //   setCart(data);
+  // };
+// CartProvider.js
+
+const updateItemQuantity = async (itemId, quantity) => {
+  if (!isLogged) return;
+  // fire the API call that updates one item…
+  await updateCartItem(itemId, quantity);
+  // then fetch the *entire* cart state from the server
+  const freshCart = await fetchCart();
+  setCart({
+    ...freshCart,
+    total_items: freshCart.items.length,
+  });
+  return freshCart;
+};
 
   // Remove an item from the cart
   const removeItemFromCart = async (itemId) => {

@@ -23,7 +23,7 @@ const WatchlistScreen = () => {
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+          style={{ marginHorizontal: 10, paddingHorizontal: 2,borderWidth:1, borderColor:"#445399",borderRadius:54 ,paddingVertical:1}}
           className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
         >
           <Ionicons name="arrow-back" size={24} color="#445399" />
@@ -42,7 +42,7 @@ const WatchlistScreen = () => {
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
  <View style={styles.iconWrapper}>
           <TouchableOpacity>
-            <MaterialIcons name="favorite-border" size={200} color="#BE3144" />
+            <MaterialIcons name="favorite-border" size={200} color="#EB5B00" />
           </TouchableOpacity>
           <View style={styles.badge1}>
             <Text style={styles.badgeText1}>{watchlist.length}</Text>
@@ -86,13 +86,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -8,
     right: -8,
-    backgroundColor: "#445399",
+    backgroundColor: "#EB5B00",
     borderRadius: 10,
     width: 18,
     height: 18,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
+    // borderWidth: 1,
   },
   badgeText: {
     color: "white",
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 1,
     right: 6,
-    backgroundColor: "#BE3144",
+    backgroundColor: "#EB5B00",
     borderRadius: 50,
     width: 45,
     height: 45,

@@ -72,9 +72,9 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <AntDesign name="shoppingcart" size={32} color={color} />
           ),
-          tabBarBadge: cart.total_items, // 🔥 This line shows the number
+          tabBarBadge: cart.total_items, //  This line shows the number
           tabBarBadgeStyle: {
-            backgroundColor: "#445399",
+            backgroundColor: "#EB5B00",
             color: "white",
             fontSize: 12,
           },

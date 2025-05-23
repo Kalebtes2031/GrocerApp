@@ -17,9 +17,11 @@ import * as ImagePicker from "expo-image-picker";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import axios from "axios";
 import { getAccessToken, updateUserProfile } from "@/hooks/useFetch";
-import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+
 
 const ProfileScreen = () => {
   const { t, i18n } = useTranslation("profile");
@@ -29,12 +31,15 @@ const ProfileScreen = () => {
   const [loading, setLoading] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     username: "",
     email: "",
     phone_number: "",
+    old_password: "",
+    password: "",
   });
 
   // Sync global user data with local form state
@@ -62,13 +67,16 @@ const ProfileScreen = () => {
     let error = "";
     switch (name) {
       case "email":
-        if (!/\S+@\S+\.\S+/.test(value)) error = "Invalid email address";
+        if (!/\S+@\S+\.\S+/.test(value)) error = t('invalid_email');
         break;
       case "phone":
-        if (!/^\+?[1-9]\d{1,14}$/.test(value)) error = "Invalid phone number";
+        if (!/^(?:\+251|0)9\d{8}$/.test(value)) error = t('invalid_phone');
         break;
       case "password":
-        if (value.length < 8) error = "Password must be at least 8 characters";
+        if (value.length < 4) error = t('password_min');
+        break;
+      case "old_password":
+        if (!value) error = t("current_password_required");
         break;
     }
     setErrors((prev) => ({ ...prev, [name]: error }));
@@ -77,7 +85,7 @@ const ProfileScreen = () => {
 
   const handleChange = (name, value) => {
     validateField(name, value);
-    setUser((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImagePick = async () => {
@@ -133,50 +141,93 @@ const ProfileScreen = () => {
   //     }
   //   }
   // };
-  const handleSave = async () => {
-    const validations = Object.entries(formData).map(([key, value]) =>
-      validateField(key, value)
-    );
+ const handleSave = async () => {
+  setErrors(prev => ({ ...prev, general: "" }));
 
-    if (validations.every((v) => v)) {
-      setLoading(true);
-      try {
-        const token = await getAccessToken();
+  const validations = Object.entries(formData).map(([key, value]) =>
+    validateField(key, value)
+  );
 
-        // Create FormData for image upload
-        const formDataToSend = new FormData();
-        formDataToSend.append("first_name", formData.first_name);
-        formDataToSend.append("last_name", formData.last_name);
-        formDataToSend.append("username", formData.username);
-        formDataToSend.append("email", formData.email);
-        formDataToSend.append("phone_number", formData.phone_number);
+  if (!validations.every(v => v)) {
+    return;
+  }
 
-        if (user.image && user.image.startsWith("file://")) {
-          const uriParts = user.image.split(".");
-          const fileType = uriParts[uriParts.length - 1];
+  setLoading(true);
+  try {
+    const token = await getAccessToken();
 
-          formDataToSend.append("image", {
-            uri: user.image,
-            name: `profile.${fileType}`,
-            type: `image/${fileType}`,
-          });
-        }
+    // Create FormData for image upload
+    const formDataToSend = new FormData();
+    formDataToSend.append("first_name", formData.first_name);
+    formDataToSend.append("last_name", formData.last_name);
+    formDataToSend.append("username", formData.username);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("phone_number", formData.phone_number);
 
-        const response = await updateUserProfile(formDataToSend);
-
-        if (response.status === 200) {
-          setUser(response.data);
-          setEditMode(false);
-        }
-      } catch (error) {
-        setErrors({
-          general: typeof error === "string" ? error : "Update failed",
-        });
-      } finally {
-        setLoading(false);
-      }
+    // only include password fields if the user entered a new password
+    if (formData.password) {
+      formDataToSend.append("old_password", formData.old_password);
+      formDataToSend.append("password", formData.password);
     }
-  };
+
+    if (user.image && user.image.startsWith("file://")) {
+      const uriParts = user.image.split(".");
+      const fileType = uriParts[uriParts.length - 1];
+      formDataToSend.append("image", {
+        uri: user.image,
+        name: `profile.${fileType}`,
+        type: `image/${fileType}`,
+      });
+    }
+
+    const response = await updateUserProfile(formDataToSend);
+
+    if (response.status === 200) {
+      setUser(response.data);
+      setEditMode(false);
+      setErrors({});
+
+      Toast.show({
+        type: "success",
+        text1: t("profile_updated"),
+        position: "top",
+        visibilityTime: 2000,
+      });
+    } else {
+      throw new Error("Unexpected response");
+    }
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.status === 400) {
+      const data = err.response.data;
+      const flatErrors = Object.fromEntries(
+        Object.entries(data).map(([field, messages]) => [
+          field,
+          Array.isArray(messages) ? messages.join(" ") : messages,
+        ])
+      );
+      setErrors(flatErrors);
+      Object.values(flatErrors).forEach(text => {
+        Toast.show({
+          type: "error",
+          text1: text,
+          position: "top",
+          visibilityTime: 3000,
+        });
+      });
+    } else {
+      const message = err.message || t("update_failed");
+      setErrors({ general: message });
+      Toast.show({
+        type: "error",
+        text1: message,
+        position: "top",
+        visibilityTime: 3000,
+      });
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (!user)
     return (
@@ -203,7 +254,14 @@ const ProfileScreen = () => {
           <View style={styles.headerContainer}>
             <TouchableOpacity
               onPress={() => router.back()}
-              style={{ marginHorizontal: 10, paddingHorizontal: 2 }}
+              style={{
+                marginHorizontal: 10,
+                paddingHorizontal: 2,
+                borderWidth: 1,
+                borderColor: "#445399",
+                borderRadius: 54,
+                paddingVertical: 1,
+              }}
               className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
             >
               <Ionicons name="arrow-back" size={24} color="#445399" />
@@ -273,7 +331,7 @@ const ProfileScreen = () => {
                 <TextInput
                   value={formData.first_name}
                   onChangeText={(v) => handleChange("first_name", v)}
-                  style={editMode? styles.input1: styles.input}
+                  style={editMode ? styles.input1 : styles.input}
                   editable={editMode}
                 />
               </View>
@@ -287,7 +345,7 @@ const ProfileScreen = () => {
                 <TextInput
                   value={formData.last_name}
                   onChangeText={(v) => handleChange("last_name", v)}
-                  style={editMode? styles.input1: styles.input}
+                  style={editMode ? styles.input1 : styles.input}
                   editable={editMode}
                 />
               </View>
@@ -301,7 +359,7 @@ const ProfileScreen = () => {
                 <TextInput
                   value={formData[key]}
                   onChangeText={(v) => handleChange(key, v)}
-                  style={editMode? styles.input1: styles.input}
+                  style={editMode ? styles.input1 : styles.input}
                   editable={editMode}
                   keyboardType={
                     key === "email"
@@ -317,6 +375,93 @@ const ProfileScreen = () => {
               </View>
             ))}
 
+            {/* Current Password */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>{t("current_password")}</Text>
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  name="old_password"
+                  secureTextEntry={!showPassword}
+                  value={formData.old_password}
+                  onChangeText={(v) => handleChange("old_password", v)}
+                  editable={editMode}
+                  style={[
+                    styles.input,
+                    editMode ? styles.inputActive : styles.inputDisabled,
+                    errors.old_password && styles.inputError,
+                  ]}
+                />
+                {editMode && (
+                  <TouchableOpacity
+                    onPress={() => setShowPassword((v) => !v)}
+                    style={styles.eyeButton}
+                  >
+                    {showPassword ? (
+                      <MaterialCommunityIcons
+                        name="eye"
+                        size={20}
+                        color="#666"
+                      />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="eye-off"
+                        size={20}
+                        color="#666"
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+              {errors.old_password && (
+                <Text style={styles.errorText}>
+                  {errors.old_password.replace("_", " ")}
+                </Text>
+              )}
+            </View>
+
+            {/* New Password */}
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>{t("new_password")}</Text>
+              <View style={styles.passwordWrapper}>
+                <TextInput
+                  name="password"
+                  secureTextEntry={!showPassword}
+                  value={formData.password}
+                  onChangeText={(v) => handleChange("password", v)}
+                  editable={editMode}
+                  style={[
+                    styles.input,
+                    editMode ? styles.inputActive : styles.inputDisabled,
+                  ]}
+                />
+                {editMode && (
+                  <TouchableOpacity
+                    onPress={() => setShowPassword((v) => !v)}
+                    style={styles.eyeButton}
+                  >
+                    {showPassword ? (
+                      <MaterialCommunityIcons
+                        name="eye"
+                        size={20}
+                        color="#666"
+                      />
+                    ) : (
+                      <MaterialCommunityIcons
+                        name="eye-off"
+                        size={20}
+                        color="#666"
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
+              </View>
+              {errors.password && (
+                <Text style={styles.errorText}>
+                  {errors.password.replace("_", " ")}
+                </Text>
+              )}
+            </View>
+            
             {errors.general && (
               <Text className="font-poppins-medium" style={styles.errorText}>
                 {errors.general}
@@ -349,7 +494,19 @@ const ProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  passwordWrapper: {
+    position: "relative",
+  },
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: [{ translateY: -10 }],
+    padding: 4,
+  },
   headerContainer: {
+    paddingTop: 8,
+    width: "16%",
     // height: 60,
     backgroundColor: "#fff",
     // flexDirection: "row",

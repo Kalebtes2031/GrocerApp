@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
   button: {
     paddingVertical: 10,
     paddingHorizontal: 25,
-    borderRadius: 8,
+    borderRadius: 58,
     // minWidth: 120,
     alignItems: "center",
     width:"100%"

@@ -7,5 +7,6 @@
     "ml": "ml",
     "kg": "Kg",
     "g": "g",
-    "piece": "PCs"
+    "piece": "PCs",
+    "out_stock":"የመረጡት ምርት ለጊዜው አልቋል"
 }

@@ -90,8 +90,8 @@ const FormField = ({
             <Image
               source={
                 !showPassword
-                  ? require("@/assets/icons/eye.png")
-                  : require("@/assets/icons/eye-hide.png")
+                  ? require("@/assets/icons/eye-hide.png")
+                  : require("@/assets/icons/eye.png")
               }
               style={{
                 width: 24,

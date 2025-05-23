@@ -17,7 +17,7 @@ import { useWatchlist } from "@/context/WatchlistProvider";
 import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.45;
+const CARD_WIDTH = width * 0.40;
 
 const Card = ({ product }) => {
   const { t, i18n } = useTranslation('card');
@@ -30,6 +30,7 @@ const Card = ({ product }) => {
   const isFavorited = isFavorite(product.variation.id);
 
 const toggleFavorite = () => {
+  
   if (isFavorited) {
     removeFromWatchlist(product.variation.id);
     Toast.show({
@@ -55,6 +56,14 @@ const toggleFavorite = () => {
   };
 
   const handleAddCartClick = async() => {
+    if(product.variation.in_stock===false) {
+    Toast.show({
+      type: "info",
+      text1:t('out_stock'),
+      visibilityTime: 2000,
+    });
+    return
+  }
     try {
       console.log('product.variations.id', product)
       await addItemToCart(product.variation.id, 1);
@@ -80,9 +89,9 @@ const toggleFavorite = () => {
         <Image 
           source={{ uri: product.image }} 
           style={styles.image} 
-          resizeMode="cover"
+          resizeMode="contain"
         />
-        <View style={styles.imageOverlay} />
+        {/* <View style={styles.imageOverlay} /> */}
         
         {/* Top Icons */}
         <View style={styles.topIconsContainer}>
@@ -140,18 +149,22 @@ const styles = StyleSheet.create({
   cardContainer: {
     width: CARD_WIDTH,
     borderRadius: 16,
+    borderWidth:1,
+    borderColor:"#445399",
     marginBottom: 8,
     overflow: "hidden",
     elevation: 3,
-    shadowColor: "#000",
+    shadowColor: "#445399",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    height: 250,
+    height: 170,
+    
   },
   imageContainer: {
-    height: 280,
+    height: 150,
     justifyContent: "space-between",
+    
   },
   image: {
     ...StyleSheet.absoluteFillObject,
@@ -178,12 +191,14 @@ const styles = StyleSheet.create({
   },
   infoOverlay: {
     position: "absolute",
-    bottom: 28,
+    bottom: -20,
     left: 0,
     right: 0,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "rgba(0,0,0,0.6)",
+  backgroundColor: "rgba(68, 83, 153, 0.95)", // 80% opacity
+
+
   },
   productName: {
     color: "#fff",

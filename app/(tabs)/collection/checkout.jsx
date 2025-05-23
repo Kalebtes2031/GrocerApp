@@ -776,7 +776,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 6,
-    width:52,
+    width:62,
     color: "#333",
   },
   itemRow: {

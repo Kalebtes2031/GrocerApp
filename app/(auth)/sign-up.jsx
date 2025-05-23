@@ -14,9 +14,7 @@ import {
 } from "react-native";
 import CustomButton from "@/components/CustomButton";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
-import { ThemedText } from "@/components/ThemedText";
 import Toast from "react-native-toast-message";
-
 import * as Font from "expo-font";
 import { CREATE_NEW_CUSTOMER } from "@/hooks/useFetch";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -27,7 +25,6 @@ const { width } = Dimensions.get("window");
 const SignUp = () => {
   const { t, i18n } = useTranslation("signup");
   const [showPassword, setShowPassword] = useState(false);
-
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -35,40 +32,46 @@ const SignUp = () => {
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
-  // Add this in your component
-  // useEffect(() => {
-  //   const checkFonts = async () => {
-  //     const fonts = await Font.getAvailableFontsAsync();
-  //     console.log('Available fonts:', fonts);
-  //   };
-  //   checkFonts();
-  // }, []);
-
+  const [errors, setErrors] = useState({});
   const colorScheme = useColorScheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSignUp = async () => {
-    // Basic form validation
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.phoneNumber ||
-      !form.username ||
-      !form.email ||
-      !form.password
-    ) {
-      Toast.show({
-        type: "error",
-        text1: t("fill"),
-      });
-      return;
+  const validate = () => {
+    const errs = {};
+    // Required
+    Object.entries(form).forEach(([key, value]) => {
+      if (!value) errs[key] = t("fill");
+    });
+    // Email
+    if (form.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(form.email)) errs.email = t("invalid_email");
     }
+    // Ethiopian phone
+    if (form.phoneNumber) {
+      const phoneRegex = /^(?:\+251|0)9\d{8}$/;
+      if (!phoneRegex.test(form.phoneNumber))
+        errs.phoneNumber = t("invalid_phone");
+    }
+    // Confirm password
+    if (
+      form.password &&
+      form.confirmPassword &&
+      form.password !== form.confirmPassword
+    ) {
+      errs.confirmPassword =
+        t("password_mismatch") || "Passwords do not match.";
+    }
+    setErrors(errs);
+    return !Object.keys(errs).length;
+  };
 
+  const handleSignUp = async () => {
+    if (!validate()) return;
     setIsSubmitting(true);
-
     try {
-      // Map form fields to API expected format
       const payload = {
         first_name: form.firstName,
         last_name: form.lastName,
@@ -77,16 +80,9 @@ const SignUp = () => {
         email: form.email,
         password: form.password,
       };
-
       const response = await CREATE_NEW_CUSTOMER(payload);
-
       if (response) {
-        Toast.show({
-          type: "success",
-          text1: t("account_created"),
-        });
-
-        // Reset form
+        Toast.show({ type: "success", text1: t("account_created") });
         setForm({
           firstName: "",
           lastName: "",
@@ -95,8 +91,7 @@ const SignUp = () => {
           email: "",
           password: "",
         });
-
-        // Redirect to login after short delay
+        setErrors({});
         setTimeout(() => router.push("/sign-in"), 1500);
       }
     } catch (error) {
@@ -115,19 +110,12 @@ const SignUp = () => {
   const extractErrorDetails = (error) => {
     if (error?.response?.data) {
       const data = error.response.data;
-
-      // If it's a simple error message
       if (typeof data === "string") return data;
-
-      // If it's a dict of field-specific errors
-      const messages = Object.entries(data)
-        .map(
-          ([key, value]) =>
-            `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
-        )
-        .join("\n");
-
-      return messages || "An unknown error occurred.";
+      return (
+        Object.entries(data)
+          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+          .join("\n") || "An unknown error occurred."
+      );
     }
     return "An unknown error occurred.";
   };
@@ -140,26 +128,16 @@ const SignUp = () => {
         backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
       }}
     >
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingBottom: 24,
-        }}
-      >
-        {/* Hero Image */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}>
         <Image
           source={require("@/assets/images/signup.png")}
           resizeMode="cover"
-          style={{
-            width: "100%",
-            height: 200,
-          }}
+          style={{ width: "100%", height: 200 }}
         />
         <View className="absolute inset-0 bg-white/20" />
         <View className="absolute top-8 right-4 flex-row gap-x-1 items-center ">
           <LanguageToggle bgcolor="#445399" textcolor="#445399" />
         </View>
-        {/* Form Container */}
         <View
           style={{
             paddingHorizontal: 24,
@@ -174,7 +152,6 @@ const SignUp = () => {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              // color: colorScheme === "dark" ? "#fff" : "#000",
               marginBottom: 16,
               color: "#445399",
               fontFamily: "Poppins-Bold",
@@ -185,179 +162,144 @@ const SignUp = () => {
           </Text>
 
           {/* Name Row */}
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 16,
-              marginBottom: 20,
-            }}
-          >
-            <TextInput
-              style={{
-                flex: 1,
-                // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-                backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
-                // borderRadius: 12,
-                borderRadius: 24,
-                borderWidth: 1,
-                borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
-                padding: 14,
-                fontSize: 14,
-                color: colorScheme === "dark" ? "#fff" : "#000",
-                height: 48,
-                // width:33,
-              }}
-              placeholder={t("first_name")}
-              placeholderTextColor="#888"
-              value={form.firstName}
-              onChangeText={(text) => setForm({ ...form, firstName: text })}
-            />
-
-            <TextInput
-              // style={{
-              //   flex: 1,
-              //   backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-              //   borderRadius: 12,
-              //   padding: 14,
-              //   fontSize: 14,
-              //   color: colorScheme === "dark" ? "#fff" : "#000",
-              //   height: 48,
-              // }}
-              style={{
-                flex: 1,
-                // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-                backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
-                // borderRadius: 12,
-                borderRadius: 24,
-                borderWidth: 1,
-                borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
-                padding: 14,
-                paddingLeft: 16,
-                fontSize: 14,
-                color: colorScheme === "dark" ? "#fff" : "#000",
-                height: 48,
-              }}
-              placeholder={t("last_name")}
-              placeholderTextColor="#888"
-              value={form.lastName}
-              onChangeText={(text) => setForm({ ...form, lastName: text })}
-            />
+          <View style={{ flexDirection: "row", gap: 16, marginBottom: 20 }}>
+            <View style={{ flex: 1 }}>
+              <TextInput
+                style={{
+                  flex: 1,
+                  backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
+                  padding: 14,
+                  fontSize: 14,
+                  color: colorScheme === "dark" ? "#fff" : "#000",
+                  height: 48,
+                }}
+                placeholder={t("first_name")}
+                placeholderTextColor="#888"
+                value={form.firstName}
+                onChangeText={(text) => setForm({ ...form, firstName: text })}
+              />
+              {errors.firstName && (
+                <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                  {errors.firstName}
+                </Text>
+              )}
+            </View>
+            <View style={{ flex: 1 }}>
+              <TextInput
+                style={{
+                  flex: 1,
+                  backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
+                  padding: 14,
+                  fontSize: 14,
+                  color: colorScheme === "dark" ? "#fff" : "#000",
+                  height: 48,
+                }}
+                placeholder={t("last_name")}
+                placeholderTextColor="#888"
+                value={form.lastName}
+                onChangeText={(text) => setForm({ ...form, lastName: text })}
+              />
+              {errors.lastName && (
+                <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                  {errors.lastName}
+                </Text>
+              )}
+            </View>
           </View>
 
-          {/* Phone Number */}
-          <TextInput
-            // style={{
-            //   backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-            //   borderRadius: 12,
-            //   padding: 14,
-            //   fontSize: 14,
-            //   color: colorScheme === "dark" ? "#fff" : "#000",
-            //   marginBottom: 20,
-            //   height: 48,
-            // }}
-            style={{
-              flex: 1,
-              // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-              backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
-              // borderRadius: 12,
-              borderRadius: 24,
-              borderWidth: 1,
-              borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
-              padding: 14,
-              paddingLeft: 16,
-              fontSize: 14,
-              color: colorScheme === "dark" ? "#fff" : "#000",
-              height: 48,
-              marginBottom: 20,
-            }}
-            placeholder={t("phone_number")}
-            placeholderTextColor="#888"
-            keyboardType="phone-pad"
-            value={form.phoneNumber}
-            onChangeText={(text) => setForm({ ...form, phoneNumber: text })}
-          />
-
-          {/* Username */}
-          <TextInput
-            style={{
-              flex: 1,
-              // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-              backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
-              // borderRadius: 12,
-              borderRadius: 24,
-              borderWidth: 1,
-              borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
-              padding: 14,
-              paddingLeft: 16,
-              fontSize: 14,
-              color: colorScheme === "dark" ? "#fff" : "#000",
-              height: 48,
-              marginBottom: 20,
-            }}
-            placeholder={t("username")}
-            placeholderTextColor="#888"
-            value={form.username}
-            onChangeText={(text) => setForm({ ...form, username: text })}
-          />
-
-          {/* Email */}
-          <TextInput
-            style={{
-              flex: 1,
-              // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-              backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
-              // borderRadius: 12,
-              borderRadius: 24,
-              borderWidth: 1,
-              borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
-              padding: 14,
-              paddingLeft: 16,
-              fontSize: 14,
-              color: colorScheme === "dark" ? "#fff" : "#000",
-              height: 48,
-              marginBottom: 20,
-            }}
-            placeholder={t("email")}
-            placeholderTextColor="#888"
-            keyboardType="email-address"
-            value={form.email}
-            onChangeText={(text) => setForm({ ...form, email: text })}
-          />
-
-          {/* Password */}
-          {/* <TextInput
-            style={{
-              backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
-              borderRadius: 12,
-              padding: 14,
-              fontSize: 14,
-              color: colorScheme === "dark" ? "#fff" : "#000",
-              marginBottom: 16,
-              height: 48,
-            }}
-            placeholder="Create password"
-            placeholderTextColor="#888"
-            secureTextEntry
-            value={form.password}
-            onChangeText={(text) => setForm({ ...form, password: text })}
-          /> */}
-
-          <View style={{ marginBottom: 10, position: "relative" }}>
+          {/* Phone */}
+          <View style={{ marginBottom: 20 }}>
             <TextInput
               style={{
-                flex: 1,
-                // backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#F5F5F5",
                 backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
-                // borderRadius: 12,
                 borderRadius: 24,
                 borderWidth: 1,
                 borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
                 padding: 14,
-                paddingLeft: 16,
                 fontSize: 14,
                 color: colorScheme === "dark" ? "#fff" : "#000",
                 height: 48,
-                // marginBottom: 20,
+              }}
+              placeholder={t("phone_number")}
+              placeholderTextColor="#888"
+              keyboardType="phone-pad"
+              value={form.phoneNumber}
+              onChangeText={(text) => setForm({ ...form, phoneNumber: text })}
+            />
+            {errors.phoneNumber && (
+              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                {errors.phoneNumber}
+              </Text>
+            )}
+          </View>
+
+          {/* Username */}
+          <View style={{ marginBottom: 20 }}>
+            <TextInput
+              style={{
+                backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
+                borderRadius: 24,
+                borderWidth: 1,
+                borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
+                padding: 14,
+                fontSize: 14,
+                color: colorScheme === "dark" ? "#fff" : "#000",
+                height: 48,
+              }}
+              placeholder={t("username")}
+              placeholderTextColor="#888"
+              value={form.username}
+              onChangeText={(text) => setForm({ ...form, username: text })}
+            />
+            {errors.username && (
+              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                {errors.username}
+              </Text>
+            )}
+          </View>
+
+          {/* Email */}
+          <View style={{ marginBottom: 20 }}>
+            <TextInput
+              style={{
+                backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
+                borderRadius: 24,
+                borderWidth: 1,
+                borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
+                padding: 14,
+                fontSize: 14,
+                color: colorScheme === "dark" ? "#fff" : "#000",
+                height: 48,
+              }}
+              placeholder={t("email")}
+              placeholderTextColor="#888"
+              keyboardType="email-address"
+              value={form.email}
+              onChangeText={(text) => setForm({ ...form, email: text })}
+            />
+            {errors.email && (
+              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>{errors.email}</Text>
+            )}
+          </View>
+
+          {/* Password */}
+          <View style={{ marginBottom: 16, position: "relative" }}>
+            <TextInput
+              style={{
+                backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
+                borderRadius: 24,
+                borderWidth: 1,
+                borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
+                padding: 14,
+                fontSize: 14,
+                color: colorScheme === "dark" ? "#fff" : "#000",
+                height: 48,
               }}
               placeholder={t("password")}
               placeholderTextColor="#888"
@@ -365,28 +307,69 @@ const SignUp = () => {
               value={form.password}
               onChangeText={(text) => setForm({ ...form, password: text })}
             />
-
             <TouchableOpacity
               onPress={() => setShowPassword(!showPassword)}
-              style={{
-                position: "absolute",
-                right: 10,
-                top: 8,
-                padding: 5,
-              }}
+              style={{ position: "absolute", right: 10, top: 8, padding: 5 }}
             >
               <Image
                 source={
                   showPassword
-                    ? require("@/assets/icons/eye.png") // Icon when password is visible
-                    : require("@/assets/icons/eye-hide.png") // Icon when password is hidden
+                    ? require("@/assets/icons/eye.png")
+                    : require("@/assets/icons/eye-hide.png")
                 }
                 style={{ width: 24, height: 24 }}
                 resizeMode="contain"
               />
             </TouchableOpacity>
+            {errors.password && (
+              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                {errors.password}
+              </Text>
+            )}
           </View>
-          {/* Terms Text */}
+          {/* Confirm Password */}
+          <View style={{ marginBottom: 16, position: "relative" }}>
+            <TextInput
+              style={{
+                backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
+                borderRadius: 24,
+                borderWidth: 1,
+                borderColor: colorScheme === "dark" ? "#1E1E1E" : "#445399",
+                padding: 14,
+                fontSize: 14,
+                color: colorScheme === "dark" ? "#fff" : "#000",
+                height: 48,
+              }}
+              placeholder={t("confirm_password") || "Confirm Password"}
+              placeholderTextColor="#888"
+              secureTextEntry={!showPassword}
+              value={form.confirmPassword}
+              onChangeText={(text) =>
+                setForm({ ...form, confirmPassword: text })
+              }
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              style={{ position: "absolute", right: 10, top: 8, padding: 5 }}
+            >
+              <Image
+                source={
+                  showPassword
+                    ? require("@/assets/icons/eye.png")
+                    : require("@/assets/icons/eye-hide.png")
+                }
+                style={{ width: 24, height: 24 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+            {errors.confirmPassword && (
+              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                {errors.confirmPassword}
+              </Text>
+            )}
+          </View>
+
+          {/* Terms */}
           <Text
             style={{
               fontSize: 12,
@@ -399,20 +382,16 @@ const SignUp = () => {
           >
             {t("by")} <Text style={{ color: "#445399" }}>{t("by2")}</Text>
             <Text
-              // style={{
-              //   color: "#7E0201",
-              //   textDecorationLine: "underline",
-              // }}
               className="text-primary underline"
               onPress={() => router.push("/terms")}
             >
               {t("terms")}
             </Text>
           </Text>
+
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
           >
-            {/* Sign Up Button */}
             <CustomButton
               title={t("signup")}
               containerStyles={{
@@ -421,17 +400,12 @@ const SignUp = () => {
                 height: 48,
                 justifyContent: "center",
               }}
-              textStyles={{
-                color: "#fff",
-                fontSize: 16,
-                fontWeight: "600",
-              }}
+              textStyles={{ color: "#fff", fontSize: 16, fontWeight: "600" }}
               isLoading={isSubmitting}
               handlePress={handleSignUp}
             />
           </View>
 
-          {/* Login Link */}
           <View
             style={{
               flexDirection: "row",
@@ -446,15 +420,11 @@ const SignUp = () => {
               }}
               className="font-poppins-medium"
             >
-              {t("already")}{" "}
+              {t("already")}
             </Text>
             <TouchableOpacity onPress={() => router.push("/sign-in")}>
               <Text
-                style={{
-                  fontSize: 14,
-                  color: "#445399",
-                  fontWeight: "600",
-                }}
+                style={{ fontSize: 14, color: "#445399", fontWeight: "600" }}
                 className="text-primary font-poppins-medium text-[14px]"
               >
                 {t("login")}
@@ -475,25 +445,20 @@ const SignUp = () => {
     </SafeAreaView>
   );
 };
-// Responsive size calculation
+
 const responsiveSize = (size) => {
-  const scaleFactor = width / 375; // Base width from design (e.g., iPhone 375)
+  const scaleFactor = width / 375;
   return size * scaleFactor;
 };
+
 const styles = StyleSheet.create({
-  poweredBy: {
-    alignItems: "center",
-    marginTop: responsiveSize(10),
-  },
+  poweredBy: { alignItems: "center", marginTop: responsiveSize(10) },
   poweredText: {
     textAlign: "center",
     fontSize: responsiveSize(12),
     color: "#1f2937",
   },
-  poweredBold: {
-    fontWeight: "bold",
-    color: "#8F3C01",
-  },
+  poweredBold: { fontWeight: "bold", color: "#8F3C01" },
 });
 
 export default SignUp;
