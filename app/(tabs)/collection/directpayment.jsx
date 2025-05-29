@@ -62,6 +62,7 @@ const DirectBankTransfer = () => {
     orderId,
     amountToPay,
     paymentStatus,
+    need_delivery,
     // phone,
     // firstName,
     // lastName,
@@ -164,6 +165,7 @@ const DirectBankTransfer = () => {
       paymentStatus: paymentStatus,
       bankName: bankPaymentForm.bank,
       receipt: bankPaymentForm.receipt,
+      need_delivery:need_delivery
     });
 
     // Validate required payment data
@@ -214,9 +216,14 @@ const DirectBankTransfer = () => {
     try {
       await handleSubmit(); // <-- wait for backend call
       // only navigate once the POST completes
-      router.push(
-        `./schedule?orderId=${encodeURIComponent(JSON.stringify(orderId))}`
-      );
+      if(need_delivery){
+
+        router.push(
+          `./schedule?orderId=${encodeURIComponent(JSON.stringify(orderId))}`
+        );
+      }else{
+        router.push("/(tabs)/order");
+      }
     } catch (err) {
       console.error(err);
       Alert.alert("Error", "Something went wrong, please try again.");
@@ -227,8 +234,60 @@ const DirectBankTransfer = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
+        <Text
+            className="font-poppins-bold text-center text-primary mb-4"
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#445399",
+              marginTop: 13,
+              marginBottom:6,
+
+              // position:"absolute",
+              // top:12,
+              // right:160
+            }}
+          >
+            {t("yikeflu")}
+          </Text>
+        <View style={styles.sectiona1}>
+          {/* <Text style={styles.sectionTitle}>{t('yikeflu')}</Text> */}
+          <Text style={{
+              fontSize: 16,
+              color: "#445399",
+              // fontFamily: "Poppins-semibold",
+              textAlign: "start",
+              paddingTop: 6,
+              marginBottom: 6,
+              fontWeight: "bold",
+            }}>
+           {t("yourorder")}!
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#445399",
+              fontFamily: "Poppins-semibold",
+              textAlign: "center",
+              paddingTop: 6,
+              marginBottom: 6,
+            }}
+          >
+            {t("instruction1")}: <Text style={{fontWeight:"bold"}}>Yas-#{orderId}</Text>
+
+          </Text>
+          <View style={styles.picker}>
+                <Text style={{ textAlign: "center", color: "#445399", fontWeight: "500", }}>
+                  {t('total')}:
+                </Text>
+                <Text style={{ textAlign: "center", color: "#445399", fontWeight: "700", }}>
+                  {i18n.language === "en" ? t("br") : ""} {amountToPay} {i18n.language === "amh" ? t("br") : ""}
+                </Text>
+              </View>
+        </View>
         <View style={styles.headerContainer}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => router.push("/(tabs)/home")}
             style={{
               marginHorizontal: 10,
@@ -241,7 +300,13 @@ const DirectBankTransfer = () => {
             className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
           >
             <Ionicons name="arrow-back" size={24} color="#445399" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+         <View style={{
+          flexDirection:"row", 
+          justifyContent:"center",
+          alignItems:"center",
+          }}>
+
           <Text
             className="font-poppins-bold text-center text-primary mb-4"
             style={{
@@ -250,6 +315,8 @@ const DirectBankTransfer = () => {
               textAlign: "center",
               color: "#445399",
               marginTop: 13,
+              width:"100%"
+              // backgroundColor:"red"
 
               // position:"absolute",
               // top:12,
@@ -258,6 +325,7 @@ const DirectBankTransfer = () => {
           >
             {t("bank")}
           </Text>
+         </View>
           <View style={{ paddingHorizontal: 32 }}></View>
         </View>
         {/* <Text
@@ -344,14 +412,7 @@ const DirectBankTransfer = () => {
                   />
                 ))}
               </Picker> */}
-              <View style={styles.picker}>
-                <Text style={{ textAlign: "center", color: "#445399", fontWeight: "500", }}>
-                  {t('total')}:
-                </Text>
-                <Text style={{ textAlign: "center", color: "#445399", fontWeight: "700", }}>
-                  {i18n.language === "en" ? t("br") : ""} {amountToPay} {i18n.language === "amh" ? t("br") : ""}
-                </Text>
-              </View>
+              
             </View>
 
             <Text style={styles.label}>{t("upload")}</Text>
@@ -489,6 +550,15 @@ const styles = StyleSheet.create({
     color: "#445399",
     marginBottom: 16,
   },
+  sectiona1: {
+    backgroundColor: "rgba(150, 166, 234, 0.4)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+
+    // marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#445399",
+  },
   sectiona: {
     backgroundColor: "rgba(150, 166, 234, 0.4)",
     borderRadius: 32,
@@ -585,11 +655,12 @@ const styles = StyleSheet.create({
     // paddingLeft: 13,
   },
   picker: {
-    height: 45,
+    // height: 45,
     width: "95%",
     flexDirection: "row",
-    justifyContent: "start",
+    justifyContent: "center",
     alignItems: "center",
+    marginBottom:24,
     
     // marginLeft: 8,
   },

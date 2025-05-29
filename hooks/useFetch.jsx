@@ -58,15 +58,15 @@ export const ActivateUser = async (c) => {
 // };
 // useFetch.jsx
 export const GET_AUTH = async (payload) => {
-  try {
-    // now payload must have { login, password }
-    const response = await auth.post("auth/jwt/create/", payload);
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.detail || "An error occurred");
-  }
+  const response = await auth.post("auth/jwt/create/", payload);
+  return response.data;
 };
 
+export const deleteAccount = async () => {
+      const res= await auth.post(
+        `account/auth/deactivate/`);
+      return res.data;
+  };
 
 export const setTokens = (accessToken, refreshToken) => {
   sessionStorage.setItem("accessToken", accessToken);

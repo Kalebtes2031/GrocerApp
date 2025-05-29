@@ -8,6 +8,8 @@ import {
   StyleSheet,
   Keyboard,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
@@ -80,6 +82,10 @@ const SearchProducts = () => {
   };
 
   return (
+      <KeyboardAvoidingView
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    style={{ flex: 1 }}
+  >
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
       <View style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -186,6 +192,7 @@ const SearchProducts = () => {
         </View>
       </View>
     </TouchableWithoutFeedback>
+  </KeyboardAvoidingView>
   );
 };
 

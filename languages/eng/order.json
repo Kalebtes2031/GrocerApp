@@ -23,5 +23,8 @@
     "kg": "Kg",
     "g": "g",
     "piece": "PCs",
-    "scheduled":"Scheduled"
+    "scheduled":"Scheduled",
+    "not_scheduled":"Not Scheduled",
+        "need_delivery":"Need-delivery",
+    "self_pickup":"Self-pickup"
 }

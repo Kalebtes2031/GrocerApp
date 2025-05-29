@@ -35,21 +35,28 @@ export default function NewPasswordScreen() {
       showToast('error', t('password_mismatch'));
       return;
     }
-    try {
-      setLoading(true);
-      await axios.post(
+     try {
+    setLoading(true);
+    await axios.post(
         `${baseUrl}auth/reset-password/`,
         { reset_token, new_password: password },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      showToast('success', t('password_reset_success'));
-      router.push('/(auth)/sign-in');
-    } catch (error) {
-      showToast('error', error.response?.data?.error || t('password_reset_failed'));
-    } finally {
-      setLoading(false);
-    }
-  };
+    showToast('success', t('password_reset_success'));
+    router.push('/(auth)/sign-in');
+  } catch (error) {
+    // 1) Log the entire response to your console so you see *everything*:
+    console.log('Reset-password error response:', error.response);
+
+    // 2) Show a JSON‐stringified version in your toast:
+    const details = error.response?.data
+      ? JSON.stringify(error.response.data, null, 2)
+      : t('password_reset_failed');
+    showToast('error', details);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <SafeAreaView style={styles.safeArea}>

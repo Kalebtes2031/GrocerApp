@@ -28,7 +28,7 @@ import { LanguageProvider } from "@/context/LanguageProvider";
 import { View } from "react-native";
 import { Text } from "react-native";
 import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
-import NetInfo from "@react-native-community/netinfo";
+// import NetInfo from "@react-native-community/netinfo";
 import { useTranslation } from "react-i18next";
 
 SplashScreen.preventAutoHideAsync();
@@ -63,45 +63,45 @@ export default function RootLayout() {
   //   return () => unsubscribe();
   // }, []);
 
-  useEffect(() => {
-    // 1. Check the **initial** state
-    NetInfo.fetch().then((state) => {
-      if (!state.isConnected) {
-        Toast.show({
-          type: "error",
-          text1: t("no_internet"),
-          text2: t("check_connection"),
-          position: "top",
-          autoHide: false,
-        });
-      }
-    });
+  // useEffect(() => {
+  //   // 1. Check the **initial** state
+  //   NetInfo.fetch().then((state) => {
+  //     if (!state.isConnected) {
+  //       Toast.show({
+  //         type: "error",
+  //         text1: t("no_internet"),
+  //         text2: t("check_connection"),
+  //         position: "top",
+  //         autoHide: false,
+  //       });
+  //     }
+  //   });
 
-    // 2. Then subscribe to changes
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      if (!state.isConnected) {
-        // if we go offline later
-        Toast.show({
-          type: "error",
-          text1: t("no_internet"),
-          text2: t("check_connection"),
-          position: "top",
-          autoHide: false,
-        });
-      } else {
-        // back online
-        Toast.hide();
-        Toast.show({
-          type: "success",
-          text1: t("back_online"),
-          position: "top",
-          visibilityTime: 2000,
-        });
-      }
-    });
+  //   // 2. Then subscribe to changes
+  //   const unsubscribe = NetInfo.addEventListener((state) => {
+  //     if (!state.isConnected) {
+  //       // if we go offline later
+  //       Toast.show({
+  //         type: "error",
+  //         text1: t("no_internet"),
+  //         text2: t("check_connection"),
+  //         position: "top",
+  //         autoHide: false,
+  //       });
+  //     } else {
+  //       // back online
+  //       Toast.hide();
+  //       Toast.show({
+  //         type: "success",
+  //         text1: t("back_online"),
+  //         position: "top",
+  //         visibilityTime: 2000,
+  //       });
+  //     }
+  //   });
 
-    return () => unsubscribe();
-  }, [t]);
+  //   return () => unsubscribe();
+  // }, [t]);
 
   if (!fontsLoaded) {
     return null; // Show loading screen/image here
@@ -112,7 +112,7 @@ export default function RootLayout() {
       <ErrorToast
         {...props}
         text1Style={{
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: "bold",
           color: "red",
         }}
@@ -164,31 +164,6 @@ export default function RootLayout() {
                         name="carddetail"
                         options={{
                           headerShown: false,
-                          // header: ({ navigation }) => (
-                          //   <View
-                          //     style={{
-                          //       height: 60,
-                          //       backgroundColor: "#fff",
-                          //       flexDirection: "row",
-                          //       alignItems: "center",
-                          //       paddingHorizontal: 10,
-                          //     }}
-                          //   >
-                          //     <TouchableOpacity
-                          //       onPress={() => navigation.goBack()}
-                          //       style={{ marginRight: 10, paddingHorizontal: 12 }}
-                          //     >
-                          //       <Ionicons
-                          //         name="arrow-back"
-                          //         size={24}
-                          //         color="gray"
-                          //       />
-                          //     </TouchableOpacity>
-                          //     <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                          //       Product Detail
-                          //     </Text>
-                          //   </View>
-                          // ),
                         }}
                       />
                       <Stack.Screen

@@ -53,10 +53,17 @@ export const WatchlistProvider = ({ children }) => {
     saveWatchlist(updatedList);
   };
   
-  
+  const toggleWatchlist = (product) => {
+  if (isFavorite(product.variation.id)) {
+    removeFromWatchlist(product.variation.id);
+  } else {
+    addToWatchlist(product);
+  }
+};
+
   return (
     <WatchlistContext.Provider
-      value={{ watchlist, addToWatchlist, removeFromWatchlist, isFavorite }}
+      value={{ watchlist, addToWatchlist, removeFromWatchlist, isFavorite, toggleWatchlist }}
     >
       {children}
     </WatchlistContext.Provider>

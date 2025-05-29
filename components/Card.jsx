@@ -1,4 +1,4 @@
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -17,93 +17,118 @@ import { useWatchlist } from "@/context/WatchlistProvider";
 import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
-const CARD_WIDTH = width * 0.40;
+const CARD_WIDTH = width * 0.4;
 
-const Card = ({ product }) => {
-  const { t, i18n } = useTranslation('card');
-  const { addItemToCart } = useCart();
+const Card = ({ product, onAdded }) => {
+  const { t, i18n } = useTranslation("card");
+  const { cart, addItemToCart, isInCart } = useCart();
   const { addToWatchlist, removeFromWatchlist, isFavorite } = useWatchlist();
   // const [isFavorited, setIsFavorited] = useState(false);
   const colorScheme = useColorScheme();
   const router = useRouter();
+  // const [added, setAdded] = useState(false);
+  // protect against items being undefined, and variation missing:
+  const added = isInCart(product.variation.id);
 
   const isFavorited = isFavorite(product.variation.id);
 
-const toggleFavorite = () => {
-  
-  if (isFavorited) {
-    removeFromWatchlist(product.variation.id);
-    Toast.show({
-      type: "info",
-      text1:t('removed'),
-      visibilityTime: 2000,
-    });
-  } else {
-    addToWatchlist(product);
-    Toast.show({
-      type: "success",
-      text1: t('added'),
-      visibilityTime: 2000,
-    });
-  }
-};
-
-
-
-
-  const handlePress = () => {
-    router.push(`/carddetail?product=${encodeURIComponent(JSON.stringify(product))}`);
-  };
-
-  const handleAddCartClick = async() => {
-    if(product.variation.in_stock===false) {
-    Toast.show({
-      type: "info",
-      text1:t('out_stock'),
-      visibilityTime: 2000,
-    });
-    return
-  }
-    try {
-      console.log('product.variations.id', product)
-      await addItemToCart(product.variation.id, 1);
+  const toggleFavorite = () => {
+    if (isFavorited) {
+      removeFromWatchlist(product.variation.id);
       Toast.show({
-        type: "success",
-        text1: t('product'),
+        type: "info",
+        text1: t("removed"),
         visibilityTime: 2000,
       });
+    } else {
+      addToWatchlist(product);
+      Toast.show({
+        type: "success",
+        text1: t("added"),
+        visibilityTime: 2000,
+      });
+    }
+  };
+
+  const handlePress = () => {
+    router.push(
+      `/carddetail?product=${encodeURIComponent(JSON.stringify(product))}`
+    );
+  };
+
+  const handleAddCartClick = async () => {
+    if (product.variation.in_stock === false) {
+      Toast.show({
+        type: "error",
+        text1: t("out_stock"),
+        visibilityTime: 2000,
+      });
+      return;
+    }
+    try {
+      console.log("product.variations.id", product);
+
+      await addItemToCart(product.variation.id, 1);
+
+      Toast.show({
+        type: "success",
+        text1: t("product"),
+        visibilityTime: 2000,
+      });
+      // setAdded(true);
+
+      // 3) extra hook (e.g. remove from wishlist)
+      if (onAdded) onAdded(product.variation.id);
     } catch (error) {
       console.error("Error when add item to cart", error);
     }
-
-
   };
 
   return (
-    <TouchableOpacity 
-      onPress={handlePress} 
-      style={[styles.cardContainer, { backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#fff" }]}
+    <TouchableOpacity
+      onPress={handlePress}
+      style={[
+        styles.cardContainer,
+        { backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#fff" },
+      ]}
     >
       {/* Image Container */}
       <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: product.image }} 
-          style={styles.image} 
+        <Image
+          source={{ uri: product.image }}
+          style={styles.image}
           resizeMode="contain"
         />
         {/* <View style={styles.imageOverlay} /> */}
-        
+
         {/* Top Icons */}
         <View style={styles.topIconsContainer}>
-          <TouchableOpacity 
-            style={[styles.iconButton, styles.cartButton]}
-            onPress={handleAddCartClick}
+          <TouchableOpacity
+            onPress={(e) => {
+              e.stopPropagation();
+              if (!added) handleAddCartClick();
+            }}
+            // style={[styles.iconButton, styles.cartButton]}
+            disabled={added}
+            style={[
+              styles.iconButton2,
+              // added && { opacity: 0.6 },
+              { backgroundColor: added ? "#445399" : "#445399" },
+            ]}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <AntDesign name="shoppingcart" size={24} color="#fff" />
+            <AntDesign
+              name={added ? "checkcircleo" : "shoppingcart"}
+              size={24}
+              color={added ? "rgba(249, 244, 247, 0.8)" : "#fff"}
+              style={{
+                zIndex: 10,
+                // elevation: 1,
+              }}
+            />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={styles.iconButton}
             onPress={toggleFavorite}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -119,21 +144,22 @@ const toggleFavorite = () => {
         {/* Product Info Overlay */}
         <View style={styles.infoOverlay}>
           <Text style={styles.productName} numberOfLines={2}>
-            {i18n.language === "en"?product.item_name: product.item_name_amh}
+            {i18n.language === "en" ? product.item_name : product.item_name_amh}
           </Text>
-          
+
           <View style={styles.priceContainer}>
             <Text style={styles.unitText}>
               {parseInt(product?.variation?.quantity)}{" "}
               {t(`${product?.variation?.unit}`)}
             </Text>
             <Text style={styles.priceText}>
-              {i18n.language === "en"? "Birr":""} {product.variation?.price} {i18n.language === "amh"? "ብር":""} 
+              {i18n.language === "en" ? "Birr" : ""} {product.variation?.price}{" "}
+              {i18n.language === "amh" ? "ብር" : ""}
             </Text>
           </View>
         </View>
       </View>
-
+      {/* cartscreen back /shop */}
       {/* Add to Cart Footer */}
       {/* <TouchableOpacity 
         style={styles.addToCartButton}
@@ -149,8 +175,8 @@ const styles = StyleSheet.create({
   cardContainer: {
     width: CARD_WIDTH,
     borderRadius: 16,
-    borderWidth:1,
-    borderColor:"#445399",
+    borderWidth: 1,
+    borderColor: "#445399",
     marginBottom: 8,
     overflow: "hidden",
     elevation: 3,
@@ -159,12 +185,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     height: 170,
-    
   },
   imageContainer: {
     height: 150,
     justifyContent: "space-between",
-    
   },
   image: {
     ...StyleSheet.absoluteFillObject,
@@ -180,6 +204,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 12,
   },
+  iconButton2: {
+    backgroundColor: "rgba(255,255,255,0.4)",
+    borderRadius: 20,
+    padding: 6,
+    // elevation: 2,
+    zIndex: 0,
+    elevation: 0,
+  },
   iconButton: {
     backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: 20,
@@ -189,6 +221,9 @@ const styles = StyleSheet.create({
   cartButton: {
     backgroundColor: "#445399",
   },
+  cartButton2: {
+    backgroundColor: "rgba(39, 54, 245, 0.59)",
+  },
   infoOverlay: {
     position: "absolute",
     bottom: -20,
@@ -196,9 +231,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: 12,
     paddingVertical: 8,
-  backgroundColor: "rgba(68, 83, 153, 0.95)", // 80% opacity
-
-
+    backgroundColor: "rgba(68, 83, 153, 0.95)", // 80% opacity
   },
   productName: {
     color: "#fff",

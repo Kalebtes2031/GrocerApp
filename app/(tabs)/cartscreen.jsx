@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo  } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
+  Dimensions, 
+  Platform,
 } from "react-native";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCart } from "@/context/CartProvider";
@@ -18,12 +20,16 @@ import Toast from "react-native-toast-message";
 import { useWatchlist } from "@/context/WatchlistProvider";
 import { useTranslation } from "react-i18next";
 
+ const { width, height } = Dimensions.get("window");
+  const scale = (size) => (width / 375) * size; 
+
 const CartScreen = () => {
   const { t, i18n } = useTranslation("cartscreen");
   const { watchlist } = useWatchlist();
   const {
     cart,
     setCart,
+    itemOrder,
     loadCartData,
     updateItemQuantity,
     removeItemFromCart,
@@ -34,6 +40,11 @@ const CartScreen = () => {
   const items = cart?.items ?? [];
   const total = cart?.total ?? 0;
   const [globalLoading, setGlobalLoading] = useState(false);
+ 
+  const orderedItems = useMemo(() => {
+  const idMap = new Map(items.map((item) => [item.variations.id, item]));
+  return itemOrder.map((id) => idMap.get(id)).filter(Boolean);
+}, [items, itemOrder]);
 
   const handleQuantityUpdate = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return;
@@ -197,7 +208,7 @@ const CartScreen = () => {
             {/* <Header /> */}
             <View style={styles.headerContainer}>
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => router.push('/(tabs)/shop')}
                 style={{
                   marginHorizontal: 10,
                   paddingHorizontal: 2,
@@ -228,7 +239,7 @@ const CartScreen = () => {
             <Text
               className="font-poppins-bold text-center text-primary mb-4"
               style={{
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: "bold",
                 color: "#445399",
                 textAlign: "center",
@@ -241,7 +252,7 @@ const CartScreen = () => {
             </Text>
 
             <View style={styles.scrollContainers}>
-              {items.map((item) => (
+              {orderedItems.map((item) => (
                 <View key={item.id} style={styles.itemContainer}>
                   <TouchableOpacity
                   // onPress={() => handlePress(item)}
@@ -249,7 +260,7 @@ const CartScreen = () => {
                     <Image
                       source={{ uri: item?.image }}
                       style={styles.productImage}
-                      resizeMode="cover"
+                      resizeMode="contain"
                     />
                   </TouchableOpacity>
 
@@ -461,8 +472,21 @@ const CartScreen = () => {
     </SafeAreaView>
   );
 };
+const responsive = {
+  fontSize: (size) => {
+    const scaledSize = scale(size);
+    return {
+      fontSize: Platform.select({
+        ios: scaledSize,
+        android: scaledSize * 0.95,
+      }),
+    };
+  },
+  widthPercentage: (percentage) => (width * percentage) / 100,
+  heightPercentage: (percentage) => (height * percentage) / 100,
+};
 
-// Add these new styles to your StyleSheet
+
 const styles = StyleSheet.create({
   modalOverlay: {
     position: "absolute",
@@ -491,15 +515,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   headerContainer: {
-    height: 50,
-    backgroundColor: "#fff",
+    // height: 50,
+    // backgroundColor: "#fff",
+    // flexDirection: "row",
+    // justifyContent: "space-between",
+    // alignItems: "center",
+    // paddingHorizontal: 10,
+     height: scale(50),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 10,
-    // backgroundColor:"red"
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#eee",
+    paddingHorizontal: scale(10),
   },
 
   loadingContainer: {
@@ -507,23 +533,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  // emptyContainer: {
-  //   flex: 1,
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  // },
-  // emptyText: {
-  //   fontSize: 18,
-  //   color: "#666",
-  //   marginTop: 10,
-  // },
-  // headerContainer: {
-  //   height: 60,
-  //   backgroundColor: "#fff",
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   paddingHorizontal: 10,
-  // },
   iconWrapper: {
     position: "relative",
     marginRight: 16,
@@ -576,39 +585,47 @@ const styles = StyleSheet.create({
     // elevation: 3,
   },
   productImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    marginRight: 16,
+    // width: 100,
+    // height: 100,
+    // borderRadius: 20,
+    // marginRight: 16,
+     width: responsive.widthPercentage(25),
+    height: responsive.widthPercentage(25),
+    borderRadius: scale(8),
+    marginRight: scale(10),
   },
   detailsContainer: {
-    flexDirection: "column",
-    // gap: 8,
-    // justifyContent: "space-between",
+    // flexDirection: "column",
+      flex: 1,
+    marginLeft: scale(2),
   },
   productName: {
-    // fontSize: 16,
-    // fontWeight: "600",
-    // height:12,
-    // marginBottom: 1,
+     ...responsive.fontSize(14),
+    flexShrink: 1,
+    marginBottom: scale(4),
+    color:"#445399",
   },
   price: {
-    fontSize: 14,
-    color: "#666",
-    // marginBottom: 8,
-    // marginTop: 8,
+    // fontSize: 14,
+    // color: "#666",
+    ...responsive.fontSize(14),
+    marginVertical: scale(4),
+    color:"#445399",
   },
   quantityContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    //  marginVertical: scale(8),
   },
   quantity: {
-    fontSize: 16,
+    // fontSize: 16,
     fontWeight: "500",
-    minWidth: 24,
-    textAlign: "center",
+    // minWidth: 24,
+    // textAlign: "center",
     color: "#445399",
+     ...responsive.fontSize(16),
+    marginHorizontal: scale(8),
   },
   quantityText: {
     marginHorizontal: 10,

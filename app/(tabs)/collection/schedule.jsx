@@ -335,13 +335,14 @@ const ScheduleDeliveryScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => navigation.back()}
            style={{ marginHorizontal: 10, paddingHorizontal: 2, borderWidth:1, borderRadius:52, paddingVertical:2 ,  borderColor:"#445399",}}
           className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
         >
           <Ionicons name="arrow-back" size={24} color="#445399" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <View></View>
         <Text
           // className="font-poppins-bold text-center text-primary mb-4"
           style={{

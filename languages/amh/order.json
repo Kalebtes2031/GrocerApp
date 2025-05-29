@@ -1,5 +1,5 @@
 {
-  "myorders": "የትዕዛዝ ታሪክ",
+  "myorders": "የኔ ትዕዛዝ",
   "found":"ትዕዛዞች ",
   "please":"እባክዎ",
   "login":"ወደ መግቢያ ገፅ ይግቡ",
@@ -8,7 +8,7 @@
   "cancel":"ሰርዝ",
   "proceed":"ይቀጥሉ",
   "choose":"ይምረጡ",
-  "full":"ሙሉ ክፍያ",
+  "full":"እባክዎ ይክፈሉ",
   "ordertotal":"ጠቅላላ ዋጋ",
   "br":"ብር",
   "payment":"የክፍያ ሁኔታ",
@@ -23,5 +23,9 @@
     "kg": "ኪግ",
     "g": "ግ",
     "piece": "ፍሬ",
-    "scheduled":"የታቀደው ጊዜ"
+    "scheduled":"የታቀደው ጊዜ",
+    "not_scheduled":"ቀጠሮ አልተያዘም",
+    "reschedule":"እባክዎ ቀጠሮ ይያዙ",
+    "need_delivery":"የሚያደርስ ሰው እፈልጋለው",
+    "self_pickup":"ከያሶን እወስዳለሁ"
 }

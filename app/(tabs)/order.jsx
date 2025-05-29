@@ -23,6 +23,17 @@ import { RadioButton } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 
+const COLORS = {
+  primary: "#2D4150",
+  secondary: "#445399",
+  success: "#4CAF50",
+  warning: "#FF9800",
+  error: "#FF5722",
+  background: "#F8FAFC",
+  text: "#2D4150",
+  muted: "#94A3B8",
+};
+
 const Order = () => {
   const { t, i18n } = useTranslation("order");
   const route = useRouter();
@@ -34,6 +45,7 @@ const Order = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [paymentType, setPaymentType] = useState("Direct Bank Payment");
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -43,8 +55,8 @@ const Order = () => {
     }, 2000);
   }, []);
 
-  const openModal = (order, buttonType, amount) => {
-    setSelectedOrder({ order, buttonType, amount });
+  const openModal = (order, buttonType, amount, need_delivery) => {
+    setSelectedOrder({ order, buttonType, amount, need_delivery });
     setIsModalOpen(true);
   };
 
@@ -54,14 +66,31 @@ const Order = () => {
     setPaymentType("Direct Bank Payment");
   };
 
+  const handleReschedule = async (orderId) => {
+    // setConfirmingId(orderId);
+    try {
+      setIsLoading(true);
+      route.push(
+        `/(tabs)/collection/schedule?orderId=${encodeURIComponent(
+          JSON.stringify(orderId)
+        )}`
+      );
+    } catch (err) {
+      console.error("Confirm failed", err);
+    } finally {
+      // setConfirmingId(null);
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmitPayment = () => {
-    const { order, buttonType, amount } = selectedOrder;
+    const { order, buttonType, amount, need_delivery } = selectedOrder;
     if (paymentType === "Direct Bank Payment") {
-      handleBankPayment(order, buttonType, amount);
+      handleBankPayment(order, buttonType, amount, need_delivery);
     }
     closeModal();
   };
-  const handleBankPayment = (order_id, buttonType, amount) => {
+  const handleBankPayment = (order_id, buttonType, amount, need_delivery) => {
     if (buttonType === "advance") {
       amount = (amount * 0.3).toFixed(2);
     }
@@ -72,6 +101,7 @@ const Order = () => {
       orderId: order_id,
       amountToPay: amount,
       paymentStatus: buttonType,
+      need_delivery: need_delivery,
     };
     route.push(
       `/(tabs)/collection/directpayment?paymentData=${encodeURIComponent(
@@ -249,6 +279,9 @@ const Order = () => {
           <Text style={styles.orderId}>
             {t("order")} #Yas-{order.id}
           </Text>
+          <Text style={{ fontSize: 10, fontWeight: "600", color: "#445399",}}>
+            {order.need_delivery ? t("need_delivery") : t("self_pickup")}
+          </Text>
           {/* {renderOrderStatus(order.status)} */}
         </View>
 
@@ -257,9 +290,10 @@ const Order = () => {
 
         <View style={styles.totalContainer}>
           <Text style={styles.orderTotal}>{t("ordertotal")}:</Text>
-          <Text style={styles.orderTotal}>
-            {i18n.language === "en" ? t("br") : ""}
-            {order.total}
+          <Text
+            style={[styles.orderTotal, { marginLeft: 24, textAlign: "center" }]}
+          >
+            {i18n.language === "en" ? t("br") : ""} {order.total}{" "}
             {i18n.language === "amh" ? t("br") : ""}
           </Text>
         </View>
@@ -281,11 +315,44 @@ const Order = () => {
             <Text style={[styles.boldLabel, styles.flexLabel]}>
               {t("scheduled")}:
             </Text>
-            <Text style={styles.flexValue}>
-              {new Date(order.scheduled_delivery).toLocaleString()}
-            </Text>
-          </View>
 
+            {order?.scheduled_delivery ? (
+              <Text style={styles.flexValue}>
+                {" "}
+                {new Date(order.scheduled_delivery).toLocaleString()}
+              </Text>
+            ) : (
+              <Text style={styles.flexValue}>{t("not_scheduled")}</Text>
+            )}
+          </View>
+          {order?.scheduled_delivery ? (
+            ""
+          ) : (
+            <TouchableOpacity
+              onPress={() => handleReschedule(order.id)}
+              style={[
+                styles.button2,
+                { backgroundColor: COLORS.error, marginTop: 4 },
+              ]}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontWeight: "600",
+                    fontSize: i18n.language === "en" ? 15 : 12,
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  {t("reschedule")}
+                </Text>
+              )}
+            </TouchableOpacity>
+          )}
           {/* Payment Status */}
           <View style={styles.paymentRow}>
             <Text style={[styles.boldLabel, styles.flexLabel]}>
@@ -304,7 +371,14 @@ const Order = () => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.fullPayment]}
-                onPress={() => openModal(order.id, "full_payment", order.total)}
+                onPress={() =>
+                  openModal(
+                    order.id,
+                    "full_payment",
+                    order.total,
+                    order.need_delivery
+                  )
+                }
               >
                 <Text style={styles.buttonText}>{t("full")}</Text>
               </TouchableOpacity>
@@ -354,7 +428,7 @@ const Order = () => {
                   // paddingTop: 4,
                 }}
               >
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => route.back()}
                   style={{
                     // marginHorizontal: 10,
@@ -367,13 +441,28 @@ const Order = () => {
                   className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
                 >
                   <Ionicons name="arrow-back" size={24} color="#445399" />
-                </TouchableOpacity>
-                <Text
-                  className="font-poppins-bold text-center text-primary mb-4"
-                  style={styles.headerTitle}
+                </TouchableOpacity> */}
+                <View></View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 8,
+                    backgroundColor: "#445399",
+                    width: "100%",
+                    borderTopRightRadius: 8,
+                    borderTopLeftRadius: 8,
+                    paddingVertical: 6,
+                  }}
                 >
-                  {t("myorders")}
-                </Text>
+                  <Text
+                    className="font-poppins-bold text-center text-primary mb-4"
+                    style={styles.headerTitle}
+                  >
+                    {t("myorders")}
+                  </Text>
+                </View>
                 <View></View>
               </View>
             </View>
@@ -429,15 +518,24 @@ const Order = () => {
 export default Order;
 
 const styles = StyleSheet.create({
+  button2: {
+    width: "100%",
+    marginBottom: 8,
+    paddingVertical: 10,
+    borderRadius: 58,
+    alignItems: "center",
+  },
   responsiveContainer: {
     paddingRight: 10,
+    //  backgroundColor:"red"
     // marginTop: 12,
   },
   rowContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 2,
+    // marginVertical: 2,
     flexWrap: "wrap",
+    // backgroundColor:"red"
   },
   paymentRow: {
     flexDirection: "row",
@@ -460,6 +558,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flexShrink: 1, // Allow text wrapping
     flexWrap: "wrap",
+    color: "#445399",
   },
   statusContainer: {
     flexDirection: "row",
@@ -480,7 +579,7 @@ const styles = StyleSheet.create({
     borderRadius: 58,
     // minWidth: 120,
     alignItems: "center",
-    width:"100%"
+    width: "100%",
   },
   fullPayment: {
     backgroundColor: "#445399",
@@ -511,7 +610,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginRight: 20,
-    color: "#445399",
+    color: "#fff",
   },
   container: {
     flex: 1,
@@ -564,18 +663,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // marginBottom: 12,
-  },
-  orderId: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#445399",
-    width: "100%",
-    textAlign: "center",
+    width:"100%",
     borderBottomColor: "#445399",
     borderBottomWidth: 1,
     paddingBottom: 4,
     marginBottom: 8,
+    // marginBottom: 12,
+  },
+  orderId: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#445399",
+    width: "50%",
+    // textAlign: "center",
+    // borderBottomColor: "#445399",
+    // borderBottomWidth: 1,
+    // paddingBottom: 4,
+    // marginBottom: 8,
   },
   orderMeta: {
     marginBottom: 6,
@@ -634,6 +738,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 8,
     marginRight: 12,
+    resizeMode: "contain",
   },
   itemDetails: {
     flex: 1,
@@ -671,13 +776,14 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: "#445399",
-    width:"100%"
+    width: "100%",
   },
   orderTotal: {
     fontSize: 16,
     fontWeight: "600",
     color: "#1A1A1A",
     // backgroundColor:"red",
+    width: "50%",
   },
   noOrdersText: {
     textAlign: "center",
@@ -734,7 +840,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
     textAlign: "center",
-    color:"#445399"
+    color: "#445399",
   },
   radioGroup: {
     marginBottom: 20,

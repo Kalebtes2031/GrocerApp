@@ -13,7 +13,7 @@ export default ({ config }) => ({
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/yasonlogowhite.png",
+        image: "./assets/images/yasonwelcome.png",
         imageWidth: 150,
         resizeMode: "contain",
         backgroundColor: "#445399",

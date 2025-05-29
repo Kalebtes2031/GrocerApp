@@ -30,6 +30,7 @@ const resources = {
     animatedcountdown: require("@/languages/eng/animatedcountdown.json"),
     shoptracking: require("@/languages/eng/shoptracking.json"),
     first: require("@/languages/eng/first.json"),
+    errormessage: require("@/languages/eng/errormessage.json"),
   },
   amh: {
     welcome: require("@/languages/amh/welcome.json"),
@@ -58,6 +59,7 @@ const resources = {
     animatedcountdown: require("@/languages/amh/animatedcountdown.json"),
     shoptracking: require("@/languages/amh/shoptracking.json"),
     first: require("@/languages/amh/first.json"),
+    errormessage: require("@/languages/amh/errormessage.json"),
   },
 };
 

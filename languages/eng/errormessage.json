@@ -1,0 +1,13 @@
+{
+  "invalid_credentials_title":   "Login failed",
+  "invalid_credentials_message": "Please check your username/email and password, then try again.",
+  
+  "inactive_title":   "Account inactive",
+  "inactive_message": "You’ve not activated your account yet. Check your email for the activation link.",
+  
+  "deactivated_title":   "Account disabled",
+  "deactivated_message": "Your account has been disabled. Contact support if you believe this is an error.",
+  
+  "default_title":   "Something went wrong",
+  "default_message": "An unexpected error occurred. Please try again later."
+}

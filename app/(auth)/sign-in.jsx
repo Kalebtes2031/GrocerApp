@@ -26,11 +26,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useTranslation } from "react-i18next";
+import { mapAuthError } from "@/utils/errorMapping";
+
 
 const { width, height } = Dimensions.get("window");
 
 const SignIn = () => {
   const { t, i18n } = useTranslation("signin");
+   const { t: tError } = useTranslation("errormessage");
   const router = useRouter();
   const colorScheme = useColorScheme();
   const { setUser, setIsLogged } = useGlobalContext();
@@ -82,34 +85,23 @@ const SignIn = () => {
 
       setIsLogged(true);
     } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Authentication failed",
-        text2: extractErrorDetails(error),
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
- const extractErrorDetails = (error) => {
-    if (error?.response?.data) {
-      const data = error.response.data;
+    //  console.error("Sign-in error:", error.response?.data || error.message);
 
-      // If it's a simple error message
-      if (typeof data === "string") return data;
+    // Pull the server’s string (your view returns { error: "…"}).
+    const raw = error.response?.data?.error || error.response?.data?.detail || "";
+  const { title, message } = mapAuthError(raw, tError);
 
-      // If it's a dict of field-specific errors
-      const messages = Object.entries(data)
-        .map(
-          ([key, value]) =>
-            `${key}: ${Array.isArray(value) ? value.join(", ") : value}`
-        )
-        .join("\n");
+  Toast.show({
+    type:  "error",
+    text1: title,
+    text2: message,
+    position: "top",
+  });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
-      return messages || "An unknown error occurred.";
-    }
-    return "An unknown error occurred.";
-  };
   useEffect(() => {
     async function checkOnboarding() {
       const check = await SecureStore.getItemAsync("onboardingCompleted");
@@ -158,7 +150,7 @@ const SignIn = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <Text style={styles.title}>{t("signin_with")}</Text>
+          <Text style={styles.title}>{t("signin_with")}!</Text>
 
           <View style={styles.inputContainer}>
             <TextInput
@@ -181,8 +173,8 @@ const SignIn = () => {
                 color="#6b7280"
               />
             }
-            containerStyles={styles.passwordInput}
-            placeholder="••••••••"
+            containerStyles={styles.input}
+            placeholder={t("password")}
           />
 
           <TouchableOpacity
@@ -198,7 +190,7 @@ const SignIn = () => {
               handlePress={submit}
               containerStyles={styles.button}
               isLoading={isSubmitting}
-              disabled={isSubmitting}  
+              disabled={isSubmitting}
             />
           </View>
 
@@ -247,7 +239,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   languageContainer: {
     position: "absolute",
@@ -336,6 +328,7 @@ const styles = StyleSheet.create({
     color: "#4b5563",
     fontFamily: "Poppins-Regular",
     fontSize: responsiveSize(14),
+    marginTop:2
   },
   signupLink: {
     color: "#445399",

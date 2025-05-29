@@ -12,8 +12,11 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Alert,
+  BackHandler,
+  Dimensions,
+  Linking,
 } from "react-native";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedView } from "./ThemedView";
 import { useNavigation } from "@react-navigation/native";
@@ -32,13 +35,18 @@ import {
   getAccessToken,
   updateUserProfile,
   updateUserProfileImage,
+  deleteAccount,
+  removeTokens,
 } from "@/hooks/useFetch";
 import axios from "axios";
 import { useWatchlist } from "@/context/WatchlistProvider";
 import { useTranslation } from "react-i18next";
 import LanguageToggle from "@/components/LanguageToggle";
 import SearchComponent from "@/components/SearchComponent";
+import Toast from "react-native-toast-message";
 
+const screenHeight = Dimensions.get("window").height;
+const MENU_WIDTH = 420;
 const Header = () => {
   const { t, i18n } = useTranslation("header");
   const { watchlist } = useWatchlist();
@@ -55,30 +63,67 @@ const Header = () => {
   const cartSlideAnim = useRef(new Animated.Value(300)).current;
   const [editMode, setEditMode] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState("EN");
-
+  const [confirmVisible, setConfirmVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  //  const [isMenuVisible, setMenuVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [contactVisible, setContactVisible] = useState(false);
 
+  const handleCall = () => Linking.openURL("tel:+251952999998");
+  const handleCall2 = () => Linking.openURL("tel:+251952999997");
+  const handleEmail = () =>
+    Linking.openURL("mailto:info@yasonsc.com?subject=Contact%20Us");
+  const handleSocial = (url) => () => Linking.openURL(url);
+
+  const handleDeletePress = () => {
+    setConfirmVisible(true);
+  };
+
+  const handleConfirm = async () => {
+    setLoading(true);
+    try {
+      await deleteAccount();
+      Toast.show({ type: "success", text1: "Account deactivated" });
+
+      removeTokens();
+      setUser(null);
+      route.replace("/(auth)/sign-in");
+    } catch (err) {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not deactivate account.",
+      });
+    } finally {
+      setLoading(false);
+      setConfirmVisible(false);
+    }
+  };
   const toggleSearch = () => {
     setShowSearch(!showSearch);
   };
 
   // Function to toggle the modal
-  const toggleModal = () => {
-    if (!isModalVisible) {
-      setModalVisible(true);
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 420,
-        useNativeDriver: true, // Enable native driver for better performance
-      }).start();
-    } else {
-      Animated.timing(slideAnim, {
-        toValue: -410,
-        duration: 360,
-        useNativeDriver: true,
-      }).start(() => setModalVisible(false));
-    }
-  };
+  // const toggleModal = () => {
+  //   if (isMenuOpen) {
+  //     setModalVisible(true);
+  //     Animated.timing(slideAnim, {
+  //       toValue: 0,
+  //       duration: 420,
+  //       useNativeDriver: true, // Enable native driver for better performance
+  //     }).start(() => setModalVisible(false));
+  //   } else {
+  //     setMenuOpen(true);
+  //     setModalVisible(true);
+  //     Animated.timing(slideAnim, {
+  //       toValue: -410,
+  //       duration: 360,
+  //       useNativeDriver: true,
+  //     }).start(() => setModalVisible(false));
+  //   }
+  // };
 
   const handleLogout = () => {
     console.log("logout");
@@ -86,18 +131,6 @@ const Header = () => {
     console.log("isLogged is : ", isLogged);
     logout();
     router.replace("/(auth)/sign-in");
-  };
-  useEffect(() => {
-    console.log("cart is : ", cart);
-  }, []);
-
-  // Modify your handleDeleteProduct function
-  const handleDeleteProduct = async (itemId) => {
-    try {
-      await removeItemFromCart(itemId);
-    } catch (error) {
-      console.error("Error deleting item:", error);
-    }
   };
 
   const handleImagePick = async () => {
@@ -163,6 +196,83 @@ const Header = () => {
     setCurrentLanguage(currentLanguage === "EN" ? "AM" : "EN");
     i18n.changeLanguage(newLangCode);
   };
+  const screenWidth = Dimensions.get('window').width;
+  const contactSlideAnim = useRef(new Animated.Value(screenHeight)).current;
+
+  // Open menu
+  const openMenu = () => {
+    setMenuVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  };
+  const openContact = () => {
+  setContactVisible(true);
+  Animated.timing(contactSlideAnim, {
+    toValue: 0,
+    duration: 300,
+    useNativeDriver: true,
+  }).start();
+};
+
+// Close: slide out to the right again
+const closeContact = () => {
+  Animated.timing(contactSlideAnim, {
+    toValue: screenWidth,
+    duration: 200,
+    useNativeDriver: true,
+  }).start(() => {
+    setContactVisible(false);
+  });
+};
+  // Close menu
+  const closeMenu = () => {
+    Animated.timing(slideAnim, {
+      toValue: -MENU_WIDTH,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setMenuVisible(false));
+  };
+
+  // Handle Android back
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    const onBack = () => {
+      if (confirmVisible) {
+        setConfirmVisible(false);
+        return true;
+      }
+      if (menuVisible) {
+        closeMenu();
+        return true;
+      }
+      return false;
+    };
+    const sub = BackHandler.addEventListener("hardwareBackPress", onBack);
+    return () => sub.remove();
+  }, [menuVisible, confirmVisible]);
+
+  const handleDeleteAccount = async () => {
+    setLoading(true);
+    try {
+      await deleteAccount();
+      removeTokens();
+      setUser(null);
+      Toast.show({ type: "success", text1: "Account deactivated" });
+      router.replace("/(auth)/sign-in");
+    } catch {
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: "Could not deactivate account.",
+      });
+    } finally {
+      setLoading(false);
+      setConfirmVisible(false);
+    }
+  };
 
   return (
     <SafeAreaView
@@ -179,9 +289,9 @@ const Header = () => {
       >
         {/* Menu and logo on the left */}
         <View style={styles.menulogo}>
-          <Pressable onPress={toggleModal}>
-            <Ionicons name="menu" size={34} color="#445399" />
-          </Pressable>
+          <TouchableOpacity onPress={menuVisible ? closeMenu : openMenu}>
+            <Ionicons name="menu" size={32} color="#445399" />
+          </TouchableOpacity>
           {/* <Image
             source={require("../assets/images/malhibfooterlogo.png")}
             style={styles.logo}
@@ -206,11 +316,25 @@ const Header = () => {
                 style={{ color: colorScheme === "dark" ? "#fff" : "#445399" }}
               />
             </TouchableOpacity>
-            {showSearch && (
+            {/* {showSearch && (
               <View style={styles.searchOverlay}>
                 <SearchComponent />
               </View>
-            )}
+            )} */}
+{showSearch && (
+  <>
+    {/* Invisible pressable background */}
+    <Pressable
+      onPress={() => setShowSearch(false)}
+      style={StyleSheet.absoluteFillObject}
+    />
+
+    {/* Actual Search Component on top */}
+    <View style={styles.searchOverlay}>
+      <SearchComponent />
+    </View>
+  </>
+)}
 
             <View style={styles.iconWrapper}>
               <TouchableOpacity
@@ -236,49 +360,57 @@ const Header = () => {
       </ThemedView>
 
       {/* Slide-in menu Modal in left side */}
-      <Modal transparent visible={isModalVisible} animationType="none">
-        {/* Overlay for closing the modal */}
-        <TouchableOpacity
-          style={styles.overlay}
-          onPress={toggleModal}
-          activeOpacity={1}
-        />
-        {/* Animated Modal Content */}
-        <Animated.View
-          style={[
-            styles.modalContent,
-            {
-              transform: [{ translateX: slideAnim }],
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
-            },
-          ]}
-        >
-          <View style={{ backgroundColor: "#445399" }}>
-            {/* first row */}
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: 10,
-                height: 70,
-                width: "100%",
-                // backgroundColor: "red",
-              }}
-            >
-              <TouchableOpacity
-                onPress={toggleModal}
-                style={{ marginHorizontal: 10, paddingHorizontal: 2, borderWidth:1, borderColor:"white", borderRadius:54, paddingVertical:1 }}
-                className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
+      {menuVisible && (
+        <Modal transparent animationType="none">
+          {/* dark overlay */}
+          <TouchableOpacity
+            style={styles.overlay}
+            onPress={closeMenu}
+            activeOpacity={1}
+          />
+          {/* Animated Modal Content */}
+          <Animated.View
+            style={[
+              styles.modalContent,
+              {
+                transform: [{ translateX: slideAnim }],
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+              },
+            ]}
+          >
+            <View style={{ backgroundColor: "#445399" }}>
+              {/* first row */}
+              <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: 10,
+                  height: 70,
+                  width: "100%",
+                  // backgroundColor: "red",
+                }}
               >
-                <Ionicons name="arrow-back" size={24} color="white" />
-              </TouchableOpacity>
-              {/* language */}
-              {/* <View className=" flex-row gap-x-1 items-center ">
+                <TouchableOpacity
+                  onPress={closeMenu}
+                  style={{
+                    marginHorizontal: 10,
+                    paddingHorizontal: 2,
+                    borderWidth: 1,
+                    borderColor: "white",
+                    borderRadius: 54,
+                    paddingVertical: 1,
+                  }}
+                  className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
+                >
+                  <Ionicons name="arrow-back" size={24} color="white" />
+                </TouchableOpacity>
+                {/* language */}
+                {/* <View className=" flex-row gap-x-1 items-center ">
                 <MaterialIcons name="language" size={24} color="#55B051" />
                 <TouchableOpacity
                   onPress={handleLanguageToggle}
@@ -304,103 +436,112 @@ const Header = () => {
                 </TouchableOpacity>
               </View> */}
 
-              {/* sign out */}
-              <TouchableOpacity onPress={handleLogout}>
-                <View
-                  style={{ flexDirection: "row", gap: 6, alignItems: "center" }}
-                >
-                  <Text  style={{ color: "white" }} className=" font-poppins-medium text-white">
-                    {t("signout")}
-                  </Text>
-                  <Feather name="log-out" size={14} color="white" />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+                {/* sign out */}
+                <TouchableOpacity onPress={handleLogout}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      gap: 6,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{ color: "white" }}
+                      className=" font-poppins-medium text-white"
+                    >
+                      {t("signout")}
+                    </Text>
+                    <Feather name="log-out" size={14} color="white" />
+                  </View>
+                </TouchableOpacity>
+              </View>
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "start",
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  // backgroundColor:"red",
-                  marginLeft: 33,
                 }}
               >
-                <View style={styles.profileHeader}>
-                  <TouchableOpacity
-                    onPress={handleImagePick}
-                    style={styles.imageContainer}
-                  >
-                    {user?.image ? (
-                      <Image
-                        source={{ uri: user.image }}
-                        style={styles.profileImage}
-                      />
-                    ) : (
-                      <View style={styles.profileImagePlaceholder}>
-                        <Icon name="person" size={40} color="#666" />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                  <View style={{ position: "absolute", bottom: 10, left: 32,  }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "start",
+                    alignItems: "center",
+                    // backgroundColor:"red",
+                    marginLeft: 33,
+                  }}
+                >
+                  <View style={styles.profileHeader}>
                     <TouchableOpacity
-                      style={styles.editButton}
                       onPress={handleImagePick}
+                      style={styles.imageContainer}
                     >
-                      <Icon
-                        name="edit"
-                        size={i18n.language === "en" ? 15 : 10}
-                        color="#445399"
-                      />
-
-                      <Text
-                        style={{
-                          color: "#445399",
-                          fontWeight: "500",
-                          fontSize: i18n.language === "en"?10:9,
-                        }}
-                      >
-                        {t("edit")}
-                      </Text>
+                      {user?.image ? (
+                        <Image
+                          source={{ uri: user.image }}
+                          style={styles.profileImage}
+                        />
+                      ) : (
+                        <View style={styles.profileImagePlaceholder}>
+                          <Icon name="person" size={40} color="#666" />
+                        </View>
+                      )}
                     </TouchableOpacity>
+                    <View
+                      style={{ position: "absolute", bottom: 10, left: 32 }}
+                    >
+                      <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={handleImagePick}
+                      >
+                        <Icon
+                          name="edit"
+                          size={i18n.language === "en" ? 15 : 10}
+                          color="#445399"
+                        />
+
+                        <Text
+                          style={{
+                            color: "#445399",
+                            fontWeight: "500",
+                            fontSize: i18n.language === "en" ? 10 : 9,
+                          }}
+                        >
+                          {t("edit")}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
+                  <Text style={{ color: "white" }}>
+                    {user?.first_name} {user?.last_name}
+                  </Text>
                 </View>
-                <Text style={{ color: "white" }}>
-                  {user?.first_name} {user?.last_name}
-                </Text>
-              </View>
-              <View style={{ marginRight: 10 }}>
-                <LanguageToggle bgcolor="#55B051" textcolor="#55B051" />
+                <View style={{ marginRight: 10 }}>
+                  <LanguageToggle bgcolor="#55B051" textcolor="#55B051" />
+                </View>
               </View>
             </View>
-          </View>
-          {/* zerzer */}
-          <View
-            style={{
-              borderTopRightRadius: 28,
-              borderTopLeftRadius: 28,
-              backgroundColor: "white",
-              height: "100%",
-              padding: 22,
-              marginTop: 12,
-            }}
-          >
-            <TouchableOpacity
-              style={styles.link}
-              onPress={() => route.push("order")}
+            {/* zerzer */}
+            <View
+              style={{
+                borderTopRightRadius: 28,
+                borderTopLeftRadius: 28,
+                backgroundColor: "white",
+                height: "100%",
+                padding: 22,
+                marginTop: 12,
+              }}
             >
-              <Octicons name="note" size={24} color="#445399" />
-              <Text className="font-poppins-mediu" style={styles.linkText}>
-                {t("myorders")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+              <TouchableOpacity
+                style={styles.link}
+                onPress={() => route.push("order")}
+              >
+                <Octicons name="note" size={24} color="#445399" />
+                <Text className="font-poppins-mediu" style={styles.linkText}>
+                  {t("myorders")}
+                </Text>
+              </TouchableOpacity>
+              {/* <TouchableOpacity
               style={styles.link}
               // onPress={() => route.push("home")}
             >
@@ -408,26 +549,27 @@ const Header = () => {
               <Text className="font-poppins-mediu" style={styles.linkText}>
                 {t("settings")}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.link}
-              // onPress={() => route.push("home")}
-            >
-              <SimpleLineIcons name="earphones-alt" size={24} color="#445399" />
-              <Text className="font-poppins-mediu" style={styles.linkText}>
-                {t("contact")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.link}
-              // onPress={() => route.push("home")}
-            >
-              <SimpleLineIcons name="note" size={24} color="#445399" />
-              <Text className="font-poppins-mediu" style={styles.linkText}>
-                {t("terms")}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity> */}
+              <TouchableOpacity style={styles.link} onPress={() => openContact()}>
+                <SimpleLineIcons
+                  name="earphones-alt"
+                  size={24}
+                  color="#445399"
+                />
+                <Text className="font-poppins-mediu" style={styles.linkText}>
+                  {t("contact")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.link}
+                // onPress={() => route.push("home")}
+              >
+                <SimpleLineIcons name="note" size={24} color="#445399" />
+                <Text className="font-poppins-mediu" style={styles.linkText}>
+                  {t("terms")}
+                </Text>
+              </TouchableOpacity>
+              {/* <TouchableOpacity
               style={styles.link}
               // onPress={() => route.push("home")}
             >
@@ -435,8 +577,8 @@ const Header = () => {
               <Text className="font-poppins-mediu" style={styles.linkText}>
                 {t("faq")}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity> */}
+              {/* <TouchableOpacity
               style={styles.link}
               // onPress={() => route.push("home")}
             >
@@ -444,24 +586,275 @@ const Header = () => {
               <Text className="font-poppins-mediu" style={styles.linkText}>
                 {t("privacy")}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.link}
-              // onPress={() => route.push("home")}
-            >
-              <MaterialIcons name="delete" size={24} color="#445399" />
-              <Text className="font-poppins-mediu" style={styles.linkText}>
-                {t("remove")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </Modal>
+            </TouchableOpacity> */}
+              <TouchableOpacity style={styles.link} onPress={handleDeletePress}>
+                <MaterialIcons name="delete" size={24} color="#445399" />
+                <Text className="font-poppins-mediu" style={styles.linkText}>
+                  {t("remove")}
+                </Text>
+              </TouchableOpacity>
+            </View>
+           <View style={styles.versionBadge}>
+    <Text style={styles.versionText}>V.1.0.0</Text>
+  </View>
+          </Animated.View>
+        </Modal>
+      )}
+      <Modal
+  transparent
+  visible={contactVisible}      // ← tell the Modal to actually show
+  animationType="none"
+>
+          {/* dark backdrop */}
+          <TouchableOpacity
+            style={styles.contactOverlay}
+            onPress={closeContact}
+            activeOpacity={1}
+          />
+
+          {/* full-screen sliding panel */}
+          <Animated.View
+  style={[
+    styles.contactPanel,
+    { transform: [{ translateX: contactSlideAnim }] },
+  ]}
+>
+            {/* Header */}
+            <View style={styles.contactHeader}>
+              <TouchableOpacity
+                onPress={closeContact}
+                style={styles.backButton}
+              >
+                <Ionicons name="arrow-back" size={24} color="white" />
+              </TouchableOpacity>
+              <Text style={styles.contactTitle}> {t("contact")}</Text>
+              <View style={{marginRight:24}}></View>
+            </View>
+
+            {/* Body */}
+            <View style={styles.contactBody}>
+              <TouchableOpacity style={styles.contactRow} onPress={handleCall}>
+                <Ionicons name="call" size={28} color="#445399" />
+                <Text style={styles.contactRowText}>+251 952999998</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.contactRow,{ marginLeft:32}]} onPress={handleCall2}>
+                {/* <Ionicons name="call" size={28} color="#445399" /> */}
+                <Text style={styles.contactRowText}>+251 952999997</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.contactRow} onPress={handleEmail}>
+                <Ionicons name="mail" size={28} color="#445399" />
+                <Text style={styles.contactRowText}>info@yasonsc.com</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{marginTop:320}}>
+
+            </View>
+
+            {/* Footer */}
+            <View style={styles.contactFooter}>
+              <TouchableOpacity 
+              // onPress={handleSocial("https://facebook.com/")}
+              >
+                <FontAwesome name="facebook-square" size={36} color="#445399" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+              onPress={handleSocial("https://tiktok.com/@yason.asbeza?_t=ZM-8whuIMb9qcw&_r=1")}
+              >
+                <FontAwesome5 name="tiktok" size={36} color="#445399" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                // onPress={handleSocial("https://t.me/+Jy3gwzdJRIM3MjJk")}
+              >
+                <FontAwesome name="telegram" size={36} color="#445399" />
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </Modal>
+     
+
+      <Modal transparent visible={confirmVisible} animationType="fade">
+  {/* full-screen container */}
+  <View style={{ flex: 1 }}>
+    {/* backdrop */}
+    <TouchableOpacity
+      style={styles.overlay}
+      onPress={() => setConfirmVisible(false)}
+      activeOpacity={1}
+    />
+
+    {/* confirmation box above the overlay */}
+    <View style={styles.confirmBox}>
+      <Text style={styles.confirmTitle}>{t("sure")}?</Text>
+      <View style={styles.confirmActions}>
+        <TouchableOpacity
+          style={styles.cancelBtn}
+          onPress={() => setConfirmVisible(false)}
+          disabled={loading}
+        >
+          <Text>{t("cancel")}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.confirmBtn}
+          onPress={handleDeleteAccount}
+          disabled={loading}
+        >
+          <Text style={styles.confirmBtnText}>
+            {loading ? t("wait") : t("yes")}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+   searchOverlay: {
+    position: "absolute",
+    top: 28, // adjust as needed
+    right: 0, // if you want full screen overlay, or just position relative to your header
+    backgroundColor: "white", // optional semi-transparent background
+    // additional styling (padding, etc.) if needed
+    borderRadius: 43,
+    width: 340,
+    zIndex: 10,
+    // padding:0,
+  },
+  versionBadge: {
+  position: 'absolute',
+  bottom: 20,
+  left: 0,
+  right: 0,
+  alignItems: 'center',
+},
+versionText: {
+  color: '#445399',
+  fontSize: 14,
+},
+ contactOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.4)',
+},
+ overlay: {
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.8)",
+},
+contactPanel: {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: screenHeight,
+  backgroundColor: 'white',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: -2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  elevation: 5,
+},
+contactHeader: {
+  height: 70,
+  backgroundColor: '#445399',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent:"space-between",
+  paddingHorizontal: 16,
+},
+backButton: {
+  marginRight: 12,
+  padding: 4,
+  borderWidth:1,
+  borderColor:"white",
+  borderRadius:55,
+
+},
+contactTitle: {
+  color: 'white',
+  fontSize: 20,
+  fontWeight: '600',
+},
+contactBody: {
+  flex: 1,
+  justifyContent: 'center',
+  paddingHorizontal: 24,
+},
+contactRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginVertical: 16,
+},
+contactRowText: {
+  marginLeft: 12,
+  fontSize: 18,
+  color: '#333',
+},
+contactFooter: {
+  flexDirection: 'row',
+  justifyContent: 'space-evenly',
+  paddingVertical: 24,
+  borderTopWidth: 1,
+  borderColor: '#eee',
+},
+
+  confirmBox: {
+    position: "absolute",
+    top: "40%",
+    left: "10%",
+    right: "10%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 8,
+    zIndex:2,
+    elevation:2
+  },
+  confirmTitle: { fontSize: 18, marginBottom: 20, textAlign: "center" },
+  confirmActions: { flexDirection: "row", justifyContent: "space-between" },
+  cancelBtn: {
+    flex: 1,
+    padding: 12,
+    marginRight: 8,
+    alignItems: "center",
+    backgroundColor: "#eee",
+    borderRadius: 4,
+  },
+  confirmBtn: {
+    flex: 1,
+    padding: 12,
+    marginLeft: 8,
+    alignItems: "center",
+    backgroundColor: "#d9534f",
+    borderRadius: 4,
+  },
+  confirmBtnText: { color: "#fff" },
+
+  modalcontact: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 8,
+    zIndex: 20,
+  },
+  modalTitle: { fontSize: 18, marginBottom: 16, textAlign: "center" },
+  modalButtons: { flexDirection: "row", justifyContent: "space-between" },
+  button: {
+    flex: 1,
+    padding: 12,
+    marginHorizontal: 4,
+    borderRadius: 4,
+    alignItems: "center",
+  },
+  cancel: { backgroundColor: "#eee" },
+  confirm: { backgroundColor: "#d9534f" },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -473,10 +866,10 @@ const styles = StyleSheet.create({
     // top: 0,
     // zIndex: 1000,
   },
-  searchOverlay: {
+  searchcontact: {
     position: "absolute",
     top: 28, // adjust as needed
-    right: 0, // if you want full screen overlay, or just position relative to your header
+    right: 0, // if you want full screen contact, or just position relative to your header
     backgroundColor: "white", // optional semi-transparent background
     // additional styling (padding, etc.) if needed
     borderRadius: 43,
@@ -533,7 +926,7 @@ const styles = StyleSheet.create({
     // width: 44,
     borderWidth: 1,
     borderColor: "#445399",
-    padding:4
+    padding: 4,
   },
   editButtonText: {
     color: "#445399",
@@ -585,7 +978,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: 12,
   },
-  overlay: {
+  contact: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Slightly dimmed background
   },

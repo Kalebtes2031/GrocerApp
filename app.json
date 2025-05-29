@@ -14,7 +14,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/yasonlogowhite1.png",
-        "backgroundColor": "#445399"
+        "backgroundColor": "rgba(3, 21, 133, 0.8)"
       },
       "edgeToEdgeEnabled": false,
       "package": "com.abeniexpo.MyFreshApp",
@@ -32,7 +32,7 @@
       "apiUrl": "https://yasonbackend.yasonsc.com",
       "router": {},
       "eas": {
-        "projectId": "5e66ca3a-dc85-4d7b-bbe2-f8a83e617df8"
+        "projectId": "7617d94e-cef0-486f-85fa-888ed4675777"
       }
     }
   }

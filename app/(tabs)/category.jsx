@@ -85,7 +85,7 @@ const CategoryScreen = () => {
       <Image
         source={{ uri: item.image }}
         style={styles.categoryImage}
-        resizeMode="cover"
+        resizeMode="contain"
       />
                         </View>
 

@@ -16,8 +16,8 @@ const FormField = ({
   const inputStyle = {
     flex: 1,
     color: colorScheme === "dark" ? "#000" : "black",
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 16,
+    // fontWeight: "600",
     paddingHorizontal: 12,
   };
 
@@ -79,7 +79,7 @@ const FormField = ({
             
             value={value}
             placeholder={placeholder}
-            placeholderTextColor="#7B7B8B"
+            placeholderTextColor="#888"
             onChangeText={handleChangeText}
             {...props}
           />

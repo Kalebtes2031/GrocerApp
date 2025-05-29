@@ -12,18 +12,34 @@ import { Ionicons } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { useCart } from "@/context/CartProvider";
 
 const WatchlistScreen = () => {
-  const { watchlist } = useWatchlist();
+  const { watchlist, removeFromWatchlist, toggleWatchlist } = useWatchlist();
   const router = useRouter();
   const { t, i18n } = useTranslation("watchlist");
+  const { addItemToCart } = useCart();
+
+  // Combined handler: add to cart, then remove from watchlist
+  const handleAddedFromWishlist = async (variationId) => {
+    // (Card already called addItemToCart for you,
+    //  but you could also re-call or track it here if you prefer.)
+    removeFromWatchlist(variationId);
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={{ marginHorizontal: 10, paddingHorizontal: 2,borderWidth:1, borderColor:"#445399",borderRadius:54 ,paddingVertical:1}}
+          style={{
+            marginHorizontal: 10,
+            paddingHorizontal: 2,
+            borderWidth: 1,
+            borderColor: "#445399",
+            borderRadius: 54,
+            paddingVertical: 1,
+          }}
           className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
         >
           <Ionicons name="arrow-back" size={24} color="#445399" />
@@ -37,30 +53,44 @@ const WatchlistScreen = () => {
           </View>
         </View>
       </View>
-      <Text style={styles.title}>{t('my')}</Text>
+      <Text style={styles.title}>{t("my")}</Text>
       {watchlist.length === 0 ? (
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
- <View style={styles.iconWrapper}>
-          <TouchableOpacity>
-            <MaterialIcons name="favorite-border" size={200} color="#EB5B00" />
-          </TouchableOpacity>
-          <View style={styles.badge1}>
-            <Text style={styles.badgeText1}>{watchlist.length}</Text>
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <View style={styles.iconWrapper}>
+            <TouchableOpacity>
+              <MaterialIcons
+                name="favorite-border"
+                size={200}
+                color="#EB5B00"
+              />
+            </TouchableOpacity>
+            <View style={styles.badge1}>
+              <Text style={styles.badgeText1}>{watchlist.length}</Text>
+            </View>
           </View>
+          <Text style={styles.emptyMessage}>{t("your")}</Text>
         </View>
-          <Text style={styles.emptyMessage}>{t('your')}</Text>
-          </View>
       ) : (
         // Render using a FlatList or map method
         <View style={styles.popularContainer}>
           {watchlist.length > 0 ? (
             watchlist.map((product, index) => (
-              <View key={product.variation.id || index} style={styles.cardWrapper}>
-                <Card product={product} />
+              <View
+                key={product.variation.id || index}
+                style={styles.cardWrapper}
+              >
+                <Card
+                  key={product.variation.id}
+                  product={product}
+                  // this hook fires *after* default add-to-cart
+                  onAdded={handleAddedFromWishlist}
+                />
               </View>
             ))
           ) : (
-            <Text style={styles.loadingText}>{t('loading')}</Text>
+            <Text style={styles.loadingText}>{t("loading")}</Text>
           )}
         </View>
       )}
@@ -143,7 +173,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
     textAlign: "center",
-    marginTop:43
+    marginTop: 43,
   },
 });
 

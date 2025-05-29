@@ -65,6 +65,7 @@ const CheckoutPage = () => {
     // };
     console.log("is the problem here, need for investigation:", paymentData);
     // Pass the paymentData as a query parameter
+    
     route.push(
       `./directpayment?paymentData=${encodeURIComponent(
         JSON.stringify(paymentData)
@@ -155,8 +156,9 @@ const CheckoutPage = () => {
       //   text1: "Order successful!",
       //   // visibilityTime: 2000,
       // });
+      console.log("want to see everything here bobby: ", response)
 
-      const { id, total, payment_status } = response;
+      const { id, total, payment_status, need_delivery } = response;
 
       setOrderId(id);
       setTotalAmount(total);
@@ -170,6 +172,7 @@ const CheckoutPage = () => {
           orderId: id,
           amountToPay: total,
           paymentStatus: payment_status,
+          need_delivery: need_delivery
         });
       } else {
         let orderId = id;

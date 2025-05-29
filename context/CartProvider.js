@@ -3,74 +3,104 @@ import { fetchCart, addToCart, updateCartItem, removeCartItem } from "@/hooks/us
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const CartContext = createContext();
-
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const { isLogged } = useGlobalContext();
-  const [cart, setCart] = useState({ items: [], total_items: 0 });
+  const [cart, setCart] = useState({ items: [], total_items: 0, total: 0 });
+  // Track insertion order of item variation IDs
+  const [itemOrder, setItemOrder] = useState([]);
 
   // Load the cart data only if the user is logged in
   const loadCartData = async () => {
-    if (!isLogged) return; // Do nothing if not logged in
+    if (!isLogged) return;
     try {
       const data = await fetchCart();
+      // Update cart state
       setCart({
         ...data,
-        total_items: data.items.length,
+        total_items: Array.isArray(data.items) ? data.items.length : 0,
       });
-      console.log('feres cart: ', data)
+
+      // Update insertion order: keep existing IDs first, then any new IDs at the end
+      const fetchedIds = Array.isArray(data.items)
+        ? data.items.map((item) => item.variations.id)
+        : [];
+      setItemOrder((prevOrder) => {
+        if (prevOrder.length === 0) {
+          return fetchedIds;
+        }
+        // Filter out any removed items, then append new ones
+        const existing = prevOrder.filter((id) => fetchedIds.includes(id));
+        const added = fetchedIds.filter((id) => !prevOrder.includes(id));
+        return [...existing, ...added];
+      });
+
+      console.log("👀 fetched cart:", data);
     } catch (error) {
       console.error("Failed to load cart data:", error);
     }
   };
 
-  // Run loadCartData when the component mounts or when isLogged changes
   useEffect(() => {
     if (isLogged) {
       loadCartData();
     }
   }, [isLogged]);
 
-  // Add an item to the cart (only if logged in)
+  // Check if an item variation is in the cart
+  const isInCart = (variationId) => {
+    return Array.isArray(cart.items) && cart.items.some((item) => item.variations.id === variationId);
+  };
+
+  // Add an item to the cart
   const addItemToCart = async (productId, quantity) => {
     if (!isLogged) return;
     await addToCart(productId, quantity);
     await loadCartData();
+    // Put the newly added variation at the front of the order
+    setItemOrder((prevOrder) => [productId, ...prevOrder.filter((id) => id !== productId)]);
   };
 
   // Update item quantity
-  // const updateItemQuantity = async (itemId, quantity) => {
-  //   if (!isLogged) return;
-  //   const data = await updateCartItem(itemId, quantity);
-  //   setCart(data);
-  // };
-// CartProvider.js
-
-const updateItemQuantity = async (itemId, quantity) => {
-  if (!isLogged) return;
-  // fire the API call that updates one item…
-  await updateCartItem(itemId, quantity);
-  // then fetch the *entire* cart state from the server
-  const freshCart = await fetchCart();
-  setCart({
-    ...freshCart,
-    total_items: freshCart.items.length,
-  });
-  return freshCart;
-};
+  const updateItemQuantity = async (itemId, quantity) => {
+    if (!isLogged) return;
+    await updateCartItem(itemId, quantity);
+    const freshCart = await fetchCart();
+    setCart({
+      ...freshCart,
+      total_items: Array.isArray(freshCart.items) ? freshCart.items.length : 0,
+    });
+    // Keep order unchanged
+    return freshCart;
+  };
 
   // Remove an item from the cart
   const removeItemFromCart = async (itemId) => {
     if (!isLogged) return;
     await removeCartItem(itemId);
     const data = await fetchCart();
-    setCart(data);
+    setCart({
+      ...data,
+      total_items: Array.isArray(data.items) ? data.items.length : 0,
+    });
+    // Remove from order
+    setItemOrder((prevOrder) => prevOrder.filter((id) => id !== itemId));
   };
 
   return (
     <CartContext.Provider
-      value={{ cart, setCart, loadCartData, addItemToCart, updateItemQuantity, removeItemFromCart }}
+      value={{
+        cart,
+        isInCart,
+        itemOrder,
+        setItemOrder,
+        setCart,
+        loadCartData,
+        addItemToCart,
+        updateItemQuantity,
+        removeItemFromCart,
+      }}
     >
       {children}
     </CartContext.Provider>

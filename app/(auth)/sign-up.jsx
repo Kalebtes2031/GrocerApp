@@ -411,6 +411,7 @@ const SignUp = () => {
               flexDirection: "row",
               justifyContent: "center",
               marginTop: 8,
+              gap:2,
             }}
           >
             <Text

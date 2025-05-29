@@ -105,12 +105,13 @@ export default function HomeScreen() {
         // if you need the other image_* fields (full, left, etc),
         // you’ll have to include them in your ProductVariantSerializer
         // and then spread them here:
-        // image_full:     v.product.image_full,
-        // image_left:     v.product.image_left,
-        // …etc.
+        image_full: v.product.image_full,
+        image_back: v.product.image_back,
+        image_left: v.product.image_left,
+        image_right: v.product.image_right,
 
         category: v.product.category, // only if your serializer includes it
-        
+
         variation: {
           id: v.id,
           quantity: v.quantity,
@@ -225,7 +226,7 @@ export default function HomeScreen() {
       setGreeting(t("morning")); // 6 AM to 12 PM
     } else if (currentHour < 15) {
       setGreeting(t("afternoon1")); // 12 PM to 19 PM
-    }else if (currentHour < 18) {
+    } else if (currentHour < 18) {
       setGreeting(t("afternoon")); // 12 PM to 6 PM
     } else {
       setGreeting(t("evening")); // 6 PM to Midnight
@@ -285,6 +286,7 @@ export default function HomeScreen() {
           alignItems: "center",
           marginLeft: 24,
           gap: 6,
+          // backgroundColor:"red",
           // marginTop: 6,
         }}
       >
@@ -293,6 +295,7 @@ export default function HomeScreen() {
             fontSize: 16,
             color: "#445399",
             fontFamily: "Poppins-Medium",
+             marginTop: 1,
           }}
           // className="text-lg  font-poppins-medium text-primary "
         >
@@ -309,7 +312,7 @@ export default function HomeScreen() {
           }}
           className="italic ml-2 text-primary"
         >
-          {user?.first_name} {user?.last_name}
+          {user?.first_name} {user?.last_name}?
         </Text>
       </View>
 
@@ -348,8 +351,11 @@ export default function HomeScreen() {
         {loading ? (
           [0, 1, 2].map((i) => <SkeletonCard key={i} />)
         ) : announcements.length === 0 ? (
-          <Text style={{textAlign:"center"}} className="text-gray-500 text-center">
-            {t('noannounce')}
+          <Text
+            style={{ textAlign: "center" }}
+            className="text-gray-500 text-center"
+          >
+            {t("noannounce")}
           </Text>
         ) : (
           extendedAnnouncements.map((item, index) => (
@@ -367,7 +373,7 @@ export default function HomeScreen() {
       </ScrollView>
 
       {/* categories*/}
-      <View  className="">
+      <View className="">
         <View
           style={{
             flexDirection: "row",
@@ -392,7 +398,7 @@ export default function HomeScreen() {
             onPress={() => {
               route.push("/(tabs)/category");
             }}
-            style={{backgroundColor:"#445399", borderRadius:54, padding:4}}
+            style={{ backgroundColor: "#445399", borderRadius: 54, paddingHorizontal: 4, paddingVertical:3 }}
           >
             <Ionicons name="arrow-forward-sharp" size={24} color="white" />
           </TouchableOpacity>
@@ -424,7 +430,7 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             className="px-8"
             style={{ paddingHorizontal: 10 }}
-            contentContainerStyle={{ paddingRight: 1 }}
+            contentContainerStyle={{ paddingRight: 6 }}
           >
             {category && category.length > 0 ? (
               category.map((product, index) => (
@@ -433,7 +439,7 @@ export default function HomeScreen() {
                   onPress={() =>
                     handlecategory(product.id, product.name, product.name_amh)
                   }
-                  style={{ flexDirection: "column", marginHorizontal: 4,  }}
+                  style={{ flexDirection: "column", marginHorizontal: 4 }}
                   // className="flex justify-center items-center mx-2"
                 >
                   <View
@@ -442,8 +448,8 @@ export default function HomeScreen() {
                       height: 96,
                       borderRadius: 12,
                       overflow: "hidden",
-                      borderWidth:1,
-                      borderColor:"#445399",
+                      borderWidth: 1,
+                      borderColor: "#445399",
                     }}
                   >
                     <Image
@@ -488,7 +494,7 @@ export default function HomeScreen() {
                 }}
                 className="text-gray-500 text-center"
               >
-                {t('nocategory')}
+                {t("nocategory")}
               </Text>
             )}
           </ScrollView>
@@ -510,7 +516,7 @@ export default function HomeScreen() {
             style={{
               color: colorScheme === "dark" ? "white" : "#445399",
               paddingHorizontal: 16,
-              paddingTop:8,
+              paddingTop: 8,
               fontSize: 20,
               fontWeight: "bold",
               textAlign: "start",
@@ -522,7 +528,7 @@ export default function HomeScreen() {
             onPress={() => {
               route.push("/(tabs)/shop");
             }}
-            style={{backgroundColor:"#445399", borderRadius:54, padding:4}}
+            style={{ backgroundColor: "#445399", borderRadius: 54, paddingHorizontal: 4, paddingVertical:3 }}
           >
             <Ionicons name="arrow-forward-sharp" size={24} color="white" />
           </TouchableOpacity>
@@ -553,7 +559,7 @@ export default function HomeScreen() {
               }}
             >
               <Text className="text-gray-500 text-center">
-                {t('norecommended')}
+                {t("norecommended")}
               </Text>
               <View className="">
                 <Image
@@ -593,7 +599,7 @@ export default function HomeScreen() {
               className="font-poppins-medium"
             >
               {" "}
-              {t('more')}
+              {t("more")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -659,7 +665,7 @@ const styles = StyleSheet.create({
   },
   popularContainer: {
     // marginBottom: 1,
-    marginLeft:8,
+    marginLeft: 8,
     padding: 16,
     flexDirection: "row",
     flexWrap: "wrap", // Allows wrapping to the next row
@@ -694,12 +700,11 @@ const styles = StyleSheet.create({
     overflow: "hidden", // Ensures the children are clipped to the borderRadius
     marginRight: 16, // Gap between cards
     position: "relative",
-    marginTop:6
+    marginTop: 6,
   },
   image: {
     ...StyleSheet.absoluteFillObject,
     resizeMode: "cover",
-    
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

@@ -20,5 +20,9 @@
   "errormessage3":"File size exceeds 5MB limit",
   "br":"Birr",
   "instruction":"choose a bank and upload a payment receipt",
-   "total":"Total"
+   "total":"Total",
+  "instruction1":"Order ID",
+  "yikeflu":"Pay!",
+  "yourorder":" Your order is Registered"
+
 }

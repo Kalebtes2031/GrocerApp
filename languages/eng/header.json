@@ -8,5 +8,9 @@
   "faq": "FAQ",
   "remove":"Remove",
   "edit":"Edit",
-  "search":"Search"
+  "search":"Search",
+  "sure":"Are you sure you want to delete your account",
+  "cancel":"Cancel",
+  "yes":"Yes, delete",
+  "wait":"Please wait..."
 }

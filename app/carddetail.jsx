@@ -45,7 +45,7 @@ const ProductDetail = () => {
     if (isFavorited) {
       removeFromWatchlist(product.variation.id);
       Toast.show({
-        type: "info",
+        type: "error",
         text1: t("removed"),
         visibilityTime: 2000,
       });
@@ -70,7 +70,7 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (product.variation.in_stock === false) {
       Toast.show({
-        type: "info",
+        type: "error",
         text1: t("out_stock"),
         visibilityTime: 2000,
       });
@@ -246,19 +246,33 @@ const ProductDetail = () => {
               style={styles.quantityContainer}
               // className="absolute right-10 bottom-6"
             >
+              <View style={{borderWidth:1,
+    borderColor:'#445399',
+    borderRadius:44,
+    zIndex:10,
+    margin:6}}>
+
               <TouchableOpacity
                 onPress={() => setQuantity(Math.max(1, quantity - 1))}
                 style={styles.quantityButton}
               >
                 <MaterialIcons name="remove" size={24} color="#445399" />
               </TouchableOpacity>
+              </View>
               <Text style={styles.quantityText}>{quantity}</Text>
+              <View style={{borderWidth:1,
+    borderColor:'#445399',
+    borderRadius:44,
+    zIndex:10,
+    margin:6}}>
+
               <TouchableOpacity
                 onPress={() => setQuantity(quantity + 1)}
                 style={styles.quantityButton}
               >
                 <MaterialIcons name="add" size={24} color="#445399" />
               </TouchableOpacity>
+    </View>
             </View>
           </View>
         </View>
@@ -384,16 +398,38 @@ const ProductDetail = () => {
 
 const styles = StyleSheet.create({
   infoOverlay: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    backgroundColor: "rgba(68, 83, 153, 0.95)", // 80% opacity
+    backgroundColor: 'rgba(68, 83, 153, 0.95)',
     borderBottomRightRadius: 6,
     borderBottomLeftRadius: 6,
-    // borderWidth:1,
+  },
+  quantityContainer: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    padding: 2,
+    zIndex: 10,            // ✔ fixes stacking order
+    elevation: 5,          // add on Android so zIndex actually works
+  },
+  quantityButton: {
+    // padding: 2,
+    
+  },
+  quantityText: {
+    fontSize: 18,
+    fontWeight: '600',
+    minWidth: 24,
+    textAlign: 'center',
+    marginHorizontal: 6,   // ← replaces `gap: 12`
   },
   container: {
     flex: 1,
@@ -479,7 +515,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // marginBottom: 8,
+    marginBottom: 8,
     marginTop: 14,
   },
   priceText: {
@@ -579,26 +615,27 @@ const styles = StyleSheet.create({
   //   shadowRadius: 4,
   //   elevation: 5,
   // },
-  quantityContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 8,
-    padding: 2,
-    position: "absolute",
-    right: 10,
-    bottom: 10,
-  },
-  quantityButton: {
-    padding: 8,
-  },
-  quantityText: {
-    fontSize: 18,
-    fontWeight: "600",
-    minWidth: 24,
-    textAlign: "center",
-  },
+  // quantityContainer: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   gap: 12,
+  //   backgroundColor: "#f5f5f5",
+  //   borderRadius: 8,
+  //   padding: 2,
+  //   position: "absolute",
+  //   right: 10,
+  //   bottom: 10,
+  //   zindex:10
+  // },
+  // quantityButton: {
+  //   padding: 8,
+  // },
+  // quantityText: {
+  //   fontSize: 18,
+  //   fontWeight: "600",
+  //   minWidth: 24,
+  //   textAlign: "center",
+  // },
   addToCartButton: {
     flex: 1,
     backgroundColor: "#445399",

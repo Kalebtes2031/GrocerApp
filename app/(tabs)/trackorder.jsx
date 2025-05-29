@@ -184,16 +184,46 @@ const OrderTrackingScreen = () => {
           style={styles.cardHeaderNew}
         >
           <View style={styles.headerLeft}>
-            <Text style={styles.orderNumber}>
-              {t("order")} #Yas-{item.id}
-            </Text>
-            {new Date(item.scheduled_delivery) < new Date() &&
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <Text style={styles.orderNumber}>
+                {t("order")} #Yas-{item.id}
+              </Text>
+              <View
+                // style={{
+                //   backgroundColor: "#445399",
+                //   borderRadius: 45,
+                //   paddingVertical: 2,
+                //   paddingHorizontal: 6,
+                // }}
+              >
+                <Text style={styles.statusText}>
+                  {item.need_delivery ? t("need_delivery") : t("self_pickup")}
+                </Text>
+              </View>
+            </View>
+           
+          </View>
+
+           {item.scheduled_delivery && // 1) must exist
+              !isNaN(new Date(item.scheduled_delivery).getTime()) && // 2) must parse
+              new Date(item.scheduled_delivery) < new Date() && // 3) in the past
               item.status !== "Delivered" && (
+                <View
+                style={{flexDirection:"row", justifyContent:"flex-end", alignItems:"flex-end", }}
+                >
+
                 <TouchableOpacity
                   onPress={() => handleReschedule(item.id)}
                   style={[
                     styles.button2,
-                    { backgroundColor: COLORS.error, marginTop: 10 },
+                    { backgroundColor: COLORS.error, marginTop: 0 },
                   ]}
                   disabled={isLoading}
                 >
@@ -213,8 +243,8 @@ const OrderTrackingScreen = () => {
                     </Text>
                   )}
                 </TouchableOpacity>
+                </View>
               )}
-          </View>
           <View
             style={
               {
@@ -418,7 +448,7 @@ const OrderTrackingScreen = () => {
         {TABS.map((tab, index) => {
           const isActive = activeTab === index;
           const dynamicWidth = isActive
-            ? SCREEN_WIDTH * 0.4           // 40% width when active
+            ? SCREEN_WIDTH * 0.4 // 40% width when active
             : (SCREEN_WIDTH * 0.6) / (TAB_COUNT - 1); // split remaining
 
           return (
@@ -434,17 +464,11 @@ const OrderTrackingScreen = () => {
               ]}
             >
               <TouchableOpacity
-                style={[
-                  styles.tabButton,
-                  isActive && styles.tabButtonActive,
-                ]}
+                style={[styles.tabButton, isActive && styles.tabButtonActive]}
                 onPress={() => handleTabPress(index)}
               >
                 <Text
-                  style={[
-                    styles.tabText,
-                    isActive && styles.tabTextActive,
-                  ]}
+                  style={[styles.tabText, isActive && styles.tabTextActive]}
                 >
                   {t(tab)}
                 </Text>
@@ -482,17 +506,21 @@ const OrderTrackingScreen = () => {
                 {
                   title: t(tab),
                   data: orders.filter((o) => {
+                    // first, grab and parse the delivery date
+                    const sd = o.scheduled_delivery;
+                    const ts = sd ? Date.parse(sd) : NaN;
+
+                    // make sure it was a real date
+                    if (isNaN(ts)) {
+                      return false;
+                    }
+
+                    // now compare
                     if (tab === "active") {
-                      return (
-                        o.status !== "Delivered" &&
-                        new Date(o.scheduled_delivery) >= new Date()
-                      );
+                      return o.status !== "Delivered" && ts >= Date.now();
                     }
                     if (tab === "missed") {
-                      return (
-                        o.status !== "Delivered" &&
-                        new Date(o.scheduled_delivery) < new Date()
-                      );
+                      return o.status !== "Delivered" && ts < Date.now();
                     }
                     return o.status === "Delivered";
                   }),
@@ -528,9 +556,21 @@ const OrderTrackingScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  emptySectionContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 48,
+  },
+  emptySectionText: {
+    fontSize: 16,
+    color: COLORS.muted,
+    textAlign: "center",
+    paddingHorizontal: 16,
+  },
   tabContainer: {
     flexDirection: "row",
-    alignItems:"center",
+    alignItems: "center",
     justifyContent: "space-between",
     paddingVertical: 12,
     backgroundColor: "#FFF",
@@ -540,7 +580,7 @@ const styles = StyleSheet.create({
   },
   tabWrapper: {
     alignItems: "center",
-    paddingHorizontal:12,
+    paddingHorizontal: 12,
     //  backgroundColor: "red",
   },
   tabButton: {
@@ -554,18 +594,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#4CAF50",
     // borderBottomWidth: 3,
     // borderBottomColor: "#FF9800",
-    paddingHorizontal:8
+    paddingHorizontal: 8,
   },
   tabText: {
     fontSize: 14,
     color: "#FFF",
     fontWeight: "500",
-    textAlign:"center"
+    textAlign: "center",
   },
   tabTextActive: {
     fontSize: 16,
     fontWeight: "700",
-    textAlign:"center"
+    textAlign: "center",
   },
   activeTab: {
     // borderBottomWidth: 2,
@@ -610,6 +650,7 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.05,
     // shadowRadius: 8,
     // elevation: 2,
+    
   },
   cardHeader: {
     flexDirection: "column",
@@ -628,7 +669,7 @@ const styles = StyleSheet.create({
   },
   button2: {
     width: 130,
-    marginLeft: 22,
+    marginLeft: 12,
     paddingVertical: 10,
     borderRadius: 58,
     alignItems: "center",
@@ -660,7 +701,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "start",
     // padding: 12,
-    gap: 12,
+    gap: 2,
     paddingleft: 16,
     borderRadius: 10,
     // shadowColor: "#000",
@@ -668,7 +709,7 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.15,
     // shadowRadius: 4,
     // elevation: 3,
-    marginBottom: 8,
+    // marginBottom: 8,
   },
   headerLeft: {
     flexDirection: "row",
@@ -721,8 +762,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
+    color: "#445399",
+    marginBottom:4
   },
   timeContainer: {
     paddingHorizontal: 16,
@@ -762,6 +805,7 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     padding: 16,
+    
   },
   sectionTitle: {
     fontSize: 16,
@@ -778,6 +822,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
+    resizeMode:"contain"
   },
   productInfo: {
     flex: 1,
