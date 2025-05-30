@@ -1,4 +1,4 @@
-import { fetchOrderDetail } from "@/hooks/useFetch";
+import { fetchOrderDetail, givingRate } from "@/hooks/useFetch";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -7,10 +7,16 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
+  TextInput,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
 import { format } from "date-fns";
 import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
+import { Rating } from "react-native-ratings";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function OrderInfo() {
   const { t, i18n } = useTranslation("orderinfo");
@@ -20,7 +26,31 @@ export default function OrderInfo() {
   // let num = 42;
   // const orderId = num;
   const [ourOrder, setOurOrder] = useState({});
+  const [stars, setStars] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [hasRated, setHasRated] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [orderStatus, setOrderStatus] = useState("");
 
+  const handleSubmitRating = async () => {
+    setSubmitting(true);
+    await fetch(`/api/orders/${ourOrder.id}/rating/`, {
+      method: "PUT", // or POST
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stars: rating, comment }),
+    });
+    // refetch or set state to show “Thanks!”
+    setSubmitting(false);
+  };
+
+  const handleRouting = () => {
+    if (!hasRated) {
+      setShowModal(true);
+    } else {
+      route.push("/trackorder");
+    }
+  };
   const fetchOrderDetailBasedId = async () => {
     try {
       const order = await fetchOrderDetail(cleanedOrderId);
@@ -54,19 +84,19 @@ export default function OrderInfo() {
             </View>
           </View>
         </View>
-        
+
         <View style={styles.sectiona}>
           <Text
-          style={{
-            textAlign: "center",
-            color: "#445399",
-            fontSize: 15,
-            fontWeight: "bold",
-            marginBottom: 10,
-          }}
-        >
-          {t("orderinfo")}
-        </Text>
+            style={{
+              textAlign: "center",
+              color: "#445399",
+              fontSize: 15,
+              fontWeight: "bold",
+              marginBottom: 10,
+            }}
+          >
+            {t("orderinfo")}
+          </Text>
           <View
             style={{
               flexDirection: "row",
@@ -98,61 +128,60 @@ export default function OrderInfo() {
               {/* <Text>{format(new Date(ourOrder.schedule_delivery), "MMM dd, yyyy HH:mm")}</Text> */}
             </View>
           </View>
-          <View 
+          <View
             style={{
               flexDirection: "column",
               justifyContent: "center",
-              paddingHorizontal:22,
+              paddingHorizontal: 22,
             }}
           >
-
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginHorizontal: 10,
-              borderBottomWidth: 1,
-              borderBottomColor: "#445399",
-            }}
-          >
-            <Text style={styles.sectionTitle}>{t("product")}</Text>
-            <Text style={styles.sectionTitle}>{t("price")}</Text>
-          </View>
-          {ourOrder?.items?.map((item) => (
-            <View key={item.id} style={styles.itemRow}>
-              <View style={styles.itemInfo}>
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "start",
-                    alignItems: "center",
-                    gap: 10,
-                  }}
-                >
-                  <Text style={styles.productName}>
-                    {i18n.language === "en"
-                      ? item.variant?.product?.item_name
-                      : item.variant?.product?.item_name_amh}
-                  </Text>
-                  <Text style={styles.quantity1}>
-                    {parseInt(item.variant.quantity)}
-                    {t(`${item.variant.unit}`)}
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginHorizontal: 10,
+                borderBottomWidth: 1,
+                borderBottomColor: "#445399",
+              }}
+            >
+              <Text style={styles.sectionTitle}>{t("product")}</Text>
+              <Text style={styles.sectionTitle}>{t("price")}</Text>
+            </View>
+            {ourOrder?.items?.map((item) => (
+              <View key={item.id} style={styles.itemRow}>
+                <View style={styles.itemInfo}>
+                  <View
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "start",
+                      alignItems: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <Text style={styles.productName}>
+                      {i18n.language === "en"
+                        ? item.variant?.product?.item_name
+                        : item.variant?.product?.item_name_amh}
+                    </Text>
+                    <Text style={styles.quantity1}>
+                      {parseInt(item.variant.quantity)}
+                      {t(`${item.variant.unit}`)}
+                    </Text>
+                  </View>
+                  <Text style={styles.quantity}>
+                    {t("qty")}: {item.quantity}
                   </Text>
                 </View>
-                <Text style={styles.quantity}>
-                  {t("qty")}: {item.quantity}
+                <Text style={styles.itemPrice}>
+                  {i18n.language === "en" ? t("br") : ""}
+                  {item.total_price.toFixed(2)}
+                  {i18n.language === "amh" ? t("br") : ""}
                 </Text>
               </View>
-              <Text style={styles.itemPrice}>
-                {i18n.language === "en" ? t("br") : ""}
-                {item.total_price.toFixed(2)}
-                {i18n.language === "amh" ? t("br") : ""}
-              </Text>
-            </View>
-          ))}
+            ))}
           </View>
           <View
             style={{
@@ -161,14 +190,18 @@ export default function OrderInfo() {
               alignItems: "",
               marginHorizontal: 23,
               // borderWidth: 1,
-              borderBottomWidth:1,
-              marginBottom:11,
+              borderBottomWidth: 1,
+              marginBottom: 11,
             }}
           >
             <View
-              style={{ flexDirection: "row", justifyContent: "flex-end", alignItems:"flex-end" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                alignItems: "flex-end",
+              }}
             >
-              <Text style={{textAlign:"right"}}>{t("total")} : </Text>
+              <Text style={{ textAlign: "right" }}>{t("total")} : </Text>
               <Text>
                 {i18n.language === "en" ? t("br") : ""} {ourOrder.total}{" "}
                 {i18n.language === "amh" ? t("br") : ""}
@@ -264,23 +297,184 @@ export default function OrderInfo() {
             </View>
           </View>
         </View>
+
         <TouchableOpacity
           style={styles.placeOrderButton}
           // onPress={handlePlaceOrder}
-          onPress={() => route.push("/trackorder")}
+          onPress={() => handleRouting()}
           //   disabled={isLoading}
         >
-          <Text style={styles.placeOrderText}>
-            {/* {isLoading ? "Pay Now" : "Pay Now"} */}
-            {t("track")}
-          </Text>
+          <Text style={styles.placeOrderText}>{t("track")}</Text>
         </TouchableOpacity>
+        {showModal && (
+          <Modal transparent visible={showModal} animationType="fade">
+            <View style={styles.backdrop}>
+              <View style={styles.modalCard}>
+                {/* Close Button */}
+                <TouchableOpacity
+                  style={styles.closeButton}
+                  onPress={() => setShowModal(false)}
+                >
+                  <Ionicons name="close" size={24} color="#6B7280" />
+                </TouchableOpacity>
+
+                {/* Modal Content */}
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>{t("rateExperience")}</Text>
+
+                  <Text style={styles.modalSubtitle}>{t("rateSubtitle")}</Text>
+
+                  <Rating
+                    type="star"
+                    ratingCount={5}
+                    imageSize={40}
+                    showRating={false}
+                    startingValue={stars} // use your state to start at 0
+                    fractions={0}
+                    onFinishRating={setStars}
+                    style={styles.rating}
+                    ratingColor="#FFC107"
+                    ratingBackgroundColor="#E5E7EB"
+                  />
+
+                  <TextInput
+                    style={styles.commentInput}
+                    placeholder={t("commentPlaceholder")}
+                    placeholderTextColor="#9CA3AF"
+                    value={comment}
+                    onChangeText={setComment}
+                    multiline
+                    numberOfLines={4}
+                  />
+
+                  <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={async () => {
+                      if (!stars) return;
+                      setSubmitting(true);
+                      try {
+                        await givingRate(ourOrder.id, stars, comment);
+                        setHasRated(true);
+                        Alert.alert(t("thankYou"), t("feedbackSubmitted"), [
+                          {
+                            text: "OK",
+                            onPress: () => route.push("/trackorder"),
+                          },
+                        ]);
+                      } catch (error) {
+                        Alert.alert(t("error"), t("submitError"));
+                      } finally {
+                        setSubmitting(false);
+                        setShowModal(false);
+                        setHasRated(false);
+                        setStars(0);
+                        setComment("");
+                      }
+                    }}
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <ActivityIndicator color="#FFF" />
+                    ) : (
+                      <Text style={styles.submitText}>{t("submitRating")}</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        )}
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // ratingContainer: {
+  //   // margin: 10,
+  //   padding: 16,
+  //   borderRadius: 18,
+  //   // backgroundColor: "rgba(150, 166, 234, 0.4)",
+  //   // borderWidth: 1,
+  //   // borderColor: "#445399",
+  //   // shadowColor: '#000',
+  //   // shadowOffset: { width: 0, height: 1 },
+  //   // shadowOpacity: 0.1,
+  //   // shadowRadius: 4,
+  //   // elevation: 2,
+  // },
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    zIndex: 10,
+  },
+  modalContent: {
+    paddingTop: 10,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1F2937",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 25,
+  },
+  rating: {
+    paddingVertical: 15,
+    alignSelf: "center",
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 120,
+    textAlignVertical: "top",
+    marginBottom: 25,
+    fontSize: 16,
+    backgroundColor: "#F9FAFB",
+  },
+  submitButton: {
+    backgroundColor: "#445399",
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    shadowColor: "#445399",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  submitText: {
+    color: "#FFF",
+    fontSize: 17,
+    fontWeight: "600",
+  },
   itemRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -297,7 +491,7 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 16,
     color: "#444",
-    
+
     // marginBottom: 4,
   },
   quantity1: {
@@ -356,7 +550,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: -15,
     paddingBottom: 40,
-    marginHorizontal:3
+    marginHorizontal: 3,
   },
   text: {
     color: "white",

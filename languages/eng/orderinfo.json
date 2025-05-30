@@ -23,5 +23,13 @@
     "ml": "ml",
     "kg": "Kg",
     "g": "g",
-    "piece": "PCs"
+    "piece": "PCs",
+    "rateExperience": "Rate Your Experience",
+    "rateSubtitle": "How was your delivery service?",
+    "commentPlaceholder": "Share details about your experience...",
+    "thankYou": "Thank You!",
+    "feedbackSubmitted": "Your feedback helps us improve",
+    "error": "Error",
+    "submitError": "Failed to submit rating",
+    "submitRating": "Submit Rating"
 }

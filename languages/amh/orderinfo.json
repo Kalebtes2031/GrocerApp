@@ -24,5 +24,13 @@
     "ml": "ሚሊ",
     "kg": "ኪግ",
     "g": "ግ",
-    "piece": "ፍሬ"
+    "piece": "ፍሬ",
+    "rateExperience": "Rate Your Experience",
+    "rateSubtitle": "We'd greatly appreciate if you can rate us.",
+    "commentPlaceholder": "give us your feedback (optional)...",
+    "thankYou": "Thank You!",
+    "feedbackSubmitted": "Your feedback helps us improve",
+    "error": "Error",
+    "submitError": "Failed to submit Feedback",
+    "submitRating": "Submit Feedback"
 }

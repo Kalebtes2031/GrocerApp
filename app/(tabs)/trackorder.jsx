@@ -196,29 +196,31 @@ const OrderTrackingScreen = () => {
                 {t("order")} #Yas-{item.id}
               </Text>
               <View
-                // style={{
-                //   backgroundColor: "#445399",
-                //   borderRadius: 45,
-                //   paddingVertical: 2,
-                //   paddingHorizontal: 6,
-                // }}
+              // style={{
+              //   backgroundColor: "#445399",
+              //   borderRadius: 45,
+              //   paddingVertical: 2,
+              //   paddingHorizontal: 6,
+              // }}
               >
                 <Text style={styles.statusText}>
                   {item.need_delivery ? t("need_delivery") : t("self_pickup")}
                 </Text>
               </View>
             </View>
-           
           </View>
 
-           {item.scheduled_delivery && // 1) must exist
-              !isNaN(new Date(item.scheduled_delivery).getTime()) && // 2) must parse
-              new Date(item.scheduled_delivery) < new Date() && // 3) in the past
-              item.status !== "Delivered" && (
-                <View
-                style={{flexDirection:"row", justifyContent:"flex-end", alignItems:"flex-end", }}
-                >
-
+          {item.scheduled_delivery && // 1) must exist
+            !isNaN(new Date(item.scheduled_delivery).getTime()) && // 2) must parse
+            new Date(item.scheduled_delivery) < new Date() && // 3) in the past
+            item.status !== "Delivered" && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  alignItems: "flex-end",
+                }}
+              >
                 <TouchableOpacity
                   onPress={() => handleReschedule(item.id)}
                   style={[
@@ -243,8 +245,8 @@ const OrderTrackingScreen = () => {
                     </Text>
                   )}
                 </TouchableOpacity>
-                </View>
-              )}
+              </View>
+            )}
           <View
             style={
               {
@@ -346,12 +348,46 @@ const OrderTrackingScreen = () => {
           ))}
 
           <View style={styles.totalContainer}>
-            <Text style={styles.totalLabel}>{t("totalamount")}:</Text>
-            <Text style={styles.totalValue}>
-              {i18n.language === "en" ? t("br") : ""}
-              {item.total}
-              {i18n.language === "amh" ? t("br") : ""}
-            </Text>
+            <View style={{ flexDirection: "row", gap: 4 }}>
+              <Text style={styles.totalLabel}>{t("totalamount")}:</Text>
+              <Text style={styles.totalValue}>
+                {i18n.language === "en" ? t("br") : ""}
+                {item.total}
+                {i18n.language === "amh" ? t("br") : ""}
+              </Text>
+            </View>
+            {item.need_delivery === false &&
+              item.status === "Pending" &&
+              section.title !== t("missed") && (
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    alignItems: "flex-end",
+                    paddingRight: 12,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={[
+                      {
+                        backgroundColor: "#4CAF50",
+                        width: 90,
+                        // marginLeft: 22,
+                        paddingVertical: 10,
+                        borderRadius: 58,
+                        alignItems: "center",
+                      },
+                    ]}
+                    onPress={() => handleConfirm(item.id)}
+                    disabled={confirmingId === item.id}
+                  >
+                    <Text style={styles.buttonText}>
+                      {confirmingId === item.id ? t("waiting") : t("confirm")}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
           </View>
         </View>
 
@@ -650,7 +686,6 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.05,
     // shadowRadius: 8,
     // elevation: 2,
-    
   },
   cardHeader: {
     flexDirection: "column",
@@ -765,7 +800,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "600",
     color: "#445399",
-    marginBottom:4
+    marginBottom: 4,
   },
   timeContainer: {
     paddingHorizontal: 16,
@@ -805,7 +840,6 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     padding: 16,
-    
   },
   sectionTitle: {
     fontSize: 16,
@@ -822,7 +856,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    resizeMode:"contain"
+    resizeMode: "contain",
   },
   productInfo: {
     flex: 1,

@@ -204,6 +204,7 @@ const CheckoutPage = () => {
       });
     } finally {
       setIsLoading(false);
+      setSelectedOption("directbanktransfer")
     }
   };
 
