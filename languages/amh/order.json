@@ -23,9 +23,17 @@
     "kg": "ኪግ",
     "g": "ግ",
     "piece": "ፍሬ",
-    "scheduled":"የታቀደው ጊዜ",
+    "scheduled":"የቀጠሮ ጊዜ",
     "not_scheduled":"ቀጠሮ አልተያዘም",
     "reschedule":"እባክዎ ቀጠሮ ይያዙ",
-    "need_delivery":"የሚያደርስ ሰው እፈልጋለው",
-    "self_pickup":"ከያሶን እወስዳለሁ"
+    "need_delivery":"የሚያደርስ እፈልጋለው",
+    "self_pickup":"       እራሴ እወስዳለሁ",
+    "Delivered":"ደርሶኛል",
+    "Prepared":"ተዘጋጅቱአል",
+    "Accepted":"በጉዞ ላይ",
+    "Assigned":"በጉዞ ላይ",
+    "In Transit":"በጉዞ ላይ",
+    "Pending":"በትዕዛዝ ላይ",
+    "Confirmed":"ታዙዋል",
+    "order_status":"የትዕዛዝ ሁኔታ"
 }

@@ -80,6 +80,10 @@ const Header = () => {
   const handleDeletePress = () => {
     setConfirmVisible(true);
   };
+const termsUrl =
+    i18n.language === 'en'
+      ? 'https://yasonsc.com/terms_and_conditions'
+      : 'https://yasonsc.com/terms_and_conditions_amh';
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -563,6 +567,7 @@ const closeContact = () => {
               <TouchableOpacity
                 style={styles.link}
                 // onPress={() => route.push("home")}
+                onPress={() => Linking.openURL(termsUrl)}
               >
                 <SimpleLineIcons name="note" size={24} color="#445399" />
                 <Text className="font-poppins-mediu" style={styles.linkText}>

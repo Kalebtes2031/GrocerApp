@@ -158,7 +158,7 @@ const CartScreen = () => {
             </View>
           </View>
           <Text
-            className="font-poppins-bold text-center text-primary mb-4"
+            // className="font-poppins-bold text-center text-primary mb-4"
             style={styles.headerTitle}
           >
             {t("shopping")}
@@ -240,10 +240,10 @@ const CartScreen = () => {
               className="font-poppins-bold text-center text-primary mb-4"
               style={{
                 fontSize: 20,
-                fontWeight: "bold",
+                fontWeight: 700,
                 color: "#445399",
                 textAlign: "center",
-                fontFamily: "Poppins-Bold",
+                // fontFamily: "Poppins-Bold",
                 postion: "absolute",
                 top: -13,
               }}
@@ -563,12 +563,11 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 700,
     color: "#445399",
     textAlign: "center",
-    fontFamily: "Poppins-Bold",
+    // fontFamily: "Poppins-Bold",
   },
-  // ... keep the rest of your existing styles
   scrollContainers: {
     paddingHorizontal: 16,
   },

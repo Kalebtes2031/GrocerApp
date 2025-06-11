@@ -86,6 +86,8 @@ const WatchlistScreen = () => {
                   product={product}
                   // this hook fires *after* default add-to-cart
                   onAdded={handleAddedFromWishlist}
+                  onRemoveWishlist={removeFromWatchlist}
+                   inWishlistView={true}   
                 />
               </View>
             ))

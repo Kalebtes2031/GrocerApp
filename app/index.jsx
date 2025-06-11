@@ -211,6 +211,7 @@ const Welcome = () => {
                   color: colorScheme === "dark" ? "#ccc" : "#666",
                   textAlign: "center",
                   marginBottom: 30,
+                  width:"100%"
                 }}
               >
                 {item.subtitle}

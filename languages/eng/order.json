@@ -26,5 +26,14 @@
     "scheduled":"Scheduled",
     "not_scheduled":"Not Scheduled",
         "need_delivery":"Need-delivery",
-    "self_pickup":"Self-pickup"
+    "self_pickup":"Self-pickup",
+    "Delivered": "Delivered",
+  "Prepared": "Prepared",
+  "Accepted": "On the way",
+  "Confirmed": "Confirmed",
+  "Pending":"Pending",
+  "Assigned":"Assigned",
+    "In Transit":"In Transit",
+  "order_status":"Order Status",
+    "reschedule":"Schedule"
 }

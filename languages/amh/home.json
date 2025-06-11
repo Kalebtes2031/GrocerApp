@@ -1,5 +1,5 @@
 {
-  "categories": "መደቦች",
+  "categories": "ምድቦች",
   "morning": "እንደምን አደሩ",
   "afternoon": "እንደምን ዋሉ",
   "afternoon1": "እንደምን አረፈዱ",
@@ -9,6 +9,6 @@
   "loading": "በትዕግስት ይጠብቁ",
   "more":"ተጨማሪ",
   "norecommended":"ምንም የተመረጡ ምርቶች የሉም",
-  "nocategory":"ምንም መደቦች የሉም",
+  "nocategory":"ምንም ምድቦች የሉም",
   "noannounce":"ምንም ማስታወቂያ የለም"
 }

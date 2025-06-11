@@ -45,16 +45,18 @@ export default function OrderInfo() {
   };
 
   const handleRouting = () => {
-    if (!hasRated) {
-      setShowModal(true);
-    } else {
-      route.push("/trackorder");
-    }
+    // if (!hasRated) {
+    //   setShowModal(true);
+    // } else {
+    //   route.push("/(tabs)/trackorder");
+    // }
+     route.push("/(tabs)/trackorder");
   };
   const fetchOrderDetailBasedId = async () => {
     try {
       const order = await fetchOrderDetail(cleanedOrderId);
       setOurOrder(order);
+      setHasRated(order.is_rated);
       console.log("our order detail:", order);
     } catch (error) {
       console.error("Error fetching order detail", error);
@@ -63,6 +65,38 @@ export default function OrderInfo() {
   useEffect(() => {
     fetchOrderDetailBasedId();
   }, [orderId]);
+
+  function formatDateOnly(dateString) {
+  const dt = new Date(dateString);
+  if (isNaN(dt.getTime())) {
+    console.warn("formatDateOnly got invalid date:", dateString);
+    return ""; // or some placeholder
+  }
+
+  if (i18n.language === "amh") {
+    const parts = new Intl.DateTimeFormat("am-ET-u-ca-ethiopic", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      era: "short",
+    }).formatToParts(dt);
+    const dayPart   = parts.find((p) => p.type === "day")?.value ?? "";
+    const monthPart = parts.find((p) => p.type === "month")?.value ?? "";
+    const yearPart  = parts.find((p) => p.type === "year")?.value ?? "";
+    return `${monthPart} ${dayPart}, ${yearPart}`;
+  } else {
+    return dt.toLocaleDateString();
+  }
+}
+
+function formatTimeOnly(dateString) {
+  const dt = new Date(dateString);
+  if (isNaN(dt.getTime())) {
+    console.warn("formatTimeOnly got invalid date:", dateString);
+    return "";
+  }
+  return dt.toLocaleTimeString();
+}
 
   return (
     <View
@@ -124,7 +158,11 @@ export default function OrderInfo() {
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
               <Text>{t("date")} : </Text>
-              <Text>{new Date(ourOrder.created_at).toLocaleString()}</Text>
+               <Text>
+        {formatDateOnly(ourOrder.created_at)}{" "}
+        {formatTimeOnly(ourOrder.created_at)}
+      </Text>
+              {/* <Text>{new Date(ourOrder.created_at).toLocaleString()}</Text> */}
               {/* <Text>{format(new Date(ourOrder.schedule_delivery), "MMM dd, yyyy HH:mm")}</Text> */}
             </View>
           </View>
@@ -245,6 +283,23 @@ export default function OrderInfo() {
               </View>
             </View>
           )}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "start",
+              alignItems: "center",
+              marginHorizontal: 23,
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text>{t("need_delivery1")} : </Text>
+              <Text>
+                {ourOrder.need_delivery === true ? t("need_delivery") : t("self_pickup")}
+              </Text>
+            </View>
+          </View>
 
           <View
             style={{
@@ -366,7 +421,7 @@ export default function OrderInfo() {
                       } finally {
                         setSubmitting(false);
                         setShowModal(false);
-                        setHasRated(false);
+                        setHasRated(true);
                         setStars(0);
                         setComment("");
                       }
@@ -384,6 +439,7 @@ export default function OrderInfo() {
             </View>
           </Modal>
         )}
+      
       </ScrollView>
     </View>
   );
@@ -462,7 +518,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: "#445399",
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: 54,
     alignItems: "center",
     shadowColor: "#445399",
     shadowOffset: { width: 0, height: 4 },
@@ -474,6 +530,8 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 17,
     fontWeight: "600",
+    width:"100%",
+    textAlign: "center",
   },
   itemRow: {
     flexDirection: "row",
@@ -549,7 +607,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: -15,
-    paddingBottom: 40,
+    paddingBottom: 10,
     marginHorizontal: 3,
   },
   text: {

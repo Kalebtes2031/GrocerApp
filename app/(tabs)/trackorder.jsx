@@ -1,4 +1,4 @@
-import { confirmOrder, fetchOrderHistory } from "@/hooks/useFetch";
+import { confirmOrder, fetchOrderHistory , givingRate} from "@/hooks/useFetch";
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -11,6 +11,9 @@ import {
   Animated,
   TouchableOpacity,
   Dimensions,
+  Alert,
+  Modal,
+  TextInput,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,6 +23,9 @@ import OrderMapView from "@/components/OrderMapView";
 import ShopTracking from "@/components/ShopTracking";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+
+import { Rating } from "react-native-ratings";
 
 // Color Constants
 const COLORS = {
@@ -47,10 +53,24 @@ const OrderTrackingScreen = () => {
   const [confirmingId, setConfirmingId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+    const [hasRated, setHasRated] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+   const [stars, setStars] = useState(0);
+    const [comment, setComment] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+const [rateOrderId, setRateOrderId] = useState(null);
 
   const [activeTab, setActiveTab] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const sectionListRef = useRef(null);
+
+  const handleRouting = () => {
+    if (!hasRated) {
+      setShowModal(true);
+    } else {
+      route.push("/(tabs)/trackorder");
+    }
+  };
 
   const handleTabPress = (index) => {
     setActiveTab(index);
@@ -81,6 +101,12 @@ const OrderTrackingScreen = () => {
       // Sort orders descending by id
       const sortedData = data.sort((a, b) => b.id - a.id);
       setOrders(sortedData);
+
+      setActiveTab(0);
+      Animated.spring(scrollX, {
+    toValue: 0,
+    useNativeDriver: true,
+  }).start();
     } catch (error) {
       console.error("Fetch error:", error);
     } finally {
@@ -109,6 +135,8 @@ const OrderTrackingScreen = () => {
     try {
       // setIsLoading(true)
       await confirmOrder(orderId);
+      setRateOrderId(orderId);
+      setShowModal(true)  
       await loadData(); // re‑fetch to update sections
     } catch (err) {
       console.error("Confirm failed", err);
@@ -386,6 +414,7 @@ const OrderTrackingScreen = () => {
                       {confirmingId === item.id ? t("waiting") : t("confirm")}
                     </Text>
                   </TouchableOpacity>
+              
                 </View>
               )}
           </View>
@@ -587,11 +616,185 @@ const OrderTrackingScreen = () => {
           </View>
         ))}
       </Animated.View>
+       {showModal && (
+      <Modal transparent visible={showModal} animationType="fade">
+        <View style={styles.backdrop}>
+          <View style={styles.modalCard}>
+            {/* Close Button */}
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => {
+                setShowModal(false);
+                setRateOrderId(null);
+                setStars(0);
+                setComment("");
+                // Now re-fetch orders so the status updates on screen:
+                loadData();
+              }}
+            >
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+
+            {/* Modal Content */}
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>{t("rateExperience")}</Text>
+              <Text style={styles.modalSubtitle}>{t("rateSubtitle")}</Text>
+
+              <Rating
+                type="star"
+                ratingCount={5}
+                imageSize={40}
+                showRating={false}
+                startingValue={stars}
+                onFinishRating={setStars}
+                style={styles.rating}
+                ratingColor="#FFC107"
+                ratingBackgroundColor="#E5E7EB"
+              />
+
+              <TextInput
+                style={styles.commentInput}
+                placeholder={t("commentPlaceholder")}
+                placeholderTextColor="#9CA3AF"
+                value={comment}
+                onChangeText={setComment}
+                multiline
+                numberOfLines={4}
+              />
+
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={async () => {
+                  if (!stars) return;
+                  setSubmitting(true);
+                  try {
+                    await givingRate(rateOrderId, stars, comment);
+                    setHasRated(true);
+                    Alert.alert(t("thankYou"), t("feedbackSubmitted"), [
+                      {
+                        text: "OK",
+                        onPress: () => {
+                          setShowModal(false);
+                          setRateOrderId(null);
+                          setStars(0);
+                          setComment("");
+                          loadData(); // refresh orders now that rating is done
+                        },
+                      },
+                    ]);
+                  } catch (error) {
+                    Alert.alert(t("error"), t("submitError"));
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator color="#FFF" />
+                ) : (
+                  <Text style={styles.submitText}>
+                    {t("submitRating")}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: "#FFF",
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 5,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    zIndex: 10,
+  },
+  modalContent: {
+    paddingTop: 10,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1F2937",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 25,
+  },
+  rating: {
+    paddingVertical: 15,
+    alignSelf: "center",
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 120,
+    textAlignVertical: "top",
+    marginBottom: 25,
+    fontSize: 16,
+    backgroundColor: "#F9FAFB",
+  },
+  submitButton: {
+    backgroundColor: "#445399",
+    paddingVertical: 16,
+    borderRadius: 54,
+    alignItems: "center",
+    shadowColor: "#445399",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  submitText: {
+    color: "#FFF",
+    fontSize: 17,
+    fontWeight: "600",
+    width:"100%",
+    textAlign: "center",
+  },
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 3,
+    paddingVertical: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    paddingHorizontal: 10,
+  },
+  itemInfo: {
+    flex: 1,
+    marginRight: 8,
+  },
   emptySectionContainer: {
     flex: 1,
     justifyContent: "center",
@@ -801,6 +1004,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#445399",
     marginBottom: 4,
+    marginRight: 4,
+    width:"100%",
+    textAlign: "center",
+    // backgroundColor: "red",
   },
   timeContainer: {
     paddingHorizontal: 16,

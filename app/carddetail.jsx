@@ -35,6 +35,40 @@ const ProductDetail = () => {
   // const [isFavorited, setIsFavorited] = useState(false);
   const { watchlist, addToWatchlist, removeFromWatchlist, isFavorite } =
     useWatchlist();
+const [related, setRelated] = useState([]);
+
+// useEffect(() => {
+//   const loadRelated = async () => {
+//     try {
+//       const qs = `current_id=${product.variation.id}&category_id=${product.category.id}`;
+//       const data = await fetch(`/api/variations/related/?${qs}`);
+//       const variations = await data.json();
+
+//       // Map into the same “product + variation” shape your Card wants
+//       const relatedItems = variations.map(v => ({
+//         id:          v.product.id,
+//         item_name:   v.product.item_name,
+//         item_name_amh: v.product.item_name_amh,
+//         image:       v.product.image,
+//         category:    { name: v.product.category.name, name_amh: v.product.category.name_amh },
+//         variation:   {
+//           id:           v.id,
+//           quantity:     v.quantity,
+//           unit:         v.unit,
+//           price:        v.price,
+//           in_stock:     v.in_stock,
+//           stock_quantity: v.stock_quantity,
+//           popularity:   v.popularity,
+//         },
+//       }));
+//       setRelated(relatedItems);
+//     } catch (err) {
+//       console.error("Failed to load related:", err);
+//     }
+//   };
+
+//   if (product) loadRelated();
+// }, [product]);
 
   useEffect(() => {
     console.log("try to work is hard:", watchlist);
@@ -82,7 +116,7 @@ const ProductDetail = () => {
 
     Toast.show({
       type: "success",
-      text1: "Product added to cart",
+      text1: t("added1"),
     });
     router.push("/(tabs)/cartscreen");
   };
@@ -199,10 +233,10 @@ const ProductDetail = () => {
                   {product.variation?.in_stock
                     ? i18n.language === "en"
                       ? "In Stock"
-                      : "In Stock"
+                      : "ለሽያጭ ቀርቧል"
                     : i18n.language === "en"
                     ? "Out of Stock"
-                    : "Out of Stock"}
+                    : "ለሽያጭ አልቅረበም"}
                 </Text>
               </View>
             </View>
@@ -365,6 +399,26 @@ const ProductDetail = () => {
           </View> */}
         </View>
       </ScrollView>
+      {/* {related.length > 0 && (
+  <>
+    <Text style={styles.sectionTitle}>{t("related_products")}</Text>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ paddingHorizontal: 16 }}
+    >
+      {related.map(item => (
+        <View key={item.variation.id} style={{ marginRight: 12 }}>
+          <Card
+            product={item}
+            // onAdded / inWishlistView etc. if you want cart/wishlist actions here
+          />
+        </View>
+      ))}
+    </ScrollView>
+  </>
+)} */}
+
 
       {/* Fixed Bottom Action Bar */}
       <View

@@ -2,7 +2,7 @@
     "active":"ትዕዛዞች ይከታተሉ",
     "completed":"የተጠናቀቁ ትዕዛዞች",
     "noorder":"ምንም ትእዛዝ የለም",
-    "loading":"በትዕግስት ይጠብቁ...",
+    "loading":"እየጫነ ነው...",
     "await":"አድራሽ ሰው አልተመደበም",
     "br":"ብር",
     "totalamount":"ጠቅላላ ዋጋ",
@@ -26,6 +26,14 @@
     "kg": "ኪግ",
     "g": "ግ",
     "piece": "ፍሬ",
-    "need_delivery":"የሚያደርስ ሰው እፈልጋለው",
-    "self_pickup":"ከያሶን እወስዳለሁ"
+    "need_delivery":"የሚያደርስ እፈልጋለው",
+    "rateExperience": "የእርስዎን አስተያየት ይስጡ",
+    "rateSubtitle": "አስተያየት ለመስጠት ፍቃደኛ ስለሆኑ እናመሰግናለን።",
+    "commentPlaceholder": "አስተያየትዎን ይስጡን (አማራጭ)…",
+    "thankYou": "እናመሰግናለን!",
+    "feedbackSubmitted": "የእርስዎ አስተያየት እንድናሻሽል ያግዘናል።",
+    "error": "ስህተት",
+    "submitError": "አስተያየትዎን ማስገባት አልተሳካም።",
+    "submitRating": "አስተያየትዎን ያስገቡ",
+    "self_pickup":"እራሴ እወስዳለሁ"
 }

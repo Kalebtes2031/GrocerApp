@@ -102,6 +102,7 @@ export default function HomeScreen() {
         item_name: v.product.item_name,
         item_name_amh: v.product.item_name_amh,
         image: v.product.image,
+
         // if you need the other image_* fields (full, left, etc),
         // you’ll have to include them in your ProductVariantSerializer
         // and then spread them here:
@@ -110,8 +111,10 @@ export default function HomeScreen() {
         image_left: v.product.image_left,
         image_right: v.product.image_right,
 
-        category: v.product.category, // only if your serializer includes it
-
+        category: {
+          name: v.product.category.name, // only if your serializer includes it
+          name_amh: v.product.category.name_amh, // only if your serializer includes it
+        },
         variation: {
           id: v.id,
           quantity: v.quantity,
@@ -122,7 +125,7 @@ export default function HomeScreen() {
           popularity: v.popularity,
         },
       }));
-
+console.log("fearly show category", category);
       setVeryPopular(products);
       console.log("Popular Products w/ Variations:", products);
     } catch (error) {
@@ -286,16 +289,16 @@ export default function HomeScreen() {
           alignItems: "center",
           marginLeft: 24,
           gap: 6,
-          // backgroundColor:"red",
+          
           // marginTop: 6,
         }}
-      >
+        >
         <Text
           style={{
             fontSize: 16,
             color: "#445399",
             fontFamily: "Poppins-Medium",
-             marginTop: 1,
+            marginTop: 1,
           }}
           // className="text-lg  font-poppins-medium text-primary "
         >
@@ -309,6 +312,8 @@ export default function HomeScreen() {
             fontStyle: "italic",
             marginLeft: 4,
             marginBottom: 3,
+            // backgroundColor:"red",
+            width:"60%",
           }}
           className="italic ml-2 text-primary"
         >

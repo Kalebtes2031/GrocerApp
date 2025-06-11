@@ -38,6 +38,12 @@ const SignUp = () => {
   const colorScheme = useColorScheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+   const termsUrl =
+    i18n.language === 'en'
+      ? 'https://yasonsc.com/terms_and_conditions'
+      : 'https://yasonsc.com/terms_and_conditions_amh';
+
+
   const validate = () => {
     const errs = {};
     // Required
@@ -380,7 +386,7 @@ const SignUp = () => {
               paddingHorizontal: 24,
             }}
           >
-            {t("by")} <Text style={{ color: "#445399" }}>{t("by2")}</Text>
+            {t("by")} <Text onPress={() => Linking.openURL(termsUrl)} style={{ color: "#445399" }}>{t("by2")}</Text>
             <Text
               className="text-primary underline"
               onPress={() => router.push("/terms")}

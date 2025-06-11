@@ -31,5 +31,9 @@
     "feedbackSubmitted": "Your feedback helps us improve",
     "error": "Error",
     "submitError": "Failed to submit rating",
-    "submitRating": "Submit Rating"
+    "submitRating": "Submit Rating",
+    "need_delivery1":"Delivery Type",
+    "need_delivery":"Need-Delivery",
+      "selectedbank": "Payment Option",
+    "self_pickup":"Self-Pickup"
 }

@@ -14,7 +14,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { Calendar } from "react-native-calendars";
+import { Calendar as GCalendar } from "react-native-calendars";
+import { Calendar as ECalendar } from "react-native-ethiopian-calendar";
 // import { Button, Overlay, Icon } from "@rneui/themed";
 // import DateTimePicker from "expo-date-time-picker";
 import {
@@ -29,6 +30,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { TimePickerModal } from "react-native-paper-dates";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Feather, MaterialIcons, Ionicons } from "@expo/vector-icons";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import * as Location from "expo-location";
@@ -37,6 +39,8 @@ import Toast from "react-native-toast-message";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Entypo from "@expo/vector-icons/Entypo";
+import { am as dfAm } from "date-fns/locale";
+import { toEthiopian, toGregorian } from "ethiopian-date";
 
 import MapLibreGL from "@maplibre/maplibre-react-native";
 const {
@@ -57,6 +61,22 @@ import debounce from "lodash.debounce";
 // MapboxGL.setAccessToken(
 //   "pk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY205ZHdkMXJ0MGhlMTJpcXQ4bzgyYjFnZiJ9.Lhg5WUbonFe4mhCmEpSUKg"
 // );
+
+const ETHIOPIAN_MONTHS_AM = [
+  "መስከረም",
+  "ጥቅምት",
+  "ህዳር",
+  "ታህሳስ",
+  "ጥር",
+  "የካቲት",
+  "መጋቢት",
+  "ሚያዝያ",
+  "ግንቦት",
+  "ሰኔ",
+  "ሐምሌ",
+  "ነሐሴ",
+  "ጳጉሜ",
+];
 
 const ScheduleDeliveryScreen = () => {
   const { t, i18n } = useTranslation("schedule");
@@ -82,7 +102,11 @@ const ScheduleDeliveryScreen = () => {
   const [searchResults, setSearchResults] = useState([]);
   // const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedAddress, setSelectedAddress] = useState("");
+  const [openCalendar, setOpenCalendar] = useState(false);
 
+  const [openTimePicker, setOpenTimePicker] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [timeOpen, setTimeOpen] = useState(false);
   // this ensures we never access null before location is set
   // const initialCoords = selectedLocation || currentLocation;
 
@@ -116,7 +140,6 @@ const ScheduleDeliveryScreen = () => {
     const addr = data.address || {};
     // choose the most granular field available:
     return (
-      
       addr.neighbourhood ||
       addr.suburb ||
       addr.village ||
@@ -196,7 +219,7 @@ const ScheduleDeliveryScreen = () => {
   }, [user]);
 
   // fetch function (debounced if you like):
-  // 
+  //
   // 2. Improve your Nominatim fetch so it really returns JSON
   const fetchAddresses = async (q) => {
     if (q.length < 3) return setSearchResults([]);
@@ -255,17 +278,76 @@ const ScheduleDeliveryScreen = () => {
     fetchOrderData();
   }, []);
 
-  const handleDateSelect = (date) => {
-    setSelectedDate(new Date(date.timestamp));
-    setCalendarOpen(false);
-    setShowTimePicker(true);
+  // const handleDateSelect = (date) => {
+  //   setSelectedDate(new Date(date.timestamp));
+  //   setCalendarOpen(false);
+  //   setShowTimePicker(true);
+  // };
+
+  const handleDateSelect = (day) => {
+    console.log("handleDateSelect got:", day);
+
+    let jsDate;
+
+    if (i18n.language === "amh") {
+      // ───── ECalendar returns:
+      // { ethiopian: { date, month, year }, gregorian: { date, month, year } }
+      if (!day || !day.gregorian || typeof day.gregorian.year !== "number") {
+        return; // no valid GC block → bail
+      }
+
+      const gY = day.gregorian.year;
+      const gM = day.gregorian.month;
+      const gD = day.gregorian.date;
+      jsDate = new Date(gY, gM - 1, gD, 0, 0, 0);
+    } else {
+      // ───── GCalendar returns either:
+      //    • day.timestamp  (ms since epoch at midnight UTC of that GC date)
+      //    • or { year, month, day } (all Gregorian)
+      if (!day) return;
+      jsDate = day.timestamp
+        ? new Date(day.timestamp)
+        : new Date(day.year, day.month - 1, day.day, 0, 0, 0);
+    }
+
+    setSelectedDate(jsDate);
+    setOpenCalendar(false);
+    setOpenTimePicker(true);
   };
 
+  // ② Show the date header (EC if Amharic, GC otherwise):
+  const renderDateHeader = () => {
+    if (i18n.language === "amh") {
+      const [ey, em, ed] = toEthiopian(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth() + 1,
+        selectedDate.getDate()
+      );
+      return `${ed} ${ETHIOPIAN_MONTHS_AM[em - 1]} ${ey}`;
+    }
+    return format(selectedDate, "PPPP", { locale: dfAm });
+  };
 
-
+  // ③ Only compare "date-only" so tomorrow always passes:
   const validateDateTime = () => {
     const now = new Date();
-    if (selectedDate <= now) {
+    const todayMid = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0
+    );
+    const chosenMid = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      0,
+      0,
+      0
+    );
+    if (chosenMid < todayMid) {
       setError(t("please_select"));
       return false;
     }
@@ -273,13 +355,17 @@ const ScheduleDeliveryScreen = () => {
   };
 
   const handleSchedule = async () => {
+    console.log("this is time now:", selectedDate);
+    setError(""); // reset error state
+
     if (!validateDateTime()) return;
     if (!selectedLocation) {
       Toast.show({
         type: "error",
-        text1: t('please_select_address'),
+        text1: t("please_select_address"),
         visibilityTime: 2000,
       });
+
       return;
     }
     // if (!initialCoords) {
@@ -305,7 +391,14 @@ const ScheduleDeliveryScreen = () => {
       // Show success toast here
     } catch (err) {
       Toast.show({ type: "error", text1: err.response?.data?.detail });
-      setError(err.response?.data?.detail || "Failed to schedule delivery");
+      console.log("Backend responded with:", err.response?.data);
+      setError(
+        err.response?.data?.detail ||
+          err.response?.data?.scheduled_delivery?.[0] ||
+          err.response?.data?.customer_latitude?.[0] ||
+          err.response?.data?.customer_longitude?.[0] ||
+          t("failed_to_schedule")
+      );
     } finally {
       setLoading(false);
     }
@@ -346,16 +439,16 @@ const ScheduleDeliveryScreen = () => {
         <Text
           // className="font-poppins-bold text-center text-primary mb-4"
           style={{
-           fontSize: 16,
+            fontSize: 16,
             fontWeight: "bold",
             textAlign: "center",
             color: "#445399",
-            marginTop:4,
+            marginTop: 4,
           }}
         >
           {t("schedule")}
         </Text>
-        <View style={{paddingHorizontal:22}}></View>
+        <View style={{ paddingHorizontal: 22 }}></View>
       </View>
       <View>
         {/* <Text
@@ -587,7 +680,13 @@ const ScheduleDeliveryScreen = () => {
               }
             }}
           >
-            <Text style={{color: locationChoice === "current"? "white":"#445399"}}>{t("use_current")}</Text>
+            <Text
+              style={{
+                color: locationChoice === "current" ? "white" : "#445399",
+              }}
+            >
+              {t("use_current")}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -603,7 +702,13 @@ const ScheduleDeliveryScreen = () => {
               }
             }}
           >
-            <Text style={{color: locationChoice !== "current"? "white":"#445399"}}>{t("selectonmap")}</Text>
+            <Text
+              style={{
+                color: locationChoice !== "current" ? "white" : "#445399",
+              }}
+            >
+              {t("selectonmap")}
+            </Text>
           </TouchableOpacity>
         </View>
         {(locationChoice === "current" || locationChoice === "custom") && (
@@ -639,9 +744,9 @@ const ScheduleDeliveryScreen = () => {
                   ]}
                   anchor={{ x: 0.5, y: 1 }}
                 >
-                  <View style={styles.markerContainer}>
-                    <Entypo name="location-pin" size={28} color="#445399" />
-                  </View>
+                   <View style={[styles.pin, { backgroundColor: "#445399" }]}>
+            <Entypo name="location-pin" size={28} color="#fff" />
+          </View>
                 </MarkerView>
               )}
             </MapView>
@@ -655,7 +760,15 @@ const ScheduleDeliveryScreen = () => {
       )}
 
       <Text
-        style={{ fontSize: 18, paddingLeft: 8, marginTop: 5, textAlign:"center",color:"#445399", fontSize:14, fontWeight:"bold"  }}
+        style={{
+          fontSize: 18,
+          paddingLeft: 8,
+          marginTop: 5,
+          textAlign: "center",
+          color: "#445399",
+          fontSize: 14,
+          fontWeight: "bold",
+        }}
         className="text-start font-poppins-bold text-gray-800 text-[14px] mb-4"
       >
         {t("date")}
@@ -689,72 +802,201 @@ const ScheduleDeliveryScreen = () => {
               // { width: 220, height: 220, overflow: 'hidden' },
             ]}
           >
-            {calendarOpen && (
-              <Calendar
-                // only fix the overall width; height will adjust
-                style={{ width: responsiveWidth(63), alignSelf: "center" }}
-                // keep your existing props…
-                minDate={format(new Date(), "yyyy-MM-dd")}
-                onDayPress={handleDateSelect}
-                markedDates={{
-                  [format(selectedDate, "yyyy-MM-dd")]: { selected: true },
-                }}
-                // now the magic: shrink fonts & cell sizes
-                theme={{
-                  selectedDayBackgroundColor: "#445399",
-                  todayTextColor: "#445399",
-                  arrowColor: "#445399",
-                  // smaller month header
-                  textMonthFontSize: 16,
-                  textMonthFontWeight: "600",
-                  // smaller weekday names (Sun, Mon…)
-                  textDayHeaderFontSize: 12,
-                  // smaller day numbers
-                  textDayFontSize: 10,
-
-                  // shrink the arrows
-                  arrowSize: 16,
-
-                  // override the calendar’s internal styles:
-                  "stylesheet.calendar.main": {
-                    // tighten up each row
-                    week: {
-                      marginTop: 2,
-                      marginBottom: 2,
-                      flexDirection: "row",
-                      justifyContent: "space-around",
-                    },
-                  },
-                  "stylesheet.day.basic": {
-                    // shrink each day cell
-                    base: {
-                      width: 28,
-                      height: 28,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    },
-                    text: {
-                      marginTop: 0,
-                      fontSize: 10,
-                    },
-                  },
-                }}
-              />
-            )}
+            <View style={[styles.wrapper, { width: responsiveWidth(63) }]}>
+              {/* <TouchableOpacity
+        style={styles.header}
+        activeOpacity={0.7}
+        onPress={() => setOpen((o) => !o)}
+      >
+        <Text style={styles.headerText}>{formatHeaderDate(selectedDate)}</Text>
+        <MaterialIcons
+          name={open ? "keyboard-arrow-up" : "keyboard-arrow-down"}
+          size={24}
+          color="#445399"
+        />
+      </TouchableOpacity> */}
+              <TouchableOpacity
+                onPress={() => setOpenCalendar((v) => !v)}
+                style={styles.header}
+                activeOpacity={0.7}
+              >
+                <Text style={{fontSize: 16,
+    color: "#333",}}>
+                  {renderDateHeader()}
+                </Text>
+                <MaterialIcons
+                  name={
+                    openCalendar ? "keyboard-arrow-up" : "keyboard-arrow-down"
+                  }
+                  size={24}
+                  color="#445399"
+                />
+              </TouchableOpacity>
+              {openCalendar && (
+                <View style={styles.calendarBox}>
+                  {i18n.language === "amh" ? (
+                    <ECalendar
+                      mode="EC"
+                      locale="AMH"
+                      initialDate={selectedDate}
+                      onDatePress={handleDateSelect}
+                      hideHeaderButtons={true}
+                      theme={{
+                        selectedDayBackgroundColor: "#445399",
+                        selectedDayTextColor: "#ffffff",
+                        todayTextColor: "#445399",
+                        arrowColor: "#445399",
+                        textMonthFontSize: 12,
+                        textMonthFontWeight: "600",
+                        textDayHeaderFontSize: 12,
+                        textDayFontSize: 10,
+                        arrowSize: 12,
+                        "stylesheet.calendar.main": {
+                          week: {
+                            height: 22,
+                            marginTop: 2,
+                            marginBottom: 2,
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                          },
+                        },
+                        "stylesheet.day.basic": {
+                          base: {
+                            width: 24,
+                            height: 18,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          },
+                          text: { marginTop: 0, fontSize: 10 },
+                        },
+                      }}
+                    />
+                  ) : (
+                    <GCalendar
+                      style={{ width: responsiveWidth(63) }}
+                      minDate={format(new Date(), "yyyy-MM-dd")}
+                      onDayPress={handleDateSelect}
+                      markedDates={{
+                        [format(selectedDate, "yyyy-MM-dd")]: {
+                          selected: true,
+                        },
+                      }}
+                      theme={{
+                        selectedDayBackgroundColor: "#445399",
+                        todayTextColor: "#445399",
+                        arrowColor: "#445399",
+                        textMonthFontSize: 16,
+                        textMonthFontWeight: "600",
+                        textDayHeaderFontSize: 12,
+                        textDayFontSize: 10,
+                        arrowSize: 16,
+                        "stylesheet.calendar.main": {
+                          week: {
+                            marginTop: 2,
+                            marginBottom: 2,
+                            flexDirection: "row",
+                            justifyContent: "space-around",
+                          },
+                        },
+                        "stylesheet.day.basic": {
+                          base: {
+                            width: 28,
+                            height: 28,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          },
+                          text: { marginTop: 0, fontSize: 10 },
+                        },
+                      }}
+                    />
+                  )}
+                </View>
+              )}
+            </View>
           </View>
 
-          <TouchableOpacity
-            style={[styles.timePickerButton, { flexDirection: "column" }]}
-            onPress={() => setShowTimePicker(true)}
+          {/* <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              // paddingVertical: 6,
+              paddingHorizontal: 10,
+              backgroundColor: "#fff",
+              borderRadius: 6,
+              borderWidth: 1,
+              borderColor: "#ddd",
+              marginBottom: 8,
+            }}
+            activeOpacity={0.7}
+            onPress={() => setShowTimePicker((o) => !o)}
           >
-            <FontAwesome6 name="clock" size={24} color="#445399" />
-            {/* <Icon name="clock" type="feather" color="#2089dc" /> */}
-            <Text style={styles.timeText}>
+            <Text style={styles.headerText}>
               {format(selectedDate, "hh:mm a")}
             </Text>
+            <MaterialIcons
+              name={
+                showTimePicker ? "keyboard-arrow-up" : "keyboard-arrow-down"
+              }
+              size={24}
+              color="#445399"
+            />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            onPress={() => setOpenTimePicker((v) => !v)}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              // paddingVertical: 6,
+              paddingHorizontal: 1,
+              backgroundColor: "#fff",
+              borderRadius: 6,
+              borderWidth: 1,
+              borderColor: "#fff",
+              marginBottom: 8,
+              height:50,
+               shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 12,
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.headerText}>
+              {format(selectedDate, "hh:mm a")}
+            </Text>
+            <MaterialIcons
+              name={
+                openTimePicker ? "keyboard-arrow-up" : "keyboard-arrow-down"
+              }
+              size={24}
+              color="#445399"
+            />
           </TouchableOpacity>
+
+          <TimePickerModal
+            visible={openTimePicker}
+            onDismiss={() => setOpenTimePicker(false)}
+            onConfirm={({ hours, minutes }) => {
+              const d = new Date(selectedDate);
+              d.setHours(hours, minutes, 0);
+              setSelectedDate(d);
+              setOpenTimePicker(false);
+            }}
+            hours={selectedDate.getHours()}
+            minutes={selectedDate.getMinutes()}
+          />
+
+          {/* ───── Error if any ───── */}
+          {error !== "" && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
         </View>
-        {showTimePicker && (
+        {/* {showTimePicker && (
           // <Overlay
           //   isVisible={showTimePicker}
           //   onBackdropPress={() => setShowTimePicker(false)}
@@ -778,8 +1020,9 @@ const ScheduleDeliveryScreen = () => {
               minutes={selectedDate.getMinutes()}
             />
           </View>
-        )}
+        )} */}
         {/* confirm button */}
+
         <View
           style={{
             paddding: 50,
@@ -818,12 +1061,13 @@ const ScheduleDeliveryScreen = () => {
                 {loading ? (
                   <ActivityIndicator color="#fff" style={{ marginRight: 10 }} />
                 ) : (
-                  <MaterialIcons
-                    name="check-circle"
-                    size={20}
-                    color="#fff"
-                    style={{ marginRight: 10 }}
-                  />
+                  // <MaterialIcons
+                  //   name="check-circle"
+                  //   size={20}
+                  //   color="#fff"
+                  //   style={{ marginRight: 10 }}
+                  // />
+                  <MaterialCommunityIcons name="truck-delivery" size={20} color="#fff" style={{ marginRight: 10 }}/>
                 )}
                 <Text
                   style={{
@@ -910,15 +1154,76 @@ const ScheduleDeliveryScreen = () => {
 };
 
 const styles = StyleSheet.create({
-   headerContainer: {
+  pin: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5,
+  },
+  wrapper: {
+    alignSelf: "center",
+    // marginTop: 20,
+    // width: CAL_WIDTH,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+    borderRadius: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    elevation: 9,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 28,
+  },
+  headerText: {
+    fontSize: 16,
+    color: "#333",
+    // textAlign:"center",
+  },
+  calendarBox: {
+    marginTop: 8,
+    backgroundColor: "#fff",
+    borderRadius: 6,
+    overflow: "hidden",
+    alignItems: "center",
+  },
+  dropdownWrapper: {
+    // width: responsiveWidth(63),
+    alignSelf: "center",
+    marginVertical: 8,
+  },
+  dropdownHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
+    backgroundColor: "#fff",
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    backgroundColor:"red"
+  },
+  dropdownHeaderText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  headerContainer: {
     height: 40,
     backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingTop:0,
-    marginBottom:6
+    paddingTop: 0,
+    marginBottom: 6,
     // borderBottomWidth: 1,
     // borderBottomColor: "#eee",
   },
@@ -936,10 +1241,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginVertical: 8,
     backgroundColor: "#cce5ff",
-    padding:6,
-    marginHorizontal:24,
+    padding: 6,
+    marginHorizontal: 24,
     borderRadius: 54,
-    color:"#445399"
+    color: "#445399",
   },
 
   redPin: {
@@ -1012,7 +1317,7 @@ const styles = StyleSheet.create({
     padding: 5,
     // height:200,
   },
-  locationSection: { marginBottom: 4, },
+  locationSection: { marginBottom: 4 },
   label: { fontSize: 16, fontWeight: "bold", marginBottom: 8 },
   choiceContainer: { flexDirection: "row", marginBottom: 8 },
   choiceButton: {
@@ -1023,11 +1328,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 54,
   },
-  selectedChoice: { backgroundColor: "#445399" ,color:"white"},
+  selectedChoice: { backgroundColor: "#445399", color: "white" },
   locationText: { marginTop: 8, fontSize: 14 },
   mapContainer: {
     width: 350,
-    height: 250,
+    height: 340,
     alignSelf: "center",
     borderWidth: 1,
     borderColor: "#ccc",
@@ -1054,10 +1359,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     elevation: 3,
     backgroundColor: "white",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 4,
   },
   timePickerButton: {
     flexDirection: "row",
@@ -1069,7 +1374,7 @@ const styles = StyleSheet.create({
     // marginVertical: 10,
     elevation: 2,
     marginRight: 3,
-    height:243
+    height: 243,
   },
   timeText: {
     fontSize: 18,

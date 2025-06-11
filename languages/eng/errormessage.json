@@ -9,5 +9,8 @@
   "deactivated_message": "Your account has been disabled. Contact support if you believe this is an error.",
   
   "default_title":   "Something went wrong",
-  "default_message": "An unexpected error occurred. Please try again later."
+  "default_message": "An unexpected error occurred. Please try again later.",
+
+  "user_not_found": "User with this email not found",
+  "otp_failed": "Failed to send OTP. Please try again."
 }

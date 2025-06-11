@@ -1,5 +1,6 @@
 {
   "products": "ምርቶች",
   "items": "ምርቶች",
-  "searchPlaceholder":"ምርቶችን እዚህ ይፈልጉ"
+  "searchPlaceholder":"ምርቶችን እዚህ ይፈልጉ",
+  "no_products_found":"የፈለጉት ምርት የለም"
 }

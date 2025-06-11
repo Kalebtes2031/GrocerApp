@@ -1,7 +1,7 @@
 
 {
   "invalid_credentials_title":   "ስም/ኢሜይል እና የይለፍ ቃልዎን ያረጋግጡ",
-  "invalid_credentials_message": "እባክዎ በድጋፍ ደግመው ይሞክሩ።",
+  "invalid_credentials_message": "እባክዎ ደግመው ይሞክሩ።",
 
   "inactive_title":   "አካውንትዎ አክቲቭ አደለም",
   "inactive_message": "እባክዎ ለያሶን አስተባባሪ ያሳውቁ",
@@ -10,5 +10,9 @@
   "deactivated_message": "መለያዎት ተከልክሏል። ይህ ችግር ስህተት መሆኑን ብለው ካምኑ፣ እባክዎ ወደ ድጋፍ ይደውሉ።",
 
   "default_title":   "ያልተጠበቀ ስህተት ተፈጠረ።",
-  "default_message": "እባክዎ በኋላ ደግመው ይሞክሩ።"
+  "default_message": "እባክዎ በኋላ ደግመው ይሞክሩ።",
+  
+  "user_not_found": "ያስገቡት ኢሜይል የተሳሳተ ነው፤ እንደገና ይሞክሩ!",
+  "otp_failed": "የአንድ ጊዜ የይለፍ ቃል መላክ አልተቻለም"
+
 }

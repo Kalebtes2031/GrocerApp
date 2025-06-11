@@ -16,7 +16,7 @@ import Toast from "react-native-toast-message";
 const baseUrl = "https://yasonbackend.yasonsc.com/account/"; // Adjust to your API base URL
 
 export default function ForgotPasswordScreen() {
-  const { t } = useTranslation("forgot");
+  const { t, i18n } = useTranslation(["forgot", "errormessage"]);
   const router = useRouter();
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [channel, setChannel] = useState("email"); // 'sms' or 'email'
@@ -53,7 +53,25 @@ export default function ForgotPasswordScreen() {
         params: { emailOrPhone:identifier, channel },
       });
     } catch (error) {
-      showToast("error", error.response?.data?.error || t("otp_failed"));
+       const rawMsg = error.response?.data?.error || "otp_failed";
+
+       // 2. Map it to a key in errormessage.json
+       let errorKey;
+       switch (rawMsg) {
+         case "User with this email not found":
+           errorKey = "user_not_found";
+           break;
+         // if the backend might send other English phrases, add more cases here:
+         // case "Some other validation error": errorKey = "some_other_error_key"; break;
+         default:
+           // fallback to a generic “OTP failed” key
+           errorKey = "otp_failed";
+       }
+
+       // 3. Use t(...) with the "errormessage" namespace
+       //
+       //    Because you passed ["forgot","errormessage"] above, you can write:
+       showToast("error", t(`errormessage:${errorKey}`));
     } finally {
       setLoading(false);
     }

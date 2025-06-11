@@ -17,11 +17,14 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import Header from "@/components/Header";
 import { fetchOrderHistory } from "@/hooks/useFetch";
 import { format } from "date-fns";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, EvilIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { RadioButton } from "react-native-paper";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
+import { Rating } from "react-native-ratings";
+import StarRow from "@/components/StarRow";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const COLORS = {
   primary: "#2D4150",
@@ -33,6 +36,22 @@ const COLORS = {
   text: "#2D4150",
   muted: "#94A3B8",
 };
+
+const ETHIOPIAN_MONTHS_AM = [
+  "መስከረም",
+  "ጥቅምት",
+  "ህዳር",
+  "ታህሳስ",
+  "ጥር",
+  "የካቲት",
+  "መጋቢት",
+  "ሚያዝያ",
+  "ግንቦት",
+  "ሰኔ",
+  "ሐምሌ",
+  "ነሐሴ",
+  "ጳጉሜ",
+];
 
 const Order = () => {
   const { t, i18n } = useTranslation("order");
@@ -46,6 +65,38 @@ const Order = () => {
   const [paymentType, setPaymentType] = useState("Direct Bank Payment");
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  function formatDateOnly(dateString) {
+    const dt = new Date(dateString);
+
+    if (i18n.language === "amh") {
+      // 1) Ask for day/month/year/era in Ethiopic
+      const parts = new Intl.DateTimeFormat("am-ET-u-ca-ethiopic", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        era: "short", // still request era so formatToParts returns it (we’ll filter it out)
+      }).formatToParts(dt);
+
+      // 2) Pick out exactly the named parts:
+      const dayPart = parts.find((p) => p.type === "day")?.value ?? "";
+      const monthPart = parts.find((p) => p.type === "month")?.value ?? "";
+      const yearPart = parts.find((p) => p.type === "year")?.value ?? "";
+
+      // 3) Return in the order “{monthName} {day}, {year}”
+      return `${monthPart} ${dayPart}, ${yearPart}`;
+    } else {
+      // Fallback: only the Gregorian date, in whatever the device’s locale prefers
+      return dt.toLocaleDateString();
+    }
+  }
+
+  function formatTimeOnly(dateString) {
+    const dt = new Date(dateString);
+    // You can customize whether to show seconds, 12h vs. 24h, etc.
+    // Here is a common “HH:MM:SS AM/PM” format in the device’s locale:
+    return dt.toLocaleTimeString();
+  }
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -279,9 +330,29 @@ const Order = () => {
           <Text style={styles.orderId}>
             {t("order")} #Yas-{order.id}
           </Text>
-          <Text style={{ fontSize: 10, fontWeight: "600", color: "#445399",}}>
-            {order.need_delivery ? t("need_delivery") : t("self_pickup")}
-          </Text>
+          <View
+            style={{
+              fontSize: 9,
+              fontWeight: "600",
+              color: "#445399",
+              width: i18n.language === "en" ? "20%" : "28%",
+              textAlign: "start",
+              alignItems: "start",
+              // backgroundColor:"red",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 10,
+                fontWeight: "600",
+                color: "#445399",
+                textAlign: "flex-end",
+                alignItems: "flex-end",
+              }}
+            >
+              {order.need_delivery ? t("need_delivery") : t("self_pickup")}
+            </Text>
+          </View>
           {/* {renderOrderStatus(order.status)} */}
         </View>
 
@@ -309,7 +380,22 @@ const Order = () => {
               {i18n.language === "amh" ? t("br") : ""}
             </Text>
           </View> */}
-
+          <View style={styles.rowContainer}>
+            <Text style={[styles.boldLabel, styles.flexLabel]}>
+              {t("order_status")}:{" "}
+            </Text>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 13,
+                flexShrink: 1, // Allow text wrapping
+                flexWrap: "wrap",
+                color: "#445399",
+              }}
+            >
+              {t(`${order.status}`)}
+            </Text>
+          </View>
           {/* Scheduled Delivery */}
           <View style={styles.rowContainer}>
             <Text style={[styles.boldLabel, styles.flexLabel]}>
@@ -317,10 +403,29 @@ const Order = () => {
             </Text>
 
             {order?.scheduled_delivery ? (
-              <Text style={styles.flexValue}>
-                {" "}
-                {new Date(order.scheduled_delivery).toLocaleString()}
-              </Text>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 2,
+                  width: "100%",
+                }}
+              >
+                <AntDesign name="calendar" size={14} color="#445399" />
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: 13,
+                    flexShrink: 1, // Allow text wrapping
+                    flexWrap: "wrap",
+                    color: "#445399",
+                  }}
+                >
+                  {formatDateOnly(order.scheduled_delivery)}{" "}
+                  {formatTimeOnly(order.scheduled_delivery)}
+                </Text>
+              </View>
             ) : (
               <Text style={styles.flexValue}>{t("not_scheduled")}</Text>
             )}
@@ -342,8 +447,8 @@ const Order = () => {
                 <Text
                   style={{
                     color: "#fff",
-                    fontWeight: "600",
-                    fontSize: i18n.language === "en" ? 15 : 12,
+                    // fontWeight: "600",
+                    fontSize: i18n.language === "en" ? 14 : 12,
                     width: "100%",
                     textAlign: "center",
                   }}
@@ -355,7 +460,15 @@ const Order = () => {
           )}
           {/* Payment Status */}
           <View style={styles.paymentRow}>
-            <Text style={[styles.boldLabel, styles.flexLabel]}>
+            <Text
+              style={[
+                styles.boldLabel,
+                {
+                  marginRight: 6,
+                  width: i18n.language === "en" ? "40%" : "30%",
+                },
+              ]}
+            >
               {t("payment")}:
             </Text>
             <View style={styles.statusContainer}>
@@ -384,6 +497,12 @@ const Order = () => {
               </TouchableOpacity>
             </View>
           )}
+          {order.rating?.stars != null &&
+            typeof order.rating?.stars === "number" && (
+              <View style={{ marginTop: 8 }}>
+                <StarRow stars={order.rating.stars} size={25} />
+              </View>
+            )}
         </View>
       </View>
     ));
@@ -518,6 +637,13 @@ const Order = () => {
 export default Order;
 
 const styles = StyleSheet.create({
+  ratingContainer: {
+    flex: 1,
+  },
+  // rating: {
+  //   // Rating itself also gets a transparent background:
+  //   backgroundColor: "rgba(150,166,234,0.4)",
+  // },
   button2: {
     width: "100%",
     marginBottom: 8,
@@ -535,7 +661,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // marginVertical: 2,
     flexWrap: "wrap",
-    // backgroundColor:"red"
   },
   paymentRow: {
     flexDirection: "row",
@@ -551,7 +676,9 @@ const styles = StyleSheet.create({
     minWidth: 70, // Minimum width for labels
   },
   flexLabel: {
-    marginRight: 8,
+    marginRight: 6,
+    width: "30%",
+    // backgroundColor:"red"
   },
   flexValue: {
     flex: 1,
@@ -663,7 +790,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width:"100%",
+    width: "100%",
     borderBottomColor: "#445399",
     borderBottomWidth: 1,
     paddingBottom: 4,

@@ -1,5 +1,5 @@
 {
-  "bank": "Bank Accounts",
+  "bank": "Payment options",
   "yason":"Yason Consumption Products Trading S.C",
   "name":"Abebe Demssie W/Mariam",
   "select":"Select Bank",
@@ -19,10 +19,10 @@
   "errormessage2":"Please Select a Bank",
   "errormessage3":"File size exceeds 5MB limit",
   "br":"Birr",
-  "instruction":"choose a bank and upload a payment receipt",
+  "instruction":"Choose a bank, pay and upload a payment receipt",
    "total":"Total",
-  "instruction1":"Order ID",
+  "instruction1":"Order Number",
+  "instruction3":"You can copy the order number and use it as reference.",
   "yikeflu":"Pay!",
   "yourorder":" Your order is Registered"
-
 }

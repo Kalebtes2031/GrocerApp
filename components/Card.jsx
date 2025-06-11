@@ -19,7 +19,7 @@ import { useTranslation } from "react-i18next";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.4;
 
-const Card = ({ product, onAdded }) => {
+const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) => {
   const { t, i18n } = useTranslation("card");
   const { cart, addItemToCart, isInCart } = useCart();
   const { addToWatchlist, removeFromWatchlist, isFavorite } = useWatchlist();
@@ -54,6 +54,18 @@ const Card = ({ product, onAdded }) => {
     router.push(
       `/carddetail?product=${encodeURIComponent(JSON.stringify(product))}`
     );
+  };
+
+   const handleRemoveWishlist = (e) => {
+    e.stopPropagation();
+    if (onRemoveWishlist) {
+      onRemoveWishlist(product.variation.id);
+      Toast.show({
+        type: "info",
+        text1: t("removed_from_wishlist"),
+        visibilityTime: 2000,
+      });
+    }
   };
 
   const handleAddCartClick = async () => {
@@ -103,7 +115,8 @@ const Card = ({ product, onAdded }) => {
 
         {/* Top Icons */}
         <View style={styles.topIconsContainer}>
-          <TouchableOpacity
+       {  ( !inWishlistView || !added ) && (
+           <TouchableOpacity
             onPress={(e) => {
               e.stopPropagation();
               if (!added) handleAddCartClick();
@@ -127,7 +140,21 @@ const Card = ({ product, onAdded }) => {
               }}
             />
           </TouchableOpacity>
-
+       )}
+       {/* --- REMOVE‐FROM‐WISHLIST ICON (only if prop exists) --- */}
+          {/* {onRemoveWishlist && (
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleRemoveWishlist}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <MaterialIcons
+                name="clear"                // a little “×” icon
+                size={24}
+                color="#EB5B00"
+              />
+            </TouchableOpacity>
+          )} */}
           <TouchableOpacity
             style={styles.iconButton}
             onPress={toggleFavorite}
@@ -139,6 +166,7 @@ const Card = ({ product, onAdded }) => {
               color="#445399"
             />
           </TouchableOpacity>
+          
         </View>
 
         {/* Product Info Overlay */}
