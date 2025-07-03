@@ -120,7 +120,7 @@ const CategoryDetail = () => {
         <Image
           source={{ uri: item.image }}
           style={styles.productImage}
-          resizeMode="cover"
+          resizeMode="contain"
         />
       </View>
 
@@ -299,14 +299,17 @@ const styles = StyleSheet.create({
     height: 140,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 15,
+    paddingTop: 10,
     // marginTop: 10,
   },
   productImage: {
-    width: "80%",
-    height: "80%",
-    resizeMode: "cover",
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
     borderBottomLeftRadius: 48,
     borderBottomRightRadius: 48,
+    
   },
   productName: {
     color: "#445399",

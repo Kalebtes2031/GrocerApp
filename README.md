@@ -1,50 +1,72 @@
-# Welcome to your Expo app 👋
+# 🛒 Kabth – Customer Shopping App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Kabth is a mobile shopping app built with **React Native** and **Expo**, allowing customers to browse and purchase products from **Yason Supermarket**. It features real-time order tracking with map integration and a smooth shopping experience from cart to checkout.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Features
+
+- 🛍️ Browse products by category
+- 🧺 Add items to cart and place orders
+- 📦 View order history and status
+- 🗺️ Real-time delivery tracking with interactive maps
+- 🔐 User authentication (register/login)
+- 📲 Push notifications for order updates
+
+---
+
+## ⚙️ Tech Stack
+
+- **React Native** with **Expo**
+- **Expo Router** for file-based navigation
+- **Axios** for API requests
+- **MapLibre GL** for map tracking
+- **Firebase Realtime Database** for live delivery updates
+- **AsyncStorage** for token management
+- **Backend**: Django + Django REST Framework
+
+---
+
+## 🚀 Getting Started
+
+### 1. **Clone the Repository**
+```bash
+git clone https://github.com/kalebtes2031/FinalizedYason.git
+cd kabth-customer-app
+```
+
+### 2. Install dependencies
 
    ```bash
    npm install
    ```
 
-2. Start the app
+### 3. Start the Expo app
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+🔒 Authentication
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Token-based login and registration
+- Tokens stored in AsyncStorage
+- Auth state managed locally via context/hooks
 
-## Get a fresh project
 
-When you're ready, run:
+📍 Order Tracking
 
-```bash
-npm run reset-project
-```
+- Orders updated in real-time via Firebase Realtime Database
+- Delivery agents’ locations are tracked and synced to customers
+- Interactive map powered by MapLibre GL
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
+🤝 Related Projects
+[Kabth Delivery App](https://github.com/Kalebtes2031/FinalizedDeliveryApp)
 
-To learn more about developing your project with Expo, look at the following resources:
+[Kabth Admin Panel](https://github.com/Kalebtes2031/YasonAdminDashboard)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+[Kabth API](https://github.com/Kalebtes2031/yason/tree/main/EcommerceBackend/ecommerce_backend)
 
-## Join the community
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

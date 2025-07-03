@@ -80,10 +80,10 @@ const Header = () => {
   const handleDeletePress = () => {
     setConfirmVisible(true);
   };
-const termsUrl =
-    i18n.language === 'en'
-      ? 'https://yasonsc.com/terms_and_conditions'
-      : 'https://yasonsc.com/terms_and_conditions_amh';
+  const termsUrl =
+    i18n.language === "en"
+      ? "https://yasonsc.com/terms_and_conditions"
+      : "https://yasonsc.com/terms_and_conditions_amh";
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -200,7 +200,7 @@ const termsUrl =
     setCurrentLanguage(currentLanguage === "EN" ? "AM" : "EN");
     i18n.changeLanguage(newLangCode);
   };
-  const screenWidth = Dimensions.get('window').width;
+  const screenWidth = Dimensions.get("window").width;
   const contactSlideAnim = useRef(new Animated.Value(screenHeight)).current;
 
   // Open menu
@@ -213,24 +213,24 @@ const termsUrl =
     }).start();
   };
   const openContact = () => {
-  setContactVisible(true);
-  Animated.timing(contactSlideAnim, {
-    toValue: 0,
-    duration: 300,
-    useNativeDriver: true,
-  }).start();
-};
+    setContactVisible(true);
+    Animated.timing(contactSlideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
 
-// Close: slide out to the right again
-const closeContact = () => {
-  Animated.timing(contactSlideAnim, {
-    toValue: screenWidth,
-    duration: 200,
-    useNativeDriver: true,
-  }).start(() => {
-    setContactVisible(false);
-  });
-};
+  // Close: slide out to the right again
+  const closeContact = () => {
+    Animated.timing(contactSlideAnim, {
+      toValue: screenWidth,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      setContactVisible(false);
+    });
+  };
   // Close menu
   const closeMenu = () => {
     Animated.timing(slideAnim, {
@@ -325,20 +325,20 @@ const closeContact = () => {
                 <SearchComponent />
               </View>
             )} */}
-{showSearch && (
-  <>
-    {/* Invisible pressable background */}
-    <Pressable
-      onPress={() => setShowSearch(false)}
-      style={StyleSheet.absoluteFillObject}
-    />
+            {showSearch && (
+              <>
+                {/* Invisible pressable background */}
+                <Pressable
+                  onPress={() => setShowSearch(false)}
+                  style={StyleSheet.absoluteFillObject}
+                />
 
-    {/* Actual Search Component on top */}
-    <View style={styles.searchOverlay}>
-      <SearchComponent />
-    </View>
-  </>
-)}
+                {/* Actual Search Component on top */}
+                <View style={styles.searchOverlay}>
+                  <SearchComponent />
+                </View>
+              </>
+            )}
 
             <View style={styles.iconWrapper}>
               <TouchableOpacity
@@ -554,7 +554,10 @@ const closeContact = () => {
                 {t("settings")}
               </Text>
             </TouchableOpacity> */}
-              <TouchableOpacity style={styles.link} onPress={() => openContact()}>
+              <TouchableOpacity
+                style={styles.link}
+                onPress={() => openContact()}
+              >
                 <SimpleLineIcons
                   name="earphones-alt"
                   size={24}
@@ -599,126 +602,124 @@ const closeContact = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-           <View style={styles.versionBadge}>
-    <Text style={styles.versionText}>V.1.0.0</Text>
-  </View>
+            <View style={styles.versionBadge}>
+              <Text style={styles.versionText}>V.1.0.0</Text>
+            </View>
           </Animated.View>
         </Modal>
       )}
       <Modal
-  transparent
-  visible={contactVisible}      // ← tell the Modal to actually show
-  animationType="none"
->
-          {/* dark backdrop */}
+        transparent
+        visible={contactVisible} // ← tell the Modal to actually show
+        animationType="none"
+      >
+        {/* dark backdrop */}
+        <TouchableOpacity
+          style={styles.contactOverlay}
+          onPress={closeContact}
+          activeOpacity={1}
+        />
+
+        {/* full-screen sliding panel */}
+        <Animated.View
+          style={[
+            styles.contactPanel,
+            { transform: [{ translateX: contactSlideAnim }] },
+          ]}
+        >
+          {/* Header */}
+          <View style={styles.contactHeader}>
+            <TouchableOpacity onPress={closeContact} style={styles.backButton}>
+              <Ionicons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.contactTitle}> {t("contact")}</Text>
+            <View style={{ marginRight: 24 }}></View>
+          </View>
+
+          {/* Body */}
+          <View style={styles.contactBody}>
+            <TouchableOpacity style={styles.contactRow} onPress={handleCall}>
+              <Ionicons name="call" size={28} color="#445399" />
+              <Text style={styles.contactRowText}>+251 952999998</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.contactRow, { marginLeft: 32 }]}
+              onPress={handleCall2}
+            >
+              {/* <Ionicons name="call" size={28} color="#445399" /> */}
+              <Text style={styles.contactRowText}>+251 952999997</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.contactRow} onPress={handleEmail}>
+              <Ionicons name="mail" size={28} color="#445399" />
+              <Text style={styles.contactRowText}>info@yasonsc.com</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ marginTop: 320 }}></View>
+
+          {/* Footer */}
+          <View style={styles.contactFooter}>
+            <TouchableOpacity
+            // onPress={handleSocial("https://facebook.com/")}
+            >
+              <FontAwesome name="facebook-square" size={36} color="#445399" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSocial(
+                "https://tiktok.com/@yason.asbeza?_t=ZM-8whuIMb9qcw&_r=1"
+              )}
+            >
+              <FontAwesome5 name="tiktok" size={36} color="#445399" />
+            </TouchableOpacity>
+            <TouchableOpacity
+            // onPress={handleSocial("https://t.me/+Jy3gwzdJRIM3MjJk")}
+            >
+              <FontAwesome name="telegram" size={36} color="#445399" />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </Modal>
+
+      <Modal transparent visible={confirmVisible} animationType="fade">
+        {/* full-screen container */}
+        <View style={{ flex: 1 }}>
+          {/* backdrop */}
           <TouchableOpacity
-            style={styles.contactOverlay}
-            onPress={closeContact}
+            style={styles.overlay}
+            onPress={() => setConfirmVisible(false)}
             activeOpacity={1}
           />
 
-          {/* full-screen sliding panel */}
-          <Animated.View
-  style={[
-    styles.contactPanel,
-    { transform: [{ translateX: contactSlideAnim }] },
-  ]}
->
-            {/* Header */}
-            <View style={styles.contactHeader}>
+          {/* confirmation box above the overlay */}
+          <View style={styles.confirmBox}>
+            <Text style={styles.confirmTitle}>{t("sure")}?</Text>
+            <View style={styles.confirmActions}>
               <TouchableOpacity
-                onPress={closeContact}
-                style={styles.backButton}
+                style={styles.cancelBtn}
+                onPress={() => setConfirmVisible(false)}
+                disabled={loading}
               >
-                <Ionicons name="arrow-back" size={24} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.contactTitle}> {t("contact")}</Text>
-              <View style={{marginRight:24}}></View>
-            </View>
-
-            {/* Body */}
-            <View style={styles.contactBody}>
-              <TouchableOpacity style={styles.contactRow} onPress={handleCall}>
-                <Ionicons name="call" size={28} color="#445399" />
-                <Text style={styles.contactRowText}>+251 952999998</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.contactRow,{ marginLeft:32}]} onPress={handleCall2}>
-                {/* <Ionicons name="call" size={28} color="#445399" /> */}
-                <Text style={styles.contactRowText}>+251 952999997</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.contactRow} onPress={handleEmail}>
-                <Ionicons name="mail" size={28} color="#445399" />
-                <Text style={styles.contactRowText}>info@yasonsc.com</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{marginTop:320}}>
-
-            </View>
-
-            {/* Footer */}
-            <View style={styles.contactFooter}>
-              <TouchableOpacity 
-              // onPress={handleSocial("https://facebook.com/")}
-              >
-                <FontAwesome name="facebook-square" size={36} color="#445399" />
-              </TouchableOpacity>
-              <TouchableOpacity 
-              onPress={handleSocial("https://tiktok.com/@yason.asbeza?_t=ZM-8whuIMb9qcw&_r=1")}
-              >
-                <FontAwesome5 name="tiktok" size={36} color="#445399" />
+                <Text>{t("cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                // onPress={handleSocial("https://t.me/+Jy3gwzdJRIM3MjJk")}
+                style={styles.confirmBtn}
+                onPress={handleDeleteAccount}
+                disabled={loading}
               >
-                <FontAwesome name="telegram" size={36} color="#445399" />
+                <Text style={styles.confirmBtnText}>
+                  {loading ? t("wait") : t("yes")}
+                </Text>
               </TouchableOpacity>
             </View>
-          </Animated.View>
-        </Modal>
-     
-
-      <Modal transparent visible={confirmVisible} animationType="fade">
-  {/* full-screen container */}
-  <View style={{ flex: 1 }}>
-    {/* backdrop */}
-    <TouchableOpacity
-      style={styles.overlay}
-      onPress={() => setConfirmVisible(false)}
-      activeOpacity={1}
-    />
-
-    {/* confirmation box above the overlay */}
-    <View style={styles.confirmBox}>
-      <Text style={styles.confirmTitle}>{t("sure")}?</Text>
-      <View style={styles.confirmActions}>
-        <TouchableOpacity
-          style={styles.cancelBtn}
-          onPress={() => setConfirmVisible(false)}
-          disabled={loading}
-        >
-          <Text>{t("cancel")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.confirmBtn}
-          onPress={handleDeleteAccount}
-          disabled={loading}
-        >
-          <Text style={styles.confirmBtnText}>
-            {loading ? t("wait") : t("yes")}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
-
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-   searchOverlay: {
+  searchOverlay: {
     position: "absolute",
     top: 28, // adjust as needed
     right: 0, // if you want full screen overlay, or just position relative to your header
@@ -730,80 +731,79 @@ const styles = StyleSheet.create({
     // padding:0,
   },
   versionBadge: {
-  position: 'absolute',
-  bottom: 20,
-  left: 0,
-  right: 0,
-  alignItems: 'center',
-},
-versionText: {
-  color: '#445399',
-  fontSize: 14,
-},
- contactOverlay: {
-  flex: 1,
-  backgroundColor: 'rgba(0,0,0,0.4)',
-},
- overlay: {
-  flex: 1,
-  backgroundColor: "rgba(0, 0, 0, 0.8)",
-},
-contactPanel: {
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  width: '100%',
-  height: screenHeight,
-  backgroundColor: 'white',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: -2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 4,
-  elevation: 5,
-},
-contactHeader: {
-  height: 70,
-  backgroundColor: '#445399',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent:"space-between",
-  paddingHorizontal: 16,
-},
-backButton: {
-  marginRight: 12,
-  padding: 4,
-  borderWidth:1,
-  borderColor:"white",
-  borderRadius:55,
-
-},
-contactTitle: {
-  color: 'white',
-  fontSize: 20,
-  fontWeight: '600',
-},
-contactBody: {
-  flex: 1,
-  justifyContent: 'center',
-  paddingHorizontal: 24,
-},
-contactRow: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginVertical: 16,
-},
-contactRowText: {
-  marginLeft: 12,
-  fontSize: 18,
-  color: '#333',
-},
-contactFooter: {
-  flexDirection: 'row',
-  justifyContent: 'space-evenly',
-  paddingVertical: 24,
-  borderTopWidth: 1,
-  borderColor: '#eee',
-},
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  versionText: {
+    color: "#445399",
+    fontSize: 14,
+  },
+  contactOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  contactPanel: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: screenHeight,
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  contactHeader: {
+    height: 70,
+    backgroundColor: "#445399",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  backButton: {
+    marginRight: 12,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: 55,
+  },
+  contactTitle: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  contactBody: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  contactRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 16,
+  },
+  contactRowText: {
+    marginLeft: 12,
+    fontSize: 18,
+    color: "#333",
+  },
+  contactFooter: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    paddingVertical: 24,
+    borderTopWidth: 1,
+    borderColor: "#eee",
+  },
 
   confirmBox: {
     position: "absolute",
@@ -813,8 +813,8 @@ contactFooter: {
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 8,
-    zIndex:2,
-    elevation:2
+    zIndex: 2,
+    elevation: 2,
   },
   confirmTitle: { fontSize: 18, marginBottom: 20, textAlign: "center" },
   confirmActions: { flexDirection: "row", justifyContent: "space-between" },

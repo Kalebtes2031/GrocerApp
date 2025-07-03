@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,118 +8,52 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  FlatList,
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useLocalSearchParams } from "expo-router";
 import { useCart } from "@/context/CartProvider";
 import Toast from "react-native-toast-message";
-import Header from "@/components/Header";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useWatchlist } from "@/context/WatchlistProvider";
+import { fetchRelatedProducts } from "@/hooks/useFetch";
+import Card from "@/components/Card";
 
 const { width } = Dimensions.get("window");
 
 const ProductDetail = () => {
   const { t, i18n } = useTranslation("carddetail");
-  // const { product } = route.params;
   const { product: productString } = useLocalSearchParams();
   const product = productString ? JSON.parse(productString) : null;
+  const productId = product?.id;
   const [selectedImage, setSelectedImage] = useState(product?.image);
   const [quantity, setQuantity] = useState(1);
   const colorScheme = useColorScheme();
-  const { cart, addItemToCart } = useCart();
+  const { addItemToCart } = useCart();
   const router = useRouter();
-  // const [isFavorited, setIsFavorited] = useState(false);
-  const { watchlist, addToWatchlist, removeFromWatchlist, isFavorite } =
-    useWatchlist();
-const [related, setRelated] = useState([]);
+  const { addToWatchlist, removeFromWatchlist, isFavorite } = useWatchlist();
 
-// useEffect(() => {
-//   const loadRelated = async () => {
-//     try {
-//       const qs = `current_id=${product.variation.id}&category_id=${product.category.id}`;
-//       const data = await fetch(`/api/variations/related/?${qs}`);
-//       const variations = await data.json();
+  const [relatedProducts, setRelatedProducts] = useState([]);
+const [loadingRelated, setLoadingRelated] = useState(false);
+const [relatedError, setRelatedError] = useState(null);
 
-//       // Map into the same “product + variation” shape your Card wants
-//       const relatedItems = variations.map(v => ({
-//         id:          v.product.id,
-//         item_name:   v.product.item_name,
-//         item_name_amh: v.product.item_name_amh,
-//         image:       v.product.image,
-//         category:    { name: v.product.category.name, name_amh: v.product.category.name_amh },
-//         variation:   {
-//           id:           v.id,
-//           quantity:     v.quantity,
-//           unit:         v.unit,
-//           price:        v.price,
-//           in_stock:     v.in_stock,
-//           stock_quantity: v.stock_quantity,
-//           popularity:   v.popularity,
-//         },
-//       }));
-//       setRelated(relatedItems);
-//     } catch (err) {
-//       console.error("Failed to load related:", err);
-//     }
-//   };
+useEffect(() => {
+  if (!productId) return;
+  let mounted = true;
+  setLoadingRelated(true);
+  fetchRelatedProducts(productId)
+    .then(data => mounted && setRelatedProducts(data))
+    .catch(err => mounted && setRelatedError(err))
+    .finally(() => mounted && setLoadingRelated(false));
+  return () => { mounted = false; };
+}, [productId]);
 
-//   if (product) loadRelated();
-// }, [product]);
-
-  useEffect(() => {
-    console.log("try to work is hard:", watchlist);
-    console.log("try to work is nothard:", product);
-  }, []);
-  const isFavorited = isFavorite(product.variation.id);
-  const toggleFavorite = () => {
-    if (isFavorited) {
-      removeFromWatchlist(product.variation.id);
-      Toast.show({
-        type: "error",
-        text1: t("removed"),
-        visibilityTime: 2000,
-      });
-    } else {
-      addToWatchlist(product);
-      Toast.show({
-        type: "success",
-        text1: t("added"),
-        visibilityTime: 2000,
-      });
-    }
-  };
-  // Create array of all available images
-  const images = [
-    product.image,
-    product.image_back,
-    product.image_full,
-    product.image_left,
-    product.image_right,
-  ].filter((img) => img);
-
-  const handleAddToCart = () => {
-    if (product.variation.in_stock === false) {
-      Toast.show({
-        type: "error",
-        text1: t("out_stock"),
-        visibilityTime: 2000,
-      });
-      return;
-    }
-    console.log("quantity", quantity);
-    console.log("id", product.variation.id);
-    addItemToCart(product.variation.id, quantity);
-
-    Toast.show({
-      type: "success",
-      text1: t("added1"),
-    });
-    router.push("/(tabs)/cartscreen");
-  };
+const flattenedRelated = relatedProducts.flatMap(prod =>
+  prod.variations?.filter(v => v.in_stock).map(v => ({ ...prod, variation: v })) || []
+);
 
   if (!product) {
     return (
@@ -128,321 +62,120 @@ const [related, setRelated] = useState([]);
       </SafeAreaView>
     );
   }
-  // useEffect(()=> {
-  //   console.log("tg product", product)
-  // },[])
 
-  // console.log('ok now i wanna know if product is here: ', product)
+  const isFavorited = isFavorite(product.variation.id);
+  const toggleFavorite = () => {
+    if (isFavorited) {
+      removeFromWatchlist(product.variation.id);
+      Toast.show({ type: "error", text1: t("removed"), visibilityTime: 2000 });
+    } else {
+      addToWatchlist(product);
+      Toast.show({ type: "success", text1: t("added"), visibilityTime: 2000 });
+    }
+  };
+
+  const images = [
+    product.image,
+    product.image_back,
+    product.image_full,
+    product.image_left,
+    product.image_right,
+  ].filter(Boolean);
+
+  const handleAddToCart = () => {
+    if (!product.variation.in_stock) {
+      Toast.show({ type: "error", text1: t("out_stock"), visibilityTime: 2000 });
+      return;
+    }
+    addItemToCart(product.variation.id, quantity);
+    Toast.show({ type: "success", text1: t("added1") });
+    router.push("/(tabs)/cartscreen");
+  };
+  // Header + main content + related products
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: colorScheme === "dark" ? "#000" : "#fff" },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: colorScheme === "dark" ? "#000" : "#fff" }]}>      
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* <Header /> */}
-        <View
-          style={{
-            height: 130,
-            backgroundColor: "#fff",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "start",
-            paddingHorizontal: 20,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={{
-                marginRight: 10,
-                paddingHorizontal: 2,
-                width: 30,
-                height: 30,
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                borderWidth: 1,
-                borderRadius: 50,
-                borderColor: "#445399",
-                paddingVertical: 2,
-              }}
-              className="border w-10 h-10 flex flex-row justify-center items-center py-1 rounded-full border-gray-300"
-            >
+        {/* Existing Header */}
+        <View style={{ height: 130, backgroundColor: "#fff", flexDirection: "column", justifyContent: "center", paddingHorizontal: 2 }}>          
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 10, paddingHorizontal: 2, width: 30, height: 30, borderWidth: 1, borderRadius: 50, borderColor: "#445399", paddingVertical: 2, justifyContent: "center", alignItems: "center" }}>
               <Ionicons name="arrow-back" size={24} color="#445399" />
             </TouchableOpacity>
-            <Text
-              className="text-primary font-poppins-bold mt-6 mb-10"
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "#445399",
-                marginTop: 10,
-                marginBottom: 12,
-              }}
-            >
-              {i18n.language === "en"
-                ? product.category?.name
-                : product.category?.name_amh}
+            <Text style={{ fontSize: 18, fontWeight: 700, color: "#445399", marginTop: 10, marginBottom: 12 }}>
+              {i18n.language === "en" ? product.category.name : product.category.name_amh}
             </Text>
-            <View style={{ width: 50 }}></View>
+            <View style={{ width: 50 }} />
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-            // className="flex flex-row justify-between items-center"
-          >
-            <Text
-              className="text-primary font-poppins-bold"
-              style={{
-                fontFamily: "Poppins-bold",
-                color: "#445399",
-                fontSize: 18,
-                fontWeight: 700,
-                textAlign: "center",
-              }}
-            >
-              {i18n.language === "en"
-                ? product.item_name
-                : product.item_name_amh}
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={{ fontFamily: "Poppins-bold", color: "#445399", fontSize: 18, fontWeight: 700 }}>
+              {i18n.language === "en" ? product.item_name : product.item_name_amh}
             </Text>
-            {/* Price and Stock Status */}
-            <View style={styles.priceContainer} className="mt-6">
-              {/* <Text style={styles.priceText}>ETB {product.price}</Text> */}
-              <View
-                style={[
-                  styles.stockStatus,
-                  {
-                    backgroundColor: product.variation?.in_stock
-                      ? "#4CAF50"
-                      : "#F44336",
-                  },
-                ]}
-              >
+            <View style={styles.priceContainer}>
+              <View style={[styles.stockStatus, { backgroundColor: product.variation.in_stock ? "#4CAF50" : "#F44336" }]}>
                 <Text style={styles.stockText}>
-                  {product.variation?.in_stock
-                    ? i18n.language === "en"
-                      ? "In Stock"
-                      : "ለሽያጭ ቀርቧል"
-                    : i18n.language === "en"
-                    ? "Out of Stock"
-                    : "ለሽያጭ አልቅረበም"}
+                  {product.variation.in_stock ? (i18n.language === "en" ? "In Stock" : "ለሽያጭ ቀርቧል") : (i18n.language === "en" ? "Out of Stock" : "ለሽያጭ አልቅረበም")}
                 </Text>
               </View>
             </View>
           </View>
         </View>
+
         {/* Main Product Image */}
         <View style={styles.mainImageContainer}>
-          <Image
-            source={{
-              uri:
-                selectedImage ||
-                product.image ||
-                "https://via.placeholder.com/300",
-            }}
-            style={styles.mainImage}
-            resizeMode="contain"
-          />
+          <Image source={{ uri: selectedImage || product.image }} style={styles.mainImage} resizeMode="contain" />
           <View style={styles.infoOverlay}>
-            <Text
-              // className="text-primary absolute left-10 bottom-1 font-poppins-bold mt-6 mb-10"
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: "#fff",
-                marginTop: 10,
-                marginBottom: 12,
-                // position: "absolute",
-                // left: 10,
-                // bottom: 10,
-                fontFamily: "Poppins-bold",
-                fontWeight: 700,
-                zIndex: 10,
-                borderBottomRadius: 8,
-              }}
-            >
-              {i18n.language === "en" ? t("br") : ""}{" "}
-              {parseInt(product.variation?.price)}{" "}
-              {i18n.language === "amh" ? t("br") : ""}
+            <Text style={{ fontSize: 18, fontWeight: 700, color: "#fff", fontFamily: "Poppins-bold" }}>
+              {i18n.language === "en" ? t("br") : ""} {parseInt(product.variation.price)} {i18n.language === "amh" ? t("br") : ""}
             </Text>
-            <View
-              style={styles.quantityContainer}
-              // className="absolute right-10 bottom-6"
-            >
-              <View style={{borderWidth:1,
-    borderColor:'#445399',
-    borderRadius:44,
-    zIndex:10,
-    margin:6}}>
-
-              <TouchableOpacity
-                onPress={() => setQuantity(Math.max(1, quantity - 1))}
-                style={styles.quantityButton}
-              >
-                <MaterialIcons name="remove" size={24} color="#445399" />
-              </TouchableOpacity>
+            <View style={styles.quantityContainer}>
+              <View style={{ borderWidth: 1, borderColor: "#445399", borderRadius: 44, margin: 6 }}>
+                <TouchableOpacity onPress={() => setQuantity(q => Math.max(1, q-1))} style={styles.quantityButton}>
+                  <MaterialIcons name="remove" size={24} color="#445399" />
+                </TouchableOpacity>
               </View>
               <Text style={styles.quantityText}>{quantity}</Text>
-              <View style={{borderWidth:1,
-    borderColor:'#445399',
-    borderRadius:44,
-    zIndex:10,
-    margin:6}}>
-
-              <TouchableOpacity
-                onPress={() => setQuantity(quantity + 1)}
-                style={styles.quantityButton}
-              >
-                <MaterialIcons name="add" size={24} color="#445399" />
-              </TouchableOpacity>
-    </View>
+              <View style={{ borderWidth: 1, borderColor: "#445399", borderRadius: 44, margin: 6 }}>
+                <TouchableOpacity onPress={() => setQuantity(q => q+1)} style={styles.quantityButton}>
+                  <MaterialIcons name="add" size={24} color="#445399" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
 
         {/* Image Gallery */}
         {images.length > 0 && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.galleryContainer}
-          >
-            {images.map((img, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => setSelectedImage(img)}
-                style={[
-                  styles.galleryImageContainer,
-                  selectedImage === img && styles.selectedImageContainer,
-                ]}
-              >
-                <Image
-                  source={{ uri: img }}
-                  style={styles.galleryImage}
-                  resizeMode="cover"
-                />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.galleryContainer}>
+            {images.map((img, idx) => (
+              <TouchableOpacity key={idx} onPress={() => setSelectedImage(img)} style={[styles.galleryImageContainer, selectedImage === img && styles.selectedImageContainer]}>
+                <Image source={{ uri: img }} style={styles.galleryImage} resizeMode="cover" />
               </TouchableOpacity>
             ))}
           </ScrollView>
         )}
 
-        {/* Product Details Container */}
-        <View style={styles.detailsContainer}>
-          {/* Category Badge */}
-          {/* <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{product.category?.name}</Text>
-          </View> */}
-
-          {/* Product Title */}
-          {/* <Text
-            style={[
-              styles.title,
-              { color: colorScheme === "dark" ? "#fff" : "#000" },
-            ]}
-          >
-            {product.item_name}
-          </Text> */}
-
-          {/* Amharic Name */}
-          {/* {product.item_name_amh && (
-            <Text style={[styles.amharicText, { color: colorScheme === 'dark' ? '#ccc' : '#666' }]}>
-              {product.item_name_amh}
-            </Text>
-          )} */}
-
-          {/* Product Description Section */}
-          {/* <View style={styles.section}>
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: colorScheme === "dark" ? "#fff" : "#000" },
-              ]}
-            >
-              {t('detail')}
-            </Text>
-            <Text
-              style={[
-                styles.description,
-                { color: colorScheme === "dark" ? "#ccc" : "#666" },
-              ]}
-            >
-              Oranges are rich in vitamin C, which is essential for the immune
-              system and overall health. They also contain dietary fiber, which
-              aids digestion, as well as other vitamins and minerals like
-              vitamin A, potassium, and antioxidants.
-            </Text>
-          </View> */}
-
-          {/* Size Chart (Add your actual size data) */}
-          {/* <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-              Available Sizes
-            </Text>
-            <View style={styles.sizeContainer}>
-              {['S', 'M', 'L', 'XL'].map((size) => (
-                <TouchableOpacity key={size} style={styles.sizeButton}>
-                  <Text style={styles.sizeText}>{size}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View> */}
-        </View>
+       {/* Related Section */}
+        {/* {loadingRelated && <Text style={styles.statusText}>{t("loading_related")}</Text>}
+        {relatedError && <Text style={[styles.statusText, { color: 'red' }]}>{`Error: ${relatedError.message}`}</Text>}
+        {!loadingRelated && !relatedError && flattenedRelated.length > 0 && (
+          <Text style={styles.relatedTitle}>{t("related")}</Text>
+        )}
+        <FlatList
+          data={flattenedRelated}
+          keyExtractor={(item) => item.variation.id.toString()}
+          numColumns={2}
+          columnWrapperStyle={styles.relatedWrapper}
+          renderItem={({ item }) => <Card product={item} />}
+          scrollEnabled={false}
+        /> */}
       </ScrollView>
-      {/* {related.length > 0 && (
-  <>
-    <Text style={styles.sectionTitle}>{t("related_products")}</Text>
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 16 }}
-    >
-      {related.map(item => (
-        <View key={item.variation.id} style={{ marginRight: 12 }}>
-          <Card
-            product={item}
-            // onAdded / inWishlistView etc. if you want cart/wishlist actions here
-          />
-        </View>
-      ))}
-    </ScrollView>
-  </>
-)} */}
-
 
       {/* Fixed Bottom Action Bar */}
-      <View
-        style={[
-          styles.actionBar,
-          { backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#fff" },
-        ]}
-      >
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={toggleFavorite}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <MaterialIcons
-            name={isFavorited ? "favorite" : "favorite-border"}
-            size={34}
-            color="#445399"
-          />
+      <View style={[styles.actionBar, { backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#fff" }]}>        
+        <TouchableOpacity style={styles.iconButton} onPress={toggleFavorite} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <MaterialIcons name={isFavorited ? "favorite" : "favorite-border"} size={34} color="#445399" />
         </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={handleAddToCart}
-          style={styles.addToCartButton}
-        >
+        <TouchableOpacity onPress={handleAddToCart} style={styles.addToCartButton}>
           <Text style={styles.addToCartText}>{t("add")}</Text>
         </TouchableOpacity>
       </View>
@@ -452,152 +185,57 @@ const [related, setRelated] = useState([]);
 
 const styles = StyleSheet.create({
   infoOverlay: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(68, 83, 153, 0.95)',
+    paddingVertical: 18,
+    backgroundColor: "rgba(68, 83, 153, 0.95)",
     borderBottomRightRadius: 6,
     borderBottomLeftRadius: 6,
   },
   quantityContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 10,
     right: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     borderRadius: 8,
     padding: 2,
-    zIndex: 10,            // ✔ fixes stacking order
-    elevation: 5,          // add on Android so zIndex actually works
+    zIndex: 10,
+    elevation: 5,
   },
-  quantityButton: {
-    // padding: 2,
-    
-  },
+  quantityButton: {},
   quantityText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     minWidth: 24,
-    textAlign: 'center',
-    marginHorizontal: 6,   // ← replaces `gap: 12`
+    textAlign: "center",
+    marginHorizontal: 6,
   },
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 13,
-    paddingBottom: 80, // Space for fixed action bar
-  },
+  container: { flex: 1 },
+  scrollContent: { paddingHorizontal: 13, paddingBottom: 80 },
   mainImageContainer: {
     height: width * 0.8,
-    // backgroundColor: "rgba(150, 166, 234, 0.4)",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 44,
     borderRadius: 8,
     marginBottom: 16,
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 6,
-    // elevation: 3,
-    borderRadius: 8,
-    // borderRadius: 8,
     borderWidth: 1,
     borderColor: "#445399",
     position: "relative",
   },
-  mainImage: {
-    width: "80%",
-    height: "60%",
-    borderRadius: 8,
-    position: "absolute",
-    top: 25,
-  },
-  galleryContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  galleryImageContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 12,
-    borderWidth: 2,
-    borderColor: "transparent",
-    overflow: "hidden",
-  },
-  selectedImageContainer: {
-    borderColor: "#445399",
-  },
-  galleryImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 8,
-  },
-  detailsContainer: {
-    paddingHorizontal: 16,
-  },
-  categoryBadge: {
-    backgroundColor: "#445399",
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 15,
-    alignSelf: "flex-start",
-    marginBottom: 12,
-  },
-  categoryText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-  amharicText: {
-    fontSize: 16,
-    marginBottom: 16,
-    fontFamily: "NotoSansEthiopic-Regular",
-  },
-  priceContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-    marginTop: 14,
-  },
-  priceText: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#445399",
-  },
-  stockStatus: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-  stockText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  section: {
-    marginBottom: 24,
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
+  mainImage: { width: "80%", height: "60%", borderRadius: 8, position: "absolute", top: 25 },
+  galleryContainer: { paddingHorizontal: 16, paddingBottom: 16 },
+  galleryImageContainer: { width: 80, height: 80, borderRadius: 8, marginRight: 12, borderWidth: 2, borderColor: "transparent", overflow: "hidden" },
+  selectedImageContainer: { borderColor: "#445399" },
+  galleryImage: { width: "100%", height: "100%", borderRadius: 8 },
+  priceContainer: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8, marginTop: 14 },
+  stockStatus: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8 },
+  stockText: { color: "#fff", fontSize: 12, fontWeight: "500" },
   actionBar: {
     position: "absolute",
     bottom: 0,
@@ -607,7 +245,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: "#fff",
     borderTopWidth: 1,
     borderTopColor: "#eee",
     shadowColor: "#000",
@@ -618,92 +255,13 @@ const styles = StyleSheet.create({
     gap: 90,
     paddingLeft: 50,
   },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 14,
-    lineHeight: 22,
-  },
-  sizeContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
-  sizeButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  sizeText: {
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  // actionBar: {
-  //   position: 'absolute',
-  //   bottom: 0,
-  //   left: 0,
-  //   right: 0,
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   justifyContent: 'space-between',
-  //   padding: 16,
-  //   borderTopWidth: 1,
-  //   borderTopColor: '#eee',
-  //   shadowColor: '#000',
-  //   shadowOffset: { width: 0, height: -2 },
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 4,
-  //   elevation: 5,
-  // },
-  // quantityContainer: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   gap: 12,
-  //   backgroundColor: "#f5f5f5",
-  //   borderRadius: 8,
-  //   padding: 2,
-  //   position: "absolute",
-  //   right: 10,
-  //   bottom: 10,
-  //   zindex:10
-  // },
-  // quantityButton: {
-  //   padding: 8,
-  // },
-  // quantityText: {
-  //   fontSize: 18,
-  //   fontWeight: "600",
-  //   minWidth: 24,
-  //   textAlign: "center",
-  // },
-  addToCartButton: {
-    flex: 1,
-    backgroundColor: "#445399",
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginLeft: 12,
-    width: 10,
-  },
-  addToCartText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  iconButton: { padding: 8 },
+  addToCartButton: { flex: 1, backgroundColor: "#445399", borderRadius: 8, paddingVertical: 16, alignItems: "center", marginLeft: 12 },
+  addToCartText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  errorText: { color: "red", textAlign: "center", marginTop: 20 },
+  statusText: { margin: 16, color: '#445399' },
+  relatedTitle: { fontSize: 18, fontWeight: '700', marginLeft: 16, marginVertical: 12, color: '#445399' },
+  relatedWrapper: { justifyContent: 'space-between', paddingHorizontal: 13, marginBottom: 16 },
 });
 
 export default ProductDetail;

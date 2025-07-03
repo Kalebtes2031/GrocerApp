@@ -4,6 +4,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  ScrollView,
   StyleSheet,
 } from "react-native";
 import { useWatchlist } from "@/context/WatchlistProvider";
@@ -74,27 +75,26 @@ const WatchlistScreen = () => {
         </View>
       ) : (
         // Render using a FlatList or map method
-        <View style={styles.popularContainer}>
-          {watchlist.length > 0 ? (
-            watchlist.map((product, index) => (
-              <View
-                key={product.variation.id || index}
-                style={styles.cardWrapper}
-              >
-                <Card
-                  key={product.variation.id}
-                  product={product}
-                  // this hook fires *after* default add-to-cart
-                  onAdded={handleAddedFromWishlist}
-                  onRemoveWishlist={removeFromWatchlist}
-                   inWishlistView={true}   
-                />
-              </View>
-            ))
-          ) : (
-            <Text style={styles.loadingText}>{t("loading")}</Text>
+        <FlatList
+          data={watchlist}
+          keyExtractor={(item) => item.variation.id.toString()}
+          numColumns={2}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+            paddingHorizontal: 16,
+          }}
+          contentContainerStyle={{ paddingBottom: 36 }}
+          renderItem={({ item }) => (
+            <View style={styles.cardWrapper}>
+              <Card
+                product={item}
+                onAdded={handleAddedFromWishlist}
+                onRemoveWishlist={removeFromWatchlist}
+                inWishlistView={true}
+              />
+            </View>
           )}
-        </View>
+        />
       )}
     </View>
   );

@@ -480,7 +480,8 @@ const Order = () => {
           </View>
 
           {/* Payment Action Button */}
-          {order.payment_status === "Pending" && (
+          {order.payment_status === "Pending"&& 
+          order.payment_option==="Cash" && (
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.fullPayment]}

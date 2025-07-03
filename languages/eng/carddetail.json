@@ -6,5 +6,7 @@
    "removed": "Removed from Watchlist",
   "added": "Added to Watchlist",
   "added1": "Product added to cart",
+  "loading_related": "Loading",
+  "related": "Related Products",
   "out_stock":"Item is out of stock"
 }

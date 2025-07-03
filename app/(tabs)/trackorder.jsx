@@ -598,11 +598,35 @@ const [rateOrderId, setRateOrderId] = useState(null);
               renderSectionFooter={({ section }) => {
                 if (section.data.length === 0) {
                   return (
-                    <View style={styles.emptySectionContainer}>
-                      <Text style={styles.emptySectionText}>
-                        {t(`no${tab}delivery`)}
-                      </Text>
-                    </View>
+                   <Animated.View 
+        style={styles.emptySectionContainer}
+        // entering={FadeIn.duration(600)}
+      >
+        {/* <View style={styles.emptyIllustration}>
+          <MaterialIcons 
+            name={tab === "active" ? "pending" : "check-circle"} 
+            size={60} 
+            color="#D1D5DB" 
+          />
+        </View> */}
+        <Text style={styles.emptySectionTitle}>
+          {t(`no${tab}delivery`)}
+        </Text>
+        {/* <Text style={styles.emptySectionText}>
+          {t(`no${tab}deliverySubtitle`)}
+        </Text> */}
+        
+        {/* {tab === "active" && (
+          <TouchableOpacity 
+            style={styles.exploreButton}
+            onPress={() => navigation.navigate('Shop')}
+          >
+            <Text style={styles.exploreButtonText}>
+              {t('exploreProducts')}
+            </Text>
+          </TouchableOpacity>
+        )} */}
+      </Animated.View>
                   );
                 }
                 return null;
@@ -795,17 +819,49 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
+  // emptySectionContainer: {
+  //   flex: 1,
+  //   justifyContent: "center",
+  //   alignItems: "center",
+  //   paddingVertical: 48,
+  // },
+  // emptySectionText: {
+  //   fontSize: 16,
+  //   color: COLORS.muted,
+  //   textAlign: "center",
+  //   paddingHorizontal: 16,
+  // },
   emptySectionContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 30,
+  },
+  emptyIllustration: {
+    backgroundColor: '#F9FAFB',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  emptySectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 8,
   },
   emptySectionText: {
-    fontSize: 16,
-    color: COLORS.muted,
-    textAlign: "center",
-    paddingHorizontal: 16,
+    fontSize: 15,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 22,
+    maxWidth: 300,
   },
   tabContainer: {
     flexDirection: "row",
