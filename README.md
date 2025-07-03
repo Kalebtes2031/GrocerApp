@@ -32,7 +32,7 @@ Kabth is a mobile shopping app built with **React Native** and **Expo**, allowin
 ### 1. **Clone the Repository**
 ```bash
 git clone https://github.com/kalebtes2031/FinalizedYason.git
-cd kabth-customer-app
+cd FinalizedYason
 ```
 
 ### 2. Install dependencies
