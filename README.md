@@ -1,6 +1,6 @@
-# 🛒 Kabth – Customer Shopping App
+# 🛒 Grocer – Customer Shopping App
 
-Kabth is a mobile shopping app built with **React Native** and **Expo**, allowing customers to browse and purchase products from **Yason Supermarket**. It features real-time order tracking with map integration and a smooth shopping experience from cart to checkout.
+Kabth is a mobile shopping app built with **React Native** and **Expo**, allowing customers to browse and purchase products from **A Supermarket**. It features real-time order tracking with map integration and a smooth shopping experience from cart to checkout.
 
 ---
 
@@ -31,8 +31,8 @@ Kabth is a mobile shopping app built with **React Native** and **Expo**, allowin
 
 ### 1. **Clone the Repository**
 ```bash
-git clone https://github.com/kalebtes2031/FinalizedYason.git
-cd FinalizedYason
+git clone https://github.com/kalebtes2031/GrocerApp.git
+cd GrocerApp
 ```
 
 ### 2. Install dependencies
@@ -65,9 +65,9 @@ cd FinalizedYason
 
 🤝 Related Projects
 
-[Kabth Delivery App](https://github.com/Kalebtes2031/FinalizedDeliveryApp)
+[Grocer Delivery App](https://github.com/Kalebtes2031/GrocerDeliveryApp)
 
-[Kabth Admin Panel](https://github.com/Kalebtes2031/YasonAdminDashboard)
+[Grocer Admin Panel](https://github.com/Kalebtes2031/GrocerAdminDashboard)
 
 [Kabth API](https://github.com/Kalebtes2031/yason/tree/main/EcommerceBackend/ecommerce_backend)
 
