@@ -15,5 +15,7 @@
   "signin_with": "Welcome",
   "dont":"Don't have an account?",
     "signin":"Sign In",
-    "fill":"Please fill all fields"
+    "fill":"Please fill all fields",
+      "continue":"Continue with Google",
+      "or" :"OR"
 }

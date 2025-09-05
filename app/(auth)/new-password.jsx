@@ -14,7 +14,8 @@ import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
-const baseUrl = 'https://yasonbackend.yasonsc.com/account/';
+// const baseUrl = 'https://yasonbackend.yasonsc.com/account/';
+const baseUrl = 'https://backendsupermarket.activetechet.com/account/';
 
 export default function NewPasswordScreen() {
   const { t } = useTranslation('newpass');

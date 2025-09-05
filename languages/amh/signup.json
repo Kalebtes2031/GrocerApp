@@ -6,11 +6,11 @@
   "username": "የመለያ ስም",
   "email": "ኢሜይል",
   "password": "የይለፍ ቃል",
-  "by": "ይመዝገቡ የሚለውን ሲጫኑ",
-  "by2": "ደንቦችንና የአገልግሎት ውሎች ",
+  "by": "በያሶን",
+  "by2": "ደንቦችና የአገልግሎት ውሎች ",
   "signup": "ይመዝገቡ",
   "submit": "ይላኩ",
-  "terms": "ተቀብለዋል ማለት ነው፡፡ ",
+  "terms": "ተስማምቻለው።",
   "already": "ቀድመው ተመዝግበዋል?",
   "login": "ይግቡ!",
   "terms_and_conditions": "ወቅታዊ የስርዓት እና የምርት ደንበኞች መመሪያዎችን እገነዘባለሁ",
@@ -20,5 +20,9 @@
 "invalid_email": "እባክዎ ትክክለኛ የኢሜይል አድራሻ ያስገቡ (ለምሳሌ user@example.com).",
   "invalid_phone": "እባክዎ የኢትዮጵያ ስልክ ቁጥር ያስገቡ (ለምሳሌ 09XXXXXXXX ወይም +2519XXXXXXX).",
    "confirm_password": "የይለፍ ቃልዎን ያረጋግጡ",
-  "password_mismatch": "የይለፍ ቃሎቹ አይመሳሰሉም"
+  "password_mismatch": "የይለፍ ቃሎቹ አይመሳሰሉም",
+  "continue":"በ Google ይቀጥሉ",
+  "or" :"ወይም",
+  "terms_required": "እባክዎ ደንቦችንና የአገልግሎት ውሎች ያረጋግጡ"
+
 }

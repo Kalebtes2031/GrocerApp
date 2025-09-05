@@ -123,19 +123,14 @@ const Welcome = () => {
   if (!showOnboarding) return <Redirect href="/(auth)/sign-in" />;
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
-      }}
-    >
-      <View style={{ flex: 1, paddingHorizontal: 20 }}>
+    <View style={{ flex: 1, backgroundColor: colorScheme === "dark" ? "#000" : "#fff", paddingTop:20 }}  >
+      <View style={{ flex: 1, paddingHorizontal: 20, marginBottom:10,  }}>
         {/* Header */}
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: 20,
+            // marginTop: 20,
           }}
         >
           {currentSlide > 0 && (
@@ -157,7 +152,9 @@ const Welcome = () => {
             </TouchableOpacity>
           )}
           {currentSlide < slides.length - 1 && (
-            <TouchableOpacity onPress={handleSkip}>
+            <TouchableOpacity onPress={handleSkip} 
+            style={{marginBottom:8}}
+            >
               <Text style={{ color: "#445399", fontSize: 16 }}>
                 {t("onboarding.skip")}
               </Text>
@@ -182,13 +179,14 @@ const Welcome = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 flex: 1,
+                // backgroundColor:"red"
               }}
             >
               <Image
                 source={item.image}
                 style={{
                   width: SCREEN_WIDTH * 0.8,
-                  height: 260,
+                  height: 240,
                   resizeMode: "contain",
                 }}
                 accessibilityLabel={item.title}
@@ -272,7 +270,7 @@ const Welcome = () => {
                   borderWidth: 2,
                   borderColor: "#445399",
                   borderRadius: 32,
-                  paddingVertical: 8,
+                  paddingVertical: 10,
                   alignItems: "center",
                   width: 304,
                 }}
@@ -317,12 +315,12 @@ const Welcome = () => {
 
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <Toast />
-    </SafeAreaView>
+      </View>
   );
 };
 // Responsive size calculation
 const responsiveSize = (size) => {
-  const scaleFactor = widths / 375; // Base width from design (e.g., iPhone 375)
+  const scaleFactor = widths / 375; 
   return size * scaleFactor;
 };
 const styles = StyleSheet.create({

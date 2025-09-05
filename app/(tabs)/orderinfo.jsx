@@ -326,7 +326,7 @@ function formatTimeOnly(dateString) {
             >
               <Text>{t("name")} : </Text>
               <Text style={{ textTransform: "uppercase" }}>
-                {ourOrder.first_name} {ourOrder.last_name}
+                {ourOrder?.first_name} {ourOrder?.last_name}
               </Text>
             </View>
 

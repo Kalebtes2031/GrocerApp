@@ -13,7 +13,8 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
 
-const baseUrl = "https://yasonbackend.yasonsc.com/account/"; // Adjust to your API base URL
+// const baseUrl = "https://yasonbackend.yasonsc.com/account/"; // Adjust to your API base URL
+const baseUrl = "https://backendsupermarket.activetechet.com/account/"; // Adjust to your API base URL
 
 export default function ForgotPasswordScreen() {
   const { t, i18n } = useTranslation(["forgot", "errormessage"]);

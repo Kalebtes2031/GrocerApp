@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { fetchCart, addToCart, updateCartItem, removeCartItem } from "@/hooks/useFetch";
+import {
+  fetchCart,
+  addToCart,
+  updateCartItem,
+  removeCartItem,
+  bulkAddToCart,
+} from "@/hooks/useFetch";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const CartContext = createContext();
@@ -50,7 +56,10 @@ export const CartProvider = ({ children }) => {
 
   // Check if an item variation is in the cart
   const isInCart = (variationId) => {
-    return Array.isArray(cart.items) && cart.items.some((item) => item.variations.id === variationId);
+    return (
+      Array.isArray(cart.items) &&
+      cart.items.some((item) => item.variations.id === variationId)
+    );
   };
 
   // Add an item to the cart
@@ -59,7 +68,10 @@ export const CartProvider = ({ children }) => {
     await addToCart(productId, quantity);
     await loadCartData();
     // Put the newly added variation at the front of the order
-    setItemOrder((prevOrder) => [productId, ...prevOrder.filter((id) => id !== productId)]);
+    setItemOrder((prevOrder) => [
+      productId,
+      ...prevOrder.filter((id) => id !== productId),
+    ]);
   };
 
   // Update item quantity
@@ -88,6 +100,24 @@ export const CartProvider = ({ children }) => {
     setItemOrder((prevOrder) => prevOrder.filter((id) => id !== itemId));
   };
 
+  const reorderItems = async (orderedItems) => {
+  if (!isLogged) return;
+
+  try {
+    await bulkAddToCart(
+      orderedItems.items.map((item) => ({
+        variations_id: item.variant.id,
+        quantity: item.quantity,
+      }))
+    );
+    // Refresh cart once
+    await loadCartData();
+  } catch (error) {
+    console.error("Failed to reorder items:", error);
+  }
+};
+
+
   return (
     <CartContext.Provider
       value={{
@@ -100,6 +130,7 @@ export const CartProvider = ({ children }) => {
         addItemToCart,
         updateItemQuantity,
         removeItemFromCart,
+        reorderItems,
       }}
     >
       {children}

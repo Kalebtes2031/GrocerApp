@@ -61,9 +61,18 @@ export const WatchlistProvider = ({ children }) => {
   }
 };
 
+const clearWatchlist = async () => {
+  try {
+    await AsyncStorage.removeItem("watchlist");
+    setWatchlist([]); // <== This is the key part
+  } catch (error) {
+    console.error("Failed to clear watchlist:", error);
+  }
+};
+
   return (
     <WatchlistContext.Provider
-      value={{ watchlist, addToWatchlist, removeFromWatchlist, isFavorite, toggleWatchlist }}
+      value={{ watchlist, addToWatchlist, removeFromWatchlist, isFavorite, toggleWatchlist, clearWatchlist }}
     >
       {children}
     </WatchlistContext.Provider>

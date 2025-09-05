@@ -79,8 +79,8 @@ const CheckoutPage = () => {
       // console.log("Customer Profile:", profile);
 
       setPhone(user.phone_number || "");
-      setFirstName(user.first_name || "");
-      setLastName(user.last_name || "");
+      setFirstName(user?.first_name || "");
+      setLastName(user?.last_name || "");
       setEmail(user.email || "");
     } catch (error) {
       console.error("Error fetching customer profile:", error);

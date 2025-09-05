@@ -14,7 +14,8 @@ import Toast from "react-native-toast-message";
 import { useTranslation } from "react-i18next";
 // import i18n from "@/i18n";
 
-const baseUrl = "https://yasonbackend.yasonsc.com/account/";
+const baseUrl = "https://backendsupermarket.activetechet.com/account/";
+// const baseUrl = "https://yasonbackend.yasonsc.com/account/";
 
 export default function OTPVerificationScreen() {
   const { t, i18n } = useTranslation("otpverify");

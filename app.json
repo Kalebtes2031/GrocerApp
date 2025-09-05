@@ -18,7 +18,12 @@
       },
       "edgeToEdgeEnabled": false,
       "package": "com.abeniexpo.MyFreshApp",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+       "notification": {
+        "icon": "./assets/images/yasonlogowhite1.png",
+        "color": "#001A6E",
+        "sound": true
+      }
     },
     "web": {
       "bundler": "metro",
@@ -29,10 +34,11 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "https://yasonbackend.yasonsc.com",
       "router": {},
+      "androidClientId": "704310350921-rln2cabt9hosenab9ns2m48eebu2h6lk.apps.googleusercontent.com",
+      "webClientId": "704310350921-iob206nohtdnadmt6lpes2qvhck3k2dv.apps.googleusercontent.com",
       "eas": {
-        "projectId": "789a03e9-bace-4215-88c5-9c710b7eec33"
+        "projectId": "3efb7458-ec3b-4b25-b0af-2b83273d496f"
       }
     }
   }

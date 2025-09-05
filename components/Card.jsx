@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -19,9 +19,14 @@ import { useTranslation } from "react-i18next";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.4;
 
-const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) => {
+const Card = ({
+  product,
+  onAdded,
+  onRemoveWishlist,
+  inWishlistView = false,
+}) => {
   const { t, i18n } = useTranslation("card");
-  const { cart, addItemToCart, isInCart } = useCart();
+  const { cart, addItemToCart, isInCart, removeItemFromCart } = useCart();
   const { addToWatchlist, removeFromWatchlist, isFavorite } = useWatchlist();
   // const [isFavorited, setIsFavorited] = useState(false);
   const colorScheme = useColorScheme();
@@ -29,6 +34,12 @@ const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) =>
   // const [added, setAdded] = useState(false);
   // protect against items being undefined, and variation missing:
   const added = isInCart(product.variation.id);
+  const inCart = isInCart(product.variation.id);
+
+  const [optimisticInCart, setOptimisticInCart] = useState(inCart);
+  useEffect(() => {
+    setOptimisticInCart(inCart); // keep it in sync if cart changes elsewhere
+  }, [inCart]);
 
   const isFavorited = isFavorite(product.variation.id);
 
@@ -56,7 +67,7 @@ const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) =>
     );
   };
 
-   const handleRemoveWishlist = (e) => {
+  const handleRemoveWishlist = (e) => {
     e.stopPropagation();
     if (onRemoveWishlist) {
       onRemoveWishlist(product.variation.id);
@@ -115,33 +126,36 @@ const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) =>
 
         {/* Top Icons */}
         <View style={styles.topIconsContainer}>
-       {  ( !inWishlistView || !added ) && (
-           <TouchableOpacity
-            onPress={(e) => {
-              e.stopPropagation();
-              if (!added) handleAddCartClick();
-            }}
-            // style={[styles.iconButton, styles.cartButton]}
-            disabled={added}
-            style={[
-              styles.iconButton2,
-              // added && { opacity: 0.6 },
-              { backgroundColor: added ? "#445399" : "#445399" },
-            ]}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <AntDesign
-              name={added ? "checkcircleo" : "shoppingcart"}
-              size={24}
-              color={added ? "rgba(249, 244, 247, 0.8)" : "#fff"}
-              style={{
-                zIndex: 10,
-                // elevation: 1,
+          {(!inWishlistView || !added) && (
+            <TouchableOpacity
+              onPress={() => {
+                // immediately update the icon
+                setOptimisticInCart(!optimisticInCart);
+
+                if (optimisticInCart) {
+                  // was in cart, now optimistically remove
+                  removeItemFromCart(product.variation.id).catch(() => {
+                    // revert on error
+                    setOptimisticInCart(true);
+                  });
+                } else {
+                  // was not in cart, now optimistically add
+                  addItemToCart(product.variation.id, 1).catch(() => {
+                    // revert on error
+                    setOptimisticInCart(false);
+                  });
+                }
               }}
-            />
-          </TouchableOpacity>
-       )}
-       {/* --- REMOVE‐FROM‐WISHLIST ICON (only if prop exists) --- */}
+              style={[styles.iconButton2, { backgroundColor: "#445399" }]}
+            >
+              <AntDesign
+                name={optimisticInCart ? "checkcircleo" : "shoppingcart"}
+                size={24}
+                color={optimisticInCart ? "rgba(249, 244, 247, 0.8)" : "#fff"}
+              />
+            </TouchableOpacity>
+          )}
+          {/* --- REMOVE‐FROM‐WISHLIST ICON (only if prop exists) --- */}
           {/* {onRemoveWishlist && (
             <TouchableOpacity
               style={styles.iconButton}
@@ -149,7 +163,7 @@ const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) =>
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <MaterialIcons
-                name="clear"                // a little “×” icon
+                name="clear"               
                 size={24}
                 color="#EB5B00"
               />
@@ -166,7 +180,6 @@ const Card = ({ product, onAdded, onRemoveWishlist,inWishlistView = false, }) =>
               color="#445399"
             />
           </TouchableOpacity>
-          
         </View>
 
         {/* Product Info Overlay */}

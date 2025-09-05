@@ -1,4 +1,4 @@
-import { confirmOrder, fetchOrderHistory , givingRate} from "@/hooks/useFetch";
+import { confirmOrder, fetchOrderHistory, givingRate } from "@/hooks/useFetch";
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -53,12 +53,12 @@ const OrderTrackingScreen = () => {
   const [confirmingId, setConfirmingId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-    const [hasRated, setHasRated] = useState(false);
+  const [hasRated, setHasRated] = useState(false);
   const [showModal, setShowModal] = useState(false);
-   const [stars, setStars] = useState(0);
-    const [comment, setComment] = useState("");
-    const [submitting, setSubmitting] = useState(false);
-const [rateOrderId, setRateOrderId] = useState(null);
+  const [stars, setStars] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [rateOrderId, setRateOrderId] = useState(null);
 
   const [activeTab, setActiveTab] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -104,9 +104,9 @@ const [rateOrderId, setRateOrderId] = useState(null);
 
       setActiveTab(0);
       Animated.spring(scrollX, {
-    toValue: 0,
-    useNativeDriver: true,
-  }).start();
+        toValue: 0,
+        useNativeDriver: true,
+      }).start();
     } catch (error) {
       console.error("Fetch error:", error);
     } finally {
@@ -136,7 +136,7 @@ const [rateOrderId, setRateOrderId] = useState(null);
       // setIsLoading(true)
       await confirmOrder(orderId);
       setRateOrderId(orderId);
-      setShowModal(true)  
+      setShowModal(true);
       await loadData(); // re‑fetch to update sections
     } catch (err) {
       console.error("Confirm failed", err);
@@ -414,7 +414,6 @@ const [rateOrderId, setRateOrderId] = useState(null);
                       {confirmingId === item.id ? t("waiting") : t("confirm")}
                     </Text>
                   </TouchableOpacity>
-              
                 </View>
               )}
           </View>
@@ -598,25 +597,29 @@ const [rateOrderId, setRateOrderId] = useState(null);
               renderSectionFooter={({ section }) => {
                 if (section.data.length === 0) {
                   return (
-                   <Animated.View 
-        style={styles.emptySectionContainer}
-        // entering={FadeIn.duration(600)}
-      >
-        {/* <View style={styles.emptyIllustration}>
+                    <Animated.View
+                      style={styles.emptySectionContainer}
+                      // entering={FadeIn.duration(600)}
+                    >
+                      {/* <View style={styles.emptyIllustration}>
           <MaterialIcons 
             name={tab === "active" ? "pending" : "check-circle"} 
             size={60} 
             color="#D1D5DB" 
           />
         </View> */}
-        <Text style={styles.emptySectionTitle}>
-          {t(`no${tab}delivery`)}
-        </Text>
-        {/* <Text style={styles.emptySectionText}>
+                      <Text style={styles.emptySectionTitle}>
+                        {tab === "active"
+                          ? t(`no${tab}delivery`)
+                          : tab === "missed"
+                          ? t(`nomissedelivery`)
+                          : t(`nocompletedelivery`)}
+                      </Text>
+                      {/* <Text style={styles.emptySectionText}>
           {t(`no${tab}deliverySubtitle`)}
         </Text> */}
-        
-        {/* {tab === "active" && (
+
+                      {/* {tab === "active" && (
           <TouchableOpacity 
             style={styles.exploreButton}
             onPress={() => navigation.navigate('Shop')}
@@ -626,7 +629,7 @@ const [rateOrderId, setRateOrderId] = useState(null);
             </Text>
           </TouchableOpacity>
         )} */}
-      </Animated.View>
+                    </Animated.View>
                   );
                 }
                 return null;
@@ -640,93 +643,91 @@ const [rateOrderId, setRateOrderId] = useState(null);
           </View>
         ))}
       </Animated.View>
-       {showModal && (
-      <Modal transparent visible={showModal} animationType="fade">
-        <View style={styles.backdrop}>
-          <View style={styles.modalCard}>
-            {/* Close Button */}
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => {
-                setShowModal(false);
-                setRateOrderId(null);
-                setStars(0);
-                setComment("");
-                // Now re-fetch orders so the status updates on screen:
-                loadData();
-              }}
-            >
-              <Ionicons name="close" size={24} color="#6B7280" />
-            </TouchableOpacity>
-
-            {/* Modal Content */}
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{t("rateExperience")}</Text>
-              <Text style={styles.modalSubtitle}>{t("rateSubtitle")}</Text>
-
-              <Rating
-                type="star"
-                ratingCount={5}
-                imageSize={40}
-                showRating={false}
-                startingValue={stars}
-                onFinishRating={setStars}
-                style={styles.rating}
-                ratingColor="#FFC107"
-                ratingBackgroundColor="#E5E7EB"
-              />
-
-              <TextInput
-                style={styles.commentInput}
-                placeholder={t("commentPlaceholder")}
-                placeholderTextColor="#9CA3AF"
-                value={comment}
-                onChangeText={setComment}
-                multiline
-                numberOfLines={4}
-              />
-
+      {showModal && (
+        <Modal transparent visible={showModal} animationType="fade">
+          <View style={styles.backdrop}>
+            <View style={styles.modalCard}>
+              {/* Close Button */}
               <TouchableOpacity
-                style={styles.submitButton}
-                onPress={async () => {
-                  if (!stars) return;
-                  setSubmitting(true);
-                  try {
-                    await givingRate(rateOrderId, stars, comment);
-                    setHasRated(true);
-                    Alert.alert(t("thankYou"), t("feedbackSubmitted"), [
-                      {
-                        text: "OK",
-                        onPress: () => {
-                          setShowModal(false);
-                          setRateOrderId(null);
-                          setStars(0);
-                          setComment("");
-                          loadData(); // refresh orders now that rating is done
-                        },
-                      },
-                    ]);
-                  } catch (error) {
-                    Alert.alert(t("error"), t("submitError"));
-                  } finally {
-                    setSubmitting(false);
-                  }
+                style={styles.closeButton}
+                onPress={() => {
+                  setShowModal(false);
+                  setRateOrderId(null);
+                  setStars(0);
+                  setComment("");
+                  // Now re-fetch orders so the status updates on screen:
+                  loadData();
                 }}
-                disabled={submitting}
               >
-                {submitting ? (
-                  <ActivityIndicator color="#FFF" />
-                ) : (
-                  <Text style={styles.submitText}>
-                    {t("submitRating")}
-                  </Text>
-                )}
+                <Ionicons name="close" size={24} color="#6B7280" />
               </TouchableOpacity>
+
+              {/* Modal Content */}
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>{t("rateExperience")}</Text>
+                <Text style={styles.modalSubtitle}>{t("rateSubtitle")}</Text>
+
+                <Rating
+                  type="star"
+                  ratingCount={5}
+                  imageSize={40}
+                  showRating={false}
+                  startingValue={stars}
+                  onFinishRating={setStars}
+                  style={styles.rating}
+                  ratingColor="#FFC107"
+                  ratingBackgroundColor="#E5E7EB"
+                />
+
+                <TextInput
+                  style={styles.commentInput}
+                  placeholder={t("commentPlaceholder")}
+                  placeholderTextColor="#9CA3AF"
+                  value={comment}
+                  onChangeText={setComment}
+                  multiline
+                  numberOfLines={4}
+                />
+
+                <TouchableOpacity
+                  style={styles.submitButton}
+                  onPress={async () => {
+                    if (!stars) return;
+                    setSubmitting(true);
+                    try {
+                      await givingRate(rateOrderId, stars, comment);
+                      setHasRated(true);
+                      Alert.alert(t("thankYou"), t("feedbackSubmitted"), [
+                        {
+                          text: "OK",
+                          onPress: () => {
+                            setShowModal(false);
+                            setRateOrderId(null);
+                            setStars(0);
+                            setComment("");
+                            loadData(); // refresh orders now that rating is done
+                          },
+                        },
+                      ]);
+                    } catch (error) {
+                      Alert.alert(t("error"), t("submitError"));
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  }}
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <ActivityIndicator color="#FFF" />
+                  ) : (
+                    <Text style={styles.submitText}>{t("submitRating")}</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-    )}
+        </Modal>
+      )}
     </View>
   );
 };
@@ -803,7 +804,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 17,
     fontWeight: "600",
-    width:"100%",
+    width: "100%",
     textAlign: "center",
   },
   itemRow: {
@@ -833,33 +834,33 @@ const styles = StyleSheet.create({
   // },
   emptySectionContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 40,
     paddingHorizontal: 30,
   },
   emptyIllustration: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     width: 120,
     height: 120,
     borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: "#E5E7EB",
   },
   emptySectionTitle: {
     fontSize: 20,
-    fontWeight: '600',
-    color: '#1F2937',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "#1F2937",
+    textAlign: "center",
     marginBottom: 8,
   },
   emptySectionText: {
     fontSize: 15,
-    color: '#6B7280',
-    textAlign: 'center',
+    color: "#6B7280",
+    textAlign: "center",
     lineHeight: 22,
     maxWidth: 300,
   },
@@ -1061,7 +1062,7 @@ const styles = StyleSheet.create({
     color: "#445399",
     marginBottom: 4,
     marginRight: 4,
-    width:"100%",
+    width: "100%",
     textAlign: "center",
     // backgroundColor: "red",
   },

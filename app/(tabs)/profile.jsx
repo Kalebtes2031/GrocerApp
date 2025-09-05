@@ -46,11 +46,11 @@ const ProfileScreen = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        first_name: user.first_name || "",
-        last_name: user.last_name || "",
-        username: user.username || "",
-        email: user.email || "",
-        phone_number: user.phone_number || "",
+        first_name: user?.first_name || "",
+        last_name: user?.last_name || "",
+        username: user?.username || "",
+        email: user?.email || "",
+        phone_number: user?.phone_number || "",
       });
     }
   }, [user]);

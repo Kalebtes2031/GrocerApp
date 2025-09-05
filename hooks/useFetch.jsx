@@ -1,29 +1,34 @@
-import axios from "axios";
 import Constants from "expo-constants";
 import { useNavigation } from "@react-navigation/native";
 // hooks/useFetch.js
+import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 
+// const baseUrl = "http://10.200.76.213:8000/";  //my data network
+// const baseUrl = "https://backendsupermarket.activetechet.com/";
 // const baseUrl = "https://malhibnewbackend.activetechet.com/";
 // const baseUrl = "http://192.168.227.193:8000/";  //active wifi authentication error or server error
-const baseUrl = "http://192.168.100.51:8000/";  //active wifi authentication error or server error
+// const baseUrl = "http://192.168.100.51:8000/";  //active wifi authentication error or server error
 // const baseUrl = "http://192.168.1.3:8000/"; //home wifi
 // const baseUrl = "http://192.168.65.193:8000/";  //my data network
-// const baseUrl = "http://192.168.8.17:8000/";  //my data network
 
-// npm i @react-native-picker/picker@2.9.0 expo@52.0.42 expo-constants@17.0.8 expo-location@18.0.10 expo-router@4.0.20 expo-system-ui@4.0.9 react-native@0.76.9 react-native-svg@15.8.0 jest-expo@52.0.6
-// const rawUrl = Constants.expoConfig?.extra?.apiUrl;
-// if (!rawUrl) {
-//     throw new Error(
-//       "No API URL defined—did you forget to set EXPO_PUBLIC_API_URL in your eas.json preview profile?"
-//     );
-//   }
-//   // ensure it ends with a slash
-//   const baseUrl = rawUrl.endsWith("/") ? rawUrl : `${rawUrl}/`;
+
+const rawUrl = Constants.expoConfig?.extra?.apiUrl;
+if (!rawUrl) {
+    throw new Error(
+      "No API URL defined"
+    );
+  }
+  // ensure it ends with a slash
+  const baseUrl = rawUrl.endsWith("/") ? rawUrl : `${rawUrl}/`;
   
 
 const auth = axios.create({
+  baseURL: baseUrl,
+});
+
+const authClient = axios.create({
   baseURL: baseUrl,
 });
 
@@ -74,6 +79,7 @@ export const setTokens = (accessToken, refreshToken) => {
   sessionStorage.setItem("refreshToken", refreshToken);
 };
 
+
 //it's work is just to remove tokens from the local storage
 // export const removeTokens = () => {
 //     sessionStorage.removeItem("accessToken");
@@ -97,6 +103,12 @@ export const removeTokens = async () => {
   }
 };
 
+export const POST_GOOGLE_AUTH = async ({ id_token }) => {
+  const response = await authClient.post("auth/google/", { id_token });
+  // response.data should be { access_token, refresh_token, user }
+  return response.data;
+};
+
 export const CREATE_NEW_USER = async (credentials) => {
   console.log("am i a problem:", credentials);
   const response = await auth.post("auth/users/", credentials);
@@ -118,6 +130,10 @@ export const RESET_PASSWORD = async (data) => {
 
 export const RESET_USER_PASSWORD = async (email) => {
   const response = await auth.post(`auth/users/reset_password/`, email);
+  return response.data;
+};
+export const SAVEEXPOPUSHTOKEN = async (token) => {
+  const response = await auth.post(`notification/save-expo-push-token/`, token);
   return response.data;
 };
 export const redirectToLogin = () => {
@@ -241,6 +257,12 @@ export const addToCart = async (variations_id, quantity) => {
   const response = await api.post("cart/items/", { variations_id, quantity });
   return response.data;
 };
+
+export const bulkAddToCart = async (items) => {
+  const response = await api.post("cart/items/bulk/", { items });
+  return response.data;
+};
+
 
 export const updateCartItem = async (itemId, quantity) => {
   const response = await api.patch(`cart/items/${itemId}/`, { quantity });
@@ -466,6 +488,64 @@ auth.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+auth.interceptors.request.use(
+  async (config) => {
+    if (
+      config.url.includes("auth/jwt/create/") ||
+      config.url.includes("auth/users/") ||
+      config.url.includes("account/register/")
+    ) {
+      return config; // Don't attach Authorization header for login, registration, etc.
+    }
+    const accessToken = await getAccessToken();
+    if (!accessToken) {
+      redirectToLogin();
+      return;
+    }
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    console.log("Request Headers:", config.headers); // Debug headers
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// response interceptors
+auth.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      const refreshToken = await AsyncStorage.getItem("refreshToken");
+      if (refreshToken) {
+        try {
+          originalRequest._retry = true; // Mark request as retried
+          const refreshResponse = await auth.post("auth/jwt/refresh/", {
+            refresh: refreshToken,
+          });
+          setTokens(refreshResponse.data.access, refreshToken);
+          originalRequest.headers[
+            "Authorization"
+          ] = `Bearer ${refreshResponse.data.access}`;
+          return auth.request(originalRequest);
+        } catch (refreshError) {
+          console.error("Token refresh failed:", refreshError);
+          redirectToLogin();
+        }
+      } else {
+        console.warn("No refresh token available; redirecting to login.");
+        redirectToLogin();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 
 pay.interceptors.request.use(
   async (config) => {

@@ -517,7 +517,9 @@ const Header = () => {
                     </View>
                   </View>
                   <Text style={{ color: "white" }}>
-                    {user?.first_name} {user?.last_name}
+                    {user?.first_name
+                      ? `${user.first_name} ${user.last_name}`
+                      : user?.username}
                   </Text>
                 </View>
                 <View style={{ marginRight: 10 }}>

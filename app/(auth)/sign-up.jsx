@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -11,14 +11,26 @@ import {
   TouchableOpacity,
   Linking,
   StyleSheet,
+  ActivityIndicator,
+  Animated,
 } from "react-native";
 import CustomButton from "@/components/CustomButton";
+import CheckBox from "@react-native-community/checkbox";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import Toast from "react-native-toast-message";
 import * as Font from "expo-font";
-import { CREATE_NEW_CUSTOMER } from "@/hooks/useFetch";
+import {
+  CREATE_NEW_CUSTOMER,
+  POST_GOOGLE_AUTH,
+  USER_PROFILE,
+} from "@/hooks/useFetch";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useTranslation } from "react-i18next";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import Constants from "expo-constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const { width } = Dimensions.get("window");
 
@@ -26,8 +38,8 @@ const SignUp = () => {
   const { t, i18n } = useTranslation("signup");
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
+    // firstName: "",
+    // lastName: "",
     phoneNumber: "",
     username: "",
     email: "",
@@ -37,12 +49,74 @@ const SignUp = () => {
   const [errors, setErrors] = useState({});
   const colorScheme = useColorScheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setUser, setIsLogged } = useGlobalContext();
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
-   const termsUrl =
-    i18n.language === 'en'
-      ? 'https://yasonsc.com/terms_and_conditions'
-      : 'https://yasonsc.com/terms_and_conditions_amh';
+  const [showConfirm, setShowConfirm] = useState(false);
 
+  const confirmOpacity = useRef(new Animated.Value(0)).current;
+  const confirmHeight = useRef(new Animated.Value(0)).current;
+
+  const scaleValue = new Animated.Value(0);
+  const animateCheckbox = () => {
+    Animated.spring(scaleValue, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Do this once on app load
+  GoogleSignin.configure({
+    // This is your Android OAuth client ID from app.json → extra.androidClientId
+    webClientId: Constants.expoConfig.extra.webClientId,
+    offlineAccess: false, // set true if you need a server refresh token
+    forceCodeForRefreshToken: false,
+  });
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoadingGoogle(true);
+
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      await GoogleSignin.signOut(); // clears the cached session
+
+      await GoogleSignin.signIn(); // native UI
+
+      // Pull the tokens, including idToken
+      const { idToken } = await GoogleSignin.getTokens();
+      if (!idToken) throw new Error("No ID token returned");
+
+      const tokens = await POST_GOOGLE_AUTH({ id_token: idToken });
+
+      await AsyncStorage.multiSet([
+        ["accessToken", tokens.access_token],
+        ["refreshToken", tokens.refresh_token],
+      ]);
+      const profile = await USER_PROFILE();
+      setUser(profile);
+      setIsLogged(true);
+      router.replace("/(tabs)/home");
+    } catch (error) {
+      console.error("Google signin error", error);
+      Toast.show({
+        type: "error",
+        text1: "Google Sign-In Failed",
+        text2: error.message || "Please try again.",
+      });
+    } finally {
+      setLoadingGoogle(false);
+    }
+  };
+
+  const termsUrl =
+    i18n.language === "en"
+      ? "https://yasonsc.com/terms_and_conditions"
+      : "https://yasonsc.com/terms_and_conditions_amh";
 
   const validate = () => {
     const errs = {};
@@ -76,11 +150,19 @@ const SignUp = () => {
 
   const handleSignUp = async () => {
     if (!validate()) return;
+    if (!isChecked) {
+      Toast.show({
+        type: "error",
+        text1: t("terms_required"),
+        visibilityTime: 3000,
+      });
+      return;
+    }
     setIsSubmitting(true);
     try {
       const payload = {
-        first_name: form.firstName,
-        last_name: form.lastName,
+        // first_name: form.firstName,
+        // last_name: form.lastName,
         phone_number: form.phoneNumber,
         username: form.username,
         email: form.email,
@@ -90,8 +172,8 @@ const SignUp = () => {
       if (response) {
         Toast.show({ type: "success", text1: t("account_created") });
         setForm({
-          firstName: "",
-          lastName: "",
+          // firstName: "",
+          // lastName: "",
           phoneNumber: "",
           username: "",
           email: "",
@@ -126,6 +208,24 @@ const SignUp = () => {
     return "An unknown error occurred.";
   };
 
+  useEffect(() => {
+    if (form.password.length > 0 && !showConfirm) {
+      setShowConfirm(true);
+      Animated.parallel([
+        Animated.timing(confirmHeight, {
+          toValue: 64, // Enough to contain the TextInput and padding
+          duration: 300,
+          useNativeDriver: false,
+        }),
+        Animated.timing(confirmOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [form.password]);
+
   return (
     <SafeAreaView
       edges={["left", "right", "bottom"]}
@@ -134,7 +234,7 @@ const SignUp = () => {
         backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
       }}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 4 }}>
         <Image
           source={require("@/assets/images/signup.png")}
           resizeMode="cover"
@@ -160,7 +260,7 @@ const SignUp = () => {
               fontWeight: "700",
               marginBottom: 16,
               color: "#445399",
-              fontFamily: "Poppins-Bold",
+              fontFamily: "Poppins-Medium",
             }}
             className="text-primary text-[20px] font-poppins-medium mb-4"
           >
@@ -168,7 +268,7 @@ const SignUp = () => {
           </Text>
 
           {/* Name Row */}
-          <View style={{ flexDirection: "row", gap: 16, marginBottom: 20 }}>
+          {/* <View style={{ flexDirection: "row", gap: 16, marginBottom: 20 }}>
             <View style={{ flex: 1 }}>
               <TextInput
                 style={{
@@ -188,7 +288,9 @@ const SignUp = () => {
                 onChangeText={(text) => setForm({ ...form, firstName: text })}
               />
               {errors.firstName && (
-                <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                <Text
+                  style={{ color: "red", marginTop: 4, textAlign: "center" }}
+                >
                   {errors.firstName}
                 </Text>
               )}
@@ -212,12 +314,14 @@ const SignUp = () => {
                 onChangeText={(text) => setForm({ ...form, lastName: text })}
               />
               {errors.lastName && (
-                <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+                <Text
+                  style={{ color: "red", marginTop: 4, textAlign: "center" }}
+                >
                   {errors.lastName}
                 </Text>
               )}
             </View>
-          </View>
+          </View> */}
 
           {/* Phone */}
           <View style={{ marginBottom: 20 }}>
@@ -239,7 +343,7 @@ const SignUp = () => {
               onChangeText={(text) => setForm({ ...form, phoneNumber: text })}
             />
             {errors.phoneNumber && (
-              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+              <Text style={{ color: "red", marginTop: 4, textAlign: "center" }}>
                 {errors.phoneNumber}
               </Text>
             )}
@@ -264,7 +368,7 @@ const SignUp = () => {
               onChangeText={(text) => setForm({ ...form, username: text })}
             />
             {errors.username && (
-              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+              <Text style={{ color: "red", marginTop: 4, textAlign: "center" }}>
                 {errors.username}
               </Text>
             )}
@@ -290,11 +394,12 @@ const SignUp = () => {
               onChangeText={(text) => setForm({ ...form, email: text })}
             />
             {errors.email && (
-              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>{errors.email}</Text>
+              <Text style={{ color: "red", marginTop: 4, textAlign: "center" }}>
+                {errors.email}
+              </Text>
             )}
           </View>
 
-          {/* Password */}
           <View style={{ marginBottom: 16, position: "relative" }}>
             <TextInput
               style={{
@@ -328,13 +433,22 @@ const SignUp = () => {
               />
             </TouchableOpacity>
             {errors.password && (
-              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+              <Text style={{ color: "red", marginTop: 4, textAlign: "center" }}>
                 {errors.password}
               </Text>
             )}
           </View>
-          {/* Confirm Password */}
-          <View style={{ marginBottom: 16, position: "relative" }}>
+
+          {/* Confirm Password (Animated) */}
+          <Animated.View
+            style={{
+              // marginBottom: 16,
+              position: "relative",
+              overflow: "hidden",
+              height: confirmHeight,
+              opacity: confirmOpacity,
+            }}
+          >
             <TextInput
               style={{
                 backgroundColor: colorScheme === "dark" ? "#1E1E1E" : "#FFF",
@@ -368,32 +482,42 @@ const SignUp = () => {
                 resizeMode="contain"
               />
             </TouchableOpacity>
+
             {errors.confirmPassword && (
-              <Text style={{ color: "red", marginTop: 4, textAlign:"center" }}>
+              <Text style={{ color: "red", marginTop: 4, textAlign: "center" }}>
                 {errors.confirmPassword}
               </Text>
             )}
-          </View>
+          </Animated.View>
 
           {/* Terms */}
-          <Text
-            style={{
-              fontSize: 12,
-              color: colorScheme === "dark" ? "#888" : "#666",
-              textAlign: "center",
-              marginBottom: 14,
-              lineHeight: 16,
-              paddingHorizontal: 24,
-            }}
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setIsChecked(!isChecked)}
           >
-            {t("by")} <Text onPress={() => Linking.openURL(termsUrl)} style={{ color: "#445399" }}>{t("by2")}</Text>
+            <View style={[styles.checkbox, isChecked && styles.checkedBox]}>
+              {isChecked && (
+                <Ionicons name="checkmark" size={16} color="#fff" />
+              )}
+            </View>
             <Text
-              className="text-primary underline"
-              onPress={() => router.push("/terms")}
+              style={[
+                styles.label,
+                colorScheme === "dark" ? styles.labelDark : styles.labelLight,
+              ]}
             >
-              {t("terms")}
+              {t("by")}{" "}
+              <Text
+                onPress={() => Linking.openURL(termsUrl)}
+                style={styles.link}
+              >
+                {t("by2")}
+              </Text>{" "}
+              <Text  >
+                {t("terms")}
+              </Text>
             </Text>
-          </Text>
+          </TouchableOpacity>
 
           <View
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -403,7 +527,7 @@ const SignUp = () => {
               containerStyles={{
                 backgroundColor: "#7E0201",
                 borderRadius: 12,
-                height: 48,
+                height: 50,
                 justifyContent: "center",
               }}
               textStyles={{ color: "#fff", fontSize: 16, fontWeight: "600" }}
@@ -411,13 +535,84 @@ const SignUp = () => {
               handlePress={handleSignUp}
             />
           </View>
+          {/* Horizontal Divider with "OR" */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 24,
+              marginHorizontal: 16,
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                height: 1,
+                backgroundColor: "#e2e8f0",
+              }}
+            />
+            <Text
+              style={{
+                color: "#94a3b8",
+                fontSize: 14,
+                fontWeight: "500",
+                marginHorizontal: 12,
+                letterSpacing: 0.5,
+              }}
+            >
+              {t("or")}
+            </Text>
+            <View
+              style={{
+                flex: 1,
+                height: 1,
+                backgroundColor: "#e2e8f0",
+              }}
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={handleGoogleLogin}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 10,
+              backgroundColor: "#fff",
+              borderRadius: 32,
+              justifyContent: "center",
+              borderWidth: 1,
+              borderColor: "#445399",
+              // marginTop: 16,
+            }}
+          >
+            {loadingGoogle ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <>
+                {/* <AntDesign
+                  name="google"
+                  size={20}
+                  color="#445399"
+                  style={{ marginRight: 8 }}
+                /> */}
+                <Image
+                  source={require("@/assets/images/google1.jpg")}
+                  resizeMode="cover"
+                  style={{ width: 24, height: 24, marginRight: 8 }}
+                />
+                <Text style={{ color: "#445399", fontWeight: "500" }}>
+                  {t("continue")}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
 
           <View
             style={{
               flexDirection: "row",
               justifyContent: "center",
               marginTop: 8,
-              gap:2,
+              gap: 4,
             }}
           >
             <Text
@@ -459,7 +654,52 @@ const responsiveSize = (size) => {
 };
 
 const styles = StyleSheet.create({
-  poweredBy: { alignItems: "center", marginTop: responsiveSize(10) },
+checkboxContainer: {
+  flexDirection: "row",
+  alignItems: "flex-start",
+  marginBottom: 20,
+  width: "100%",
+  paddingHorizontal: 10,
+},
+checkbox: {
+  width: 24,
+  height: 24,
+  borderWidth: 2,
+  borderColor: "#445399",
+  borderRadius: 5,
+  marginRight: 12,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "transparent",
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 2,
+  // elevation: 2,
+},
+checkedBox: {
+  backgroundColor: "#445399",
+  borderColor: "#445399",
+},
+label: {
+  fontSize: 14,
+  textAlign: "left",
+  lineHeight: 20,
+  flex: 1,
+  flexWrap: "wrap",
+},
+labelLight: {
+  color: "#666",
+},
+labelDark: {
+  color: "#888",
+},
+link: {
+  color: "#445399",
+  textDecorationLine: "underline",
+  fontWeight: "500",
+},
+  poweredBy: { alignItems: "center", marginTop: responsiveSize(28) },
   poweredText: {
     textAlign: "center",
     fontSize: responsiveSize(12),

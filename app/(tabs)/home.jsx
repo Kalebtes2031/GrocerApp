@@ -84,7 +84,7 @@ export default function HomeScreen() {
   const newestImages = async () => {
     try {
       const data = await fetchNewImages();
-      const firstFourNewestImages = data.slice(0, 4);
+      const firstFourNewestImages = data.slice(0, 8);
       // console.log('newest images: ', firstFourNewestImages)
       setNewImages(firstFourNewestImages);
     } catch (error) {
@@ -125,7 +125,7 @@ export default function HomeScreen() {
           popularity: v.popularity,
         },
       }));
-console.log("fearly show category", category);
+      console.log("fearly show category", category);
       setVeryPopular(products);
       console.log("Popular Products w/ Variations:", products);
     } catch (error) {
@@ -289,10 +289,10 @@ console.log("fearly show category", category);
           alignItems: "center",
           marginLeft: 24,
           gap: 6,
-          
+
           // marginTop: 6,
         }}
-        >
+      >
         <Text
           style={{
             fontSize: 16,
@@ -313,11 +313,14 @@ console.log("fearly show category", category);
             marginLeft: 4,
             marginBottom: 3,
             // backgroundColor:"red",
-            width:"60%",
+            width: "60%",
           }}
           className="italic ml-2 text-primary"
         >
-          {user?.first_name} {user?.last_name}?
+          {user?.first_name
+            ? `${user.first_name} ${user.last_name}`
+            : user?.username}
+          
         </Text>
       </View>
 
@@ -403,7 +406,12 @@ console.log("fearly show category", category);
             onPress={() => {
               route.push("/(tabs)/category");
             }}
-            style={{ backgroundColor: "#445399", borderRadius: 54, paddingHorizontal: 4, paddingVertical:3 }}
+            style={{
+              backgroundColor: "#445399",
+              borderRadius: 54,
+              paddingHorizontal: 4,
+              paddingVertical: 3,
+            }}
           >
             <Ionicons name="arrow-forward-sharp" size={24} color="white" />
           </TouchableOpacity>
@@ -533,7 +541,12 @@ console.log("fearly show category", category);
             onPress={() => {
               route.push("/(tabs)/shop");
             }}
-            style={{ backgroundColor: "#445399", borderRadius: 54, paddingHorizontal: 4, paddingVertical:3 }}
+            style={{
+              backgroundColor: "#445399",
+              borderRadius: 54,
+              paddingHorizontal: 4,
+              paddingVertical: 3,
+            }}
           >
             <Ionicons name="arrow-forward-sharp" size={24} color="white" />
           </TouchableOpacity>

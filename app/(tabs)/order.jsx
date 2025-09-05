@@ -25,6 +25,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Rating } from "react-native-ratings";
 import StarRow from "@/components/StarRow";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useCart } from "@/context/CartProvider";
 
 const COLORS = {
   primary: "#2D4150",
@@ -57,6 +58,7 @@ const Order = () => {
   const { t, i18n } = useTranslation("order");
   const route = useRouter();
   const { isLogged } = useGlobalContext();
+  const { reorderItems } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const colorScheme = useColorScheme();
@@ -65,6 +67,7 @@ const Order = () => {
   const [paymentType, setPaymentType] = useState("Direct Bank Payment");
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isReorderLoading, setIsReorderLoading] = useState(false);
 
   function formatDateOnly(dateString) {
     const dt = new Date(dateString);
@@ -118,7 +121,7 @@ const Order = () => {
   };
 
   const handleReschedule = async (orderId) => {
-    // setConfirmingId(orderId);
+    setIsLoading(true);
     try {
       setIsLoading(true);
       route.push(
@@ -339,6 +342,7 @@ const Order = () => {
               textAlign: "start",
               alignItems: "start",
               // backgroundColor:"red",
+              width: "auto",
             }}
           >
             <Text
@@ -348,6 +352,7 @@ const Order = () => {
                 color: "#445399",
                 textAlign: "flex-end",
                 alignItems: "flex-end",
+                // width: "180px"
               }}
             >
               {order.need_delivery ? t("need_delivery") : t("self_pickup")}
@@ -480,24 +485,47 @@ const Order = () => {
           </View>
 
           {/* Payment Action Button */}
-          {order.payment_status === "Pending"&& 
-          order.payment_option==="Cash" && (
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.fullPayment]}
-                onPress={() =>
-                  openModal(
-                    order.id,
-                    "full_payment",
-                    order.total,
-                    order.need_delivery
-                  )
-                }
-              >
-                <Text style={styles.buttonText}>{t("full")}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {order.payment_status === "Pending" &&
+            order.payment_option === "Cash" && (
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.fullPayment]}
+                  onPress={() =>
+                    openModal(
+                      order.id,
+                      "full_payment",
+                      order.total,
+                      order.need_delivery
+                    )
+                  }
+                >
+                  <Text style={styles.buttonText}>{t("full")}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+          <TouchableOpacity
+           onPress={()=> handleReorder(order)} 
+            disabled={isReorderLoading} 
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              gap: 8,
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 8,
+              padding: 12,
+              backgroundColor: "#445399",
+              borderRadius: 68,
+            }}
+          >
+            {isReorderLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+            <Text style={{ color: "white" }}>Reorder</Text>
+              )}
+            </TouchableOpacity>
+
           {order.rating?.stars != null &&
             typeof order.rating?.stars === "number" && (
               <View style={{ marginTop: 8 }}>
@@ -507,6 +535,18 @@ const Order = () => {
         </View>
       </View>
     ));
+  };
+
+  const handleReorder = async (orders) => {
+    try {
+      setIsReorderLoading(true);
+      await reorderItems(orders);
+      route.push("/(tabs)/cartscreen"); // navigate user to cart
+    } catch (error) {
+      setError("Error reordering items. Please try again later.");
+    } finally {
+      setIsReorderLoading(false);
+    }
   };
 
   return (

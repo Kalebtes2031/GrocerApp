@@ -28,8 +28,18 @@ import { LanguageProvider } from "@/context/LanguageProvider";
 import { View } from "react-native";
 import { Text } from "react-native";
 import { FA5Style } from "@expo/vector-icons/build/FontAwesome5";
-// import NetInfo from "@react-native-community/netinfo";
+import NetInfo from "@react-native-community/netinfo";
 import { useTranslation } from "react-i18next";
+import { NotificationProvider } from "@/context/NotificationContext";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,45 +73,45 @@ export default function RootLayout() {
   //   return () => unsubscribe();
   // }, []);
 
-  // useEffect(() => {
-  //   // 1. Check the **initial** state
-  //   NetInfo.fetch().then((state) => {
-  //     if (!state.isConnected) {
-  //       Toast.show({
-  //         type: "error",
-  //         text1: t("no_internet"),
-  //         text2: t("check_connection"),
-  //         position: "top",
-  //         autoHide: false,
-  //       });
-  //     }
-  //   });
+  useEffect(() => {
+    // 1. Check the **initial** state
+    NetInfo.fetch().then((state) => {
+      if (!state.isConnected) {
+        Toast.show({
+          type: "error",
+          text1: t("no_internet"),
+          text2: t("check_connection"),
+          position: "top",
+          autoHide: false,
+        });
+      }
+    });
 
-  //   // 2. Then subscribe to changes
-  //   const unsubscribe = NetInfo.addEventListener((state) => {
-  //     if (!state.isConnected) {
-  //       // if we go offline later
-  //       Toast.show({
-  //         type: "error",
-  //         text1: t("no_internet"),
-  //         text2: t("check_connection"),
-  //         position: "top",
-  //         autoHide: false,
-  //       });
-  //     } else {
-  //       // back online
-  //       Toast.hide();
-  //       Toast.show({
-  //         type: "success",
-  //         text1: t("back_online"),
-  //         position: "top",
-  //         visibilityTime: 2000,
-  //       });
-  //     }
-  //   });
+    // 2. Then subscribe to changes
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      if (!state.isConnected) {
+        // if we go offline later
+        Toast.show({
+          type: "error",
+          text1: t("no_internet"),
+          text2: t("check_connection"),
+          position: "top",
+          autoHide: false,
+        });
+      } else {
+        // back online
+        Toast.hide();
+        Toast.show({
+          type: "success",
+          text1: t("back_online"),
+          position: "top",
+          visibilityTime: 2000,
+        });
+      }
+    });
 
-  //   return () => unsubscribe();
-  // }, [t]);
+    return () => unsubscribe();
+  }, []);
 
   if (!fontsLoaded) {
     return null; // Show loading screen/image here
@@ -141,58 +151,60 @@ export default function RootLayout() {
           {/* <Header /> */}
 
           <ErrorBoundary>
-            <GlobalProvider>
-              <CartProvider>
-                <WatchlistProvider>
-                  <LanguageProvider>
-                    {/* <SearchComp /> */}
-                    <Stack>
-                      <Stack.Screen
-                        name="(auth)"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="(tabs)"
-                        options={{ headerShown: false }}
-                      />
-                      <Stack.Screen
-                        name="index"
-                        options={{ headerShown: false }}
-                      />
+            <WatchlistProvider>
+              <GlobalProvider>
+                <NotificationProvider>
+                  <CartProvider>
+                    <LanguageProvider>
+                      {/* <SearchComp /> */}
+                      <Stack>
+                        <Stack.Screen
+                          name="(auth)"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="(tabs)"
+                          options={{ headerShown: false }}
+                        />
+                        <Stack.Screen
+                          name="index"
+                          options={{ headerShown: false }}
+                        />
 
-                      <Stack.Screen
-                        name="carddetail"
-                        options={{
-                          headerShown: false,
-                        }}
-                      />
-                      <Stack.Screen
-                        name="cartscreen"
-                        options={{
-                          headerShown: false,
-                        }}
-                      />
-                      <Stack.Screen
-                        name="checkout"
-                        options={{
-                          headerShown: false,
-                        }}
-                      />
-                      <Stack.Screen
-                        name="directpayment"
-                        options={{
-                          headerShown: false,
-                        }}
-                      />
+                        <Stack.Screen
+                          name="carddetail"
+                          options={{
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="cartscreen"
+                          options={{
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="checkout"
+                          options={{
+                            headerShown: false,
+                          }}
+                        />
+                        <Stack.Screen
+                          name="directpayment"
+                          options={{
+                            headerShown: false,
+                          }}
+                        />
 
-                      <Stack.Screen name="+not-found" />
-                    </Stack>
-                    {/* <Toast /> */}
-                    <Toast config={toastConfig} />
-                  </LanguageProvider>
-                </WatchlistProvider>
-              </CartProvider>
-            </GlobalProvider>
+                        <Stack.Screen name="+not-found" />
+                      </Stack>
+                      {/* <Toast /> */}
+                      <Toast config={toastConfig} />
+                    </LanguageProvider>
+                  </CartProvider>
+                </NotificationProvider>
+              </GlobalProvider>
+            </WatchlistProvider>
           </ErrorBoundary>
           <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         </SafeAreaView>

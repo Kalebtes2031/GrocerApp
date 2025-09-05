@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useMemo  } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
+  TextInput,
   Image,
   ScrollView,
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
   ActivityIndicator,
-  Dimensions, 
+  Dimensions,
   Platform,
 } from "react-native";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,8 +21,8 @@ import Toast from "react-native-toast-message";
 import { useWatchlist } from "@/context/WatchlistProvider";
 import { useTranslation } from "react-i18next";
 
- const { width, height } = Dimensions.get("window");
-  const scale = (size) => (width / 375) * size; 
+const { width, height } = Dimensions.get("window");
+const scale = (size) => (width / 375) * size;
 
 const CartScreen = () => {
   const { t, i18n } = useTranslation("cartscreen");
@@ -40,11 +41,12 @@ const CartScreen = () => {
   const items = cart?.items ?? [];
   const total = cart?.total ?? 0;
   const [globalLoading, setGlobalLoading] = useState(false);
- 
+  const [inputQuantities, setInputQuantities] = useState({});
+
   const orderedItems = useMemo(() => {
-  const idMap = new Map(items.map((item) => [item.variations.id, item]));
-  return itemOrder.map((id) => idMap.get(id)).filter(Boolean);
-}, [items, itemOrder]);
+    const idMap = new Map(items.map((item) => [item.variations.id, item]));
+    return itemOrder.map((id) => idMap.get(id)).filter(Boolean);
+  }, [items, itemOrder]);
 
   const handleQuantityUpdate = async (itemId, newQuantity) => {
     if (newQuantity <= 0) return;
@@ -71,7 +73,9 @@ const CartScreen = () => {
 
     try {
       setLocalLoading(itemId);
-      await updateItemQuantity(itemId, newQuantity);
+      const see = await updateItemQuantity(itemId, newQuantity);
+      console.log("see", see.quantity);
+      // 3) make the API call:
       Toast.show({ type: "success", text1: t("cartupdated") });
     } catch (error) {
       // 4) rollback if the API call fails
@@ -123,7 +127,6 @@ const CartScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      
       {cart.total === 0 ? (
         <View>
           <View style={styles.headerContainer}>
@@ -208,7 +211,7 @@ const CartScreen = () => {
             {/* <Header /> */}
             <View style={styles.headerContainer}>
               <TouchableOpacity
-                onPress={() => router.push('/(tabs)/shop')}
+                onPress={() => router.push("/(tabs)/shop")}
                 style={{
                   marginHorizontal: 10,
                   paddingHorizontal: 2,
@@ -295,12 +298,14 @@ const CartScreen = () => {
 
                     <View style={styles.quantityContainer}>
                       <TouchableOpacity
-                        onPress={() =>
-                          handleQuantityUpdate(
-                            item.variations.id,
-                            item.quantity - 1
-                          )
-                        }
+                        onPress={() => {
+                          const newQty = item.quantity - 1;
+                          setInputQuantities((prev) => ({
+                            ...prev,
+                            [item.variations.id]: newQty.toString(),
+                          }));
+                          handleQuantityUpdate(item.variations.id, newQty);
+                        }}
                         disabled={
                           localLoading === item.variations.id ||
                           item.quantity === 1
@@ -317,15 +322,90 @@ const CartScreen = () => {
                         )}
                       </TouchableOpacity>
 
-                      <Text style={styles.quantity}>{item.quantity}</Text>
-
-                      <TouchableOpacity
-                        onPress={() =>
+                      {/* <Text style={styles.quantity}>{item.quantity}</Text> */}
+                      <TextInput
+                        style={styles.quantityInput}
+                        keyboardType="numeric"
+                        value={
+                          inputQuantities[item.variations.id]?.toString() ??
+                          item.quantity.toString()
+                        }
+                        onChangeText={(text) => {
+                          const updated = {
+                            ...inputQuantities,
+                            [item.variations.id]: text,
+                          };
+                          setInputQuantities(updated);
+                        }}
+                        onBlur={() => {
                           handleQuantityUpdate(
                             item.variations.id,
-                            item.quantity + 1
-                          )
-                        }
+                            inputQuantities[item.variations.id] ?? item.quantity
+                          );
+                        }}
+                        editable={localLoading !== item.variations.id}
+                        maxLength={3}
+                      />
+                      {/* <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <TextInput
+                          style={styles.quantityInput}
+                          keyboardType="numeric"
+                          value={
+                            inputQuantities[item.variations.id]?.toString() ??
+                            item.quantity.toString()
+                          }
+                          onChangeText={(text) => {
+                            const updated = {
+                              ...inputQuantities,
+                              [item.variations.id]: text,
+                            };
+                            setInputQuantities(updated);
+                          }}
+                          editable={localLoading !== item.variations.id}
+                          maxLength={3}
+                        />
+                        <TouchableOpacity
+                          onPress={() =>
+                            handleQuantityUpdate(
+                              item.variations.id,
+                              inputQuantities[item.variations.id] ??
+                                item.quantity
+                            )
+                          }
+                          disabled={
+                            localLoading === item.variations.id ||
+                            inputQuantities[item.variations.id] === undefined ||
+                            inputQuantities[item.variations.id] ===
+                              item.quantity.toString()
+                          }
+                        >
+                          {localLoading === item.variations.id ? (
+                            <ActivityIndicator size="small" color="#000" />
+                          ) : (
+                            <Ionicons
+                              name="checkmark-circle"
+                              size={22}
+                              color="#445399"
+                            />
+                          )}
+                        </TouchableOpacity>
+                      </View> */}
+
+                      <TouchableOpacity
+                        onPress={() => {
+                          const newQty = item.quantity + 1;
+                          setInputQuantities((prev) => ({
+                            ...prev,
+                            [item.variations.id]: newQty.toString(),
+                          }));
+                          handleQuantityUpdate(item.variations.id, newQty);
+                        }}
                         disabled={localLoading === item.variations.id}
                       >
                         {localLoading === item.variations.id ? (
@@ -486,8 +566,19 @@ const responsive = {
   heightPercentage: (percentage) => (height * percentage) / 100,
 };
 
-
 const styles = StyleSheet.create({
+  quantityInput: {
+    width: 40,
+    height: 30,
+    borderColor: "#445399",
+    borderWidth: 1,
+    borderRadius: 4,
+    textAlign: "center",
+    color: "#445399",
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    ...responsive.fontSize(14),
+  },
   modalOverlay: {
     position: "absolute",
     top: 0,
@@ -521,7 +612,7 @@ const styles = StyleSheet.create({
     // justifyContent: "space-between",
     // alignItems: "center",
     // paddingHorizontal: 10,
-     height: scale(50),
+    height: scale(50),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -588,28 +679,28 @@ const styles = StyleSheet.create({
     // height: 100,
     // borderRadius: 20,
     // marginRight: 16,
-     width: responsive.widthPercentage(25),
+    width: responsive.widthPercentage(25),
     height: responsive.widthPercentage(25),
     borderRadius: scale(8),
     marginRight: scale(10),
   },
   detailsContainer: {
     // flexDirection: "column",
-      flex: 1,
+    flex: 1,
     marginLeft: scale(2),
   },
   productName: {
-     ...responsive.fontSize(14),
+    ...responsive.fontSize(14),
     flexShrink: 1,
     marginBottom: scale(4),
-    color:"#445399",
+    color: "#445399",
   },
   price: {
     // fontSize: 14,
     // color: "#666",
     ...responsive.fontSize(14),
     marginVertical: scale(4),
-    color:"#445399",
+    color: "#445399",
   },
   quantityContainer: {
     flexDirection: "row",
@@ -623,7 +714,7 @@ const styles = StyleSheet.create({
     // minWidth: 24,
     // textAlign: "center",
     color: "#445399",
-     ...responsive.fontSize(16),
+    ...responsive.fontSize(16),
     marginHorizontal: scale(8),
   },
   quantityText: {

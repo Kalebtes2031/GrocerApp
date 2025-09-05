@@ -18,7 +18,7 @@ const CustomButton = ({
       disabled={isLoading}
       style={{
         backgroundColor: "#445399",
-        height: 42,
+        height: 46,
         borderRadius: 32,
         width: 304,
         flexDirection: "row",

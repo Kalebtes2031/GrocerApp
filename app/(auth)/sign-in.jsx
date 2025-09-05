@@ -13,12 +13,13 @@ import {
   Dimensions,
   Linking,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Entypo, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
 import { useGlobalContext } from "@/context/GlobalProvider";
-import { GET_AUTH, USER_PROFILE } from "@/hooks/useFetch";
+import { GET_AUTH, POST_GOOGLE_AUTH, USER_PROFILE } from "@/hooks/useFetch";
 import { useRouter } from "expo-router";
 import FormField from "@/components/FormField";
 import CustomButton from "@/components/CustomButton";
@@ -27,13 +28,16 @@ import * as SecureStore from "expo-secure-store";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useTranslation } from "react-i18next";
 import { mapAuthError } from "@/utils/errorMapping";
-
+import { AntDesign } from "@expo/vector-icons";
+// import * as AuthSession from "expo-auth-session";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import Constants from "expo-constants";
 
 const { width, height } = Dimensions.get("window");
 
 const SignIn = () => {
   const { t, i18n } = useTranslation("signin");
-   const { t: tError } = useTranslation("errormessage");
+  const { t: tError } = useTranslation("errormessage");
   const router = useRouter();
   const colorScheme = useColorScheme();
   const { setUser, setIsLogged } = useGlobalContext();
@@ -45,6 +49,53 @@ const SignIn = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [currentLanguage, setCurrentLanguage] = useState("EN");
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+
+  // Do this once on app load
+  GoogleSignin.configure({
+    // This is your Android OAuth client ID from app.json → extra.androidClientId
+    webClientId: Constants.expoConfig.extra.webClientId,
+    offlineAccess: false, // set true if you need a server refresh token
+    forceCodeForRefreshToken: false,
+  });
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoadingGoogle(true);
+
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      await GoogleSignin.signOut(); // clears the cached session
+
+      await GoogleSignin.signIn(); // native UI
+
+      // Pull the tokens, including idToken
+      const { idToken } = await GoogleSignin.getTokens();
+      if (!idToken) throw new Error("No ID token returned");
+
+      const tokens = await POST_GOOGLE_AUTH({ id_token: idToken });
+
+      await AsyncStorage.multiSet([
+        ["accessToken", tokens.access_token],
+        ["refreshToken", tokens.refresh_token],
+      ]);
+      const profile = await USER_PROFILE();
+      setUser(profile);
+      setIsLogged(true);
+      router.replace("/(tabs)/home");
+    } catch (error) {
+      console.error("Google signin error", error);
+      Toast.show({
+        type: "error",
+        text1: "Google Sign-In Failed",
+        text2: error.message || "Please try again.",
+      });
+    } finally {
+      setLoadingGoogle(false);
+    }
+  };
 
   const submit = async () => {
     if (!form.login || !form.password) {
@@ -85,22 +136,23 @@ const SignIn = () => {
 
       setIsLogged(true);
     } catch (error) {
-    //  console.error("Sign-in error:", error.response?.data || error.message);
+      //  console.error("Sign-in error:", error.response?.data || error.message);
 
-    // Pull the server’s string (your view returns { error: "…"}).
-    const raw = error.response?.data?.error || error.response?.data?.detail || "";
-  const { title, message } = mapAuthError(raw, tError);
+      // Pull the server’s string (your view returns { error: "…"}).
+      const raw =
+        error.response?.data?.error || error.response?.data?.detail || "";
+      const { title, message } = mapAuthError(raw, tError);
 
-  Toast.show({
-    type:  "error",
-    text1: title,
-    text2: message,
-    position: "top",
-  });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+      Toast.show({
+        type: "error",
+        text1: title,
+        text2: message,
+        position: "top",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     async function checkOnboarding() {
@@ -194,6 +246,77 @@ const SignIn = () => {
             />
           </View>
 
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 24,
+              marginHorizontal: 16,
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                height: 1,
+                backgroundColor: "#e2e8f0",
+              }}
+            />
+            <Text
+              style={{
+                color: "#94a3b8",
+                fontSize: 14,
+                fontWeight: "500",
+                marginHorizontal: 12,
+                letterSpacing: 0.5,
+              }}
+            >
+              {t("or")}
+            </Text>
+            <View
+              style={{
+                flex: 1,
+                height: 1,
+                backgroundColor: "#e2e8f0",
+              }}
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={handleGoogleLogin}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              padding: 10,
+              backgroundColor: "#fff",
+              borderRadius: 32,
+              justifyContent: "center",
+              borderWidth: 1,
+              borderColor: "#445399",
+              // marginTop: 16,
+            }}
+          >
+            {loadingGoogle ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <>
+                {/* <AntDesign
+                           name="google"
+                           size={20}
+                           color="#445399"
+                           style={{ marginRight: 8 }}
+                         /> */}
+                <Image
+                  source={require("@/assets/images/google1.jpg")}
+                  resizeMode="cover"
+                  style={{ width: 24, height: 24, marginRight: 8 }}
+                />
+                <Text style={{ color: "#445399", fontWeight: "500" }}>
+                  {t("continue")}
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
+
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>{t("dont")} </Text>
             <Link href="/sign-up" style={styles.signupLink}>
@@ -269,12 +392,12 @@ const styles = StyleSheet.create({
     paddingVertical: responsiveSize(12),
   },
   scrollContent: {
-    paddingBottom: responsiveSize(10),
+    paddingBottom: responsiveSize(0),
   },
   title: {
     fontSize: responsiveSize(22),
     fontFamily: "Poppins-Medium",
-    color: "#111827",
+    color: "#445399",
     marginTop: responsiveSize(10),
     textAlign: "center",
   },
@@ -309,6 +432,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  buttonContainers: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: responsiveSize(16),
+  },
   button: {
     backgroundColor: "#7E0201",
     borderRadius: responsiveSize(12),
@@ -321,14 +450,14 @@ const styles = StyleSheet.create({
   signupContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: responsiveSize(24),
-    marginBottom: responsiveSize(50),
+    marginTop: responsiveSize(20),
+    marginBottom: responsiveSize(30),
   },
   signupText: {
     color: "#4b5563",
     fontFamily: "Poppins-Regular",
     fontSize: responsiveSize(14),
-    marginTop:2
+    marginTop: 2,
   },
   signupLink: {
     color: "#445399",
@@ -337,7 +466,7 @@ const styles = StyleSheet.create({
   },
   poweredBy: {
     alignItems: "center",
-    marginTop: responsiveSize(10),
+    // marginTop: responsiveSize(10),
   },
   poweredText: {
     textAlign: "center",
