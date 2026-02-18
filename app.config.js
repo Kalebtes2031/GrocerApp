@@ -5,7 +5,11 @@ export default ({ config }) => ({
   extra: {
     ...config.extra,
     apiUrl: process.env.API_URL,
-    androidClientId: config.extra.androidClientId,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    eas: {
+      projectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID,
+    },
   },
 
   plugins: [

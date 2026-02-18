@@ -6,13 +6,13 @@ import { getDatabase } from "firebase/database"; // Import Realtime Database if 
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBio2dIbgE-nFegeTKVNuuzFxmX9VBuYG8",
-  authDomain: "yason-7c405.firebaseapp.com",
-  projectId: "yason-7c405",
-  storageBucket: "yason-7c405.firebasestorage.app",
-  messagingSenderId: "704310350921",
-  appId: "1:704310350921:web:c0a7b7a44dd37faaa61b98",
-  measurementId: "G-D0JTF4SRZ9"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

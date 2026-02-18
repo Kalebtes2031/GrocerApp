@@ -58,10 +58,6 @@ const {
 // import MapboxGL from "@rnmapbox/maps"; // Import MapboxGL from '@rnmapbox/maps'; // Ensure you have the correct import for your version
 import debounce from "lodash.debounce";
 
-// MapboxGL.setAccessToken(
-//   "pk.eyJ1IjoiYW5kdWFsZW1hY3RpdmUiLCJhIjoiY205ZHdkMXJ0MGhlMTJpcXQ4bzgyYjFnZiJ9.Lhg5WUbonFe4mhCmEpSUKg"
-// );
-
 const ETHIOPIAN_MONTHS_AM = [
   "መስከረም",
   "ጥቅምት",
@@ -125,10 +121,10 @@ const ScheduleDeliveryScreen = () => {
   const fetchPlaceName = async ({ latitude, longitude }, langPriority) => {
     const resp = await fetch(
       `https://nominatim.openstreetmap.org/reverse?` +
-        `format=json` +
-        `&lat=${latitude}&lon=${longitude}` +
-        `&addressdetails=1` +
-        `&accept-language=${langPriority}`,
+      `format=json` +
+      `&lat=${latitude}&lon=${longitude}` +
+      `&addressdetails=1` +
+      `&accept-language=${langPriority}`,
       {
         headers: {
           "User-Agent": "Yason/1.0",
@@ -178,8 +174,8 @@ const ScheduleDeliveryScreen = () => {
   const cameraCenter = selectedLocation
     ? [selectedLocation.longitude, selectedLocation.latitude]
     : locationChoice === "current" && currentLocation
-    ? [currentLocation.longitude, currentLocation.latitude]
-    : addis;
+      ? [currentLocation.longitude, currentLocation.latitude]
+      : addis;
 
   const screenWidth = Dimensions.get("window").width;
   const responsiveWidth = (percentage) => screenWidth * (percentage / 100);
@@ -227,11 +223,11 @@ const ScheduleDeliveryScreen = () => {
     try {
       const resp = await fetch(
         `https://nominatim.openstreetmap.org/search?` +
-          `format=json&limit=10` +
-          `&accept-language=am,en` +
-          `&viewbox=${ADDIS_VIEWBOX.join(",")}` +
-          `&bounded=1` +
-          `&q=${encodeURIComponent(q)}`,
+        `format=json&limit=10` +
+        `&accept-language=am,en` +
+        `&viewbox=${ADDIS_VIEWBOX.join(",")}` +
+        `&bounded=1` +
+        `&q=${encodeURIComponent(q)}`,
         { headers: { "User-Agent": "Yason/1.0", Accept: "application/json" } }
       );
       const data = await resp.json();
@@ -394,10 +390,10 @@ const ScheduleDeliveryScreen = () => {
       console.log("Backend responded with:", err.response?.data);
       setError(
         err.response?.data?.detail ||
-          err.response?.data?.scheduled_delivery?.[0] ||
-          err.response?.data?.customer_latitude?.[0] ||
-          err.response?.data?.customer_longitude?.[0] ||
-          t("failed_to_schedule")
+        err.response?.data?.scheduled_delivery?.[0] ||
+        err.response?.data?.customer_latitude?.[0] ||
+        err.response?.data?.customer_longitude?.[0] ||
+        t("failed_to_schedule")
       );
     } finally {
       setLoading(false);
@@ -744,9 +740,9 @@ const ScheduleDeliveryScreen = () => {
                   ]}
                   anchor={{ x: 0.5, y: 1 }}
                 >
-                   <View style={[styles.pin, { backgroundColor: "#445399" }]}>
-            <Entypo name="location-pin" size={28} color="#fff" />
-          </View>
+                  <View style={[styles.pin, { backgroundColor: "#445399" }]}>
+                    <Entypo name="location-pin" size={28} color="#fff" />
+                  </View>
                 </MarkerView>
               )}
             </MapView>
@@ -820,8 +816,10 @@ const ScheduleDeliveryScreen = () => {
                 style={styles.header}
                 activeOpacity={0.7}
               >
-                <Text style={{fontSize: 16,
-    color: "#333",}}>
+                <Text style={{
+                  fontSize: 16,
+                  color: "#333",
+                }}>
                   {renderDateHeader()}
                 </Text>
                 <MaterialIcons
@@ -955,12 +953,12 @@ const ScheduleDeliveryScreen = () => {
               borderWidth: 1,
               borderColor: "#fff",
               marginBottom: 8,
-              height:50,
-               shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 12,
+              height: 50,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 12,
             }}
             activeOpacity={0.7}
           >
@@ -1067,7 +1065,7 @@ const ScheduleDeliveryScreen = () => {
                   //   color="#fff"
                   //   style={{ marginRight: 10 }}
                   // />
-                  <MaterialCommunityIcons name="truck-delivery" size={20} color="#fff" style={{ marginRight: 10 }}/>
+                  <MaterialCommunityIcons name="truck-delivery" size={20} color="#fff" style={{ marginRight: 10 }} />
                 )}
                 <Text
                   style={{
@@ -1209,7 +1207,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 1,
     borderColor: "#ddd",
-    backgroundColor:"red"
+    backgroundColor: "red"
   },
   dropdownHeaderText: {
     fontSize: 16,
