@@ -41,7 +41,17 @@ cd GrocerApp
    npm install
    ```
 
-### 3. Start the Expo app
+### 3. Environment Setup
+
+   Copy the example environment file and fill in your values:
+
+   ```bash
+   cp .env.example .env.production
+   ```
+   
+   > **Note:** You will need to obtain Firebase configuration keys and Google Client IDs to run the app successfully.
+
+### 4. Start the Expo app
 
    ```bash
    npx expo start
