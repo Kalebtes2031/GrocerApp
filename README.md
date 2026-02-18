@@ -51,6 +51,9 @@ cd GrocerApp
    
    > **Note:** You will need to obtain Firebase configuration keys and Google Client IDs to run the app successfully.
 
+   **For Android:**
+   Download your `google-services.json` file from the Firebase Console (Project Settings > General > Your apps) and place it in the `GrocerApp` root directory (next to `app.json`).
+
 ### 4. Start the Expo app
 
    ```bash

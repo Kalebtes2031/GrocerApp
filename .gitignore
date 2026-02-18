@@ -17,6 +17,13 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+google-services.json
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
 
 # Metro
 .metro-health-check*
@@ -31,7 +38,6 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
 .env.development
 .env.production
 
